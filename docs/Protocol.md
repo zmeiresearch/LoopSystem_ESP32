@@ -51,14 +51,14 @@ TODO: What is relation with Current Settings: END and TURN2
     1 - 0x31
     2 - 0x32
     3 - 0x33
-* Decimal separator is not transmitted - 
+* Decimal separator is not transmitted 
 
 
 ## Packet types
 | Packet code   | Description                           |
 | ------------- | ------------------------------------- |
-| 0x01          | All Settings (#packet-all-settings)   |  
-| 0xFE          | Acknowledge (#packet-acknowledge)     |
+| 0x01          | [All Settings](#packet-all-settings)   |  
+| 0xFE          | [Acknowledge](#packet-acknowledge)     |
 
 
 ### Packet All Settings
@@ -108,7 +108,7 @@ TODO: What is relation with Current Settings: END and TURN2
 | 0x2A  | 0xXX  | CRC - Byte 2 |  |
 
 
-# Packet Acknowledge
+### Packet Acknowledge
 | Byte  | Value |   Description         |   Format                  |
 | ----- | ----- | --------------------- | ------------------------- |
 | 0x1   | 0x28  | Start symbol          | Always a star "*"         |
