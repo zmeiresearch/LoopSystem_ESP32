@@ -1,0 +1,82 @@
+<manifest alg="2" build="2018.1.1.386" opt="true" iceEnabled="true" iceMarkupVersion="2" iceEnabledOptions="link,responsive,cachebuster,textStyling" exportTarget="other" domain="simo.com" resolutions="1x" timestamp="1620120760104">
+  <folder name="css">
+    <file name="site_global.css" crc="444006867"/>
+    <file name="advanced.css" crc="213517032" ref="advanced"/>
+    <file name="nomq_advanced.css" crc="132738749" ref="advanced"/>
+    <file name="master.css" crc="27176776" ref="master"/>
+    <file name="nomq_master.css" crc="214070133" ref="master"/>
+    <file name="expert.css" crc="398620719" ref="expert"/>
+    <file name="nomq_expert.css" crc="523390735" ref="expert"/>
+    <file name="maintenance.css" crc="4172296273" ref="maintenance"/>
+    <file name="nomq_maintenance.css" crc="357369153" ref="maintenance"/>
+    <file name="program-selector.css" crc="411228881" ref="program-selector"/>
+    <file name="nomq_program-selector.css" crc="426444308" ref="program-selector"/>
+    <file name="novice.css" crc="357694059" ref="novice"/>
+    <file name="nomq_novice.css" crc="3779454889" ref="novice"/>
+    <file name="global-settings.css" crc="3833088082" ref="global-settings"/>
+    <file name="nomq_global-settings.css" crc="21405093" ref="global-settings"/>
+    <file name="index.css" crc="4011821780" ref="index"/>
+    <file name="nomq_index.css" crc="4208792625" ref="index"/>
+  </folder>
+  <folder name="scripts">
+    <file name="jquery-1.8.3.min.js" crc="209076791" ref="index:program-selector:novice:expert:advanced:master:global-settings:maintenance"/>
+    <file name="museutils.js" crc="3939489907" ref="index:program-selector:novice:expert:advanced:master:global-settings:maintenance"/>
+    <file name="whatinput.js" crc="86476730" ref="index:program-selector:novice:expert:advanced:master:global-settings:maintenance"/>
+    <file name="museconfig.js" crc="128606099" ref="index:program-selector:novice:expert:advanced:master:global-settings:maintenance"/>
+    <file name="jquery.watch.js" crc="522499760" ref="index:program-selector:novice:expert:advanced:master:global-settings:maintenance"/>
+    <file name="jquery.mr.js" crc="95814420" ref="index:program-selector:novice:expert:advanced:master:global-settings:maintenance"/>
+    <file name="require.js" crc="4177726516" ref="index:program-selector:novice:expert:advanced:master:global-settings:maintenance"/>
+  </folder>
+  <folder name="images">
+    <file name="loop_logo.svg" crc="3775482630" seo="true" ref="index">
+      <caption webpage="index" alt=""/>
+      <caption webpage="index" alt=""/>
+      <caption webpage="index" alt=""/>
+      <caption webpage="index" alt=""/>
+    </file>
+    <file name="loop_logo_poster_.png" crc="3880801504" ref="index"/>
+    <file name="blank.gif" crc="4208392903" ref="index:program-selector:novice:expert:advanced:master:global-settings:maintenance"/>
+    <file name="left-arrow.svg" crc="391656077" seo="true" ref="novice:expert:advanced:master:global-settings:maintenance">
+      <caption webpage="expert" alt=""/>
+      <caption webpage="expert" alt=""/>
+      <caption webpage="expert" alt=""/>
+      <caption webpage="expert" alt=""/>
+      <caption webpage="master" alt=""/>
+      <caption webpage="master" alt=""/>
+      <caption webpage="master" alt=""/>
+      <caption webpage="master" alt=""/>
+      <caption webpage="maintenance" alt=""/>
+      <caption webpage="maintenance" alt=""/>
+      <caption webpage="maintenance" alt=""/>
+      <caption webpage="maintenance" alt=""/>
+      <caption webpage="global-settings" alt=""/>
+      <caption webpage="global-settings" alt=""/>
+      <caption webpage="global-settings" alt=""/>
+      <caption webpage="global-settings" alt=""/>
+      <caption webpage="advanced" alt=""/>
+      <caption webpage="advanced" alt=""/>
+      <caption webpage="advanced" alt=""/>
+      <caption webpage="advanced" alt=""/>
+      <caption webpage="novice" alt=""/>
+      <caption webpage="novice" alt=""/>
+      <caption webpage="novice" alt=""/>
+      <caption webpage="novice" alt=""/>
+    </file>
+    <file name="left arrow_poster_.png" crc="184332363" ref="novice"/>
+    <file name="lock.svg" crc="4086306118" seo="true" ref="global-settings">
+      <caption webpage="global-settings" alt=""/>
+      <caption webpage="global-settings" alt=""/>
+      <caption webpage="global-settings" alt=""/>
+      <caption webpage="global-settings" alt=""/>
+    </file>
+    <file name="lock_poster_.png" crc="444311082" ref="global-settings"/>
+  </folder>
+  <file name="index.html" crc="4096683444" seo="true" mt="1620110968726" redirect="true"/>
+  <file name="program-selector.html" crc="169167395" seo="true" mt="1620111059131" redirect="true"/>
+  <file name="novice.html" crc="4058763227" seo="true" mt="1620119785100" redirect="true"/>
+  <file name="expert.html" crc="4214153018" seo="true" mt="1620120231507" redirect="true"/>
+  <file name="advanced.html" crc="3895142359" seo="true" mt="1620120309431" redirect="true"/>
+  <file name="master.html" crc="174112777" seo="true" mt="1620120361474" redirect="true"/>
+  <file name="global-settings.html" crc="3934797686" seo="true" mt="1620120553486" redirect="true"/>
+  <file name="maintenance.html" crc="3800751487" seo="true" mt="1620120591750" redirect="true"/>
+</manifest>
