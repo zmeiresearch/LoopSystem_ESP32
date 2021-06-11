@@ -27,7 +27,7 @@
 //==============================================================================
 //  Exported functions
 //==============================================================================
-void WebserverInit(void * params);
+eStatus WebserverInit(void * params);
 
 
 #endif // INC_WEBSERVER_H

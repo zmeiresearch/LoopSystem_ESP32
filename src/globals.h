@@ -1,46 +1,53 @@
 /*==============================================================================
-  LoopSystem ESP32
-
+   LoopSystem ESP32
   ============================================================================*/
 
 //==============================================================================
 //  Multi-include guard
 //==============================================================================
-#ifndef INC_CONFIG_H
-#define INC_CONFIG_H
+#ifndef INC_GLOBALS_H
+#define INC_GLOBALS_H
 
 //==============================================================================
-//  Includes
+//  Multi-include guard
 //==============================================================================
+#include <stdint.h>
+
 
 //==============================================================================
-//  Defines
+//  Defines/Macros
 //==============================================================================
+#define ARRAY_SIZE(x)           (sizeof(x)/sizeof(x[0]))
 
-// Wifi configuration
-#define WIFI_SSID                   "gr5-c3_leaf"
-#define WIFI_PASSWORD               "AASSDDFFqwer11223344!!"
-#define WIFI_DEVICE_NAME            "loopsystem-esp32"
+// GCC-ism below. Make it a proper function if compilation fails 
+#define WAIT_FOR(cond, timeout) ({                                          \
+        uint32_t startTime = PortGetTime(); bool condState = (cond);        \
+        while (!condState && ((PortGetTime() - startTime) < (timeout)))     \
+        { PortSleepMs(5); condState = (cond);}                              \
+        (condState) ? eOK : eTIMEOUT;                                       \
+    })
 
-// Log configuration
-#define     LOG_TASK_PERIOD         5   //  in ms
-#define     LOG_LEVEL_DEFAULT       eLogInfo
-#define     LOG_BUFFER_SIZE         8192
-#define     LOG_SOCKET_PORT         81
-#define     LOG_SOCKET_PATH         "/log"
-
-// Control UART
-#define     CONTROL_SERIAL_PORT     2
-#define     CONTROL_SERIAL_BAUD     19200
-#define     CONTROL_SERIAL_FORMAT   SERIAL_8N2
-#define     CONTROL_SERIAL_RX_PIN   16
-#define     CONTROL_SERIAL_TX_PIN   17
-
+//==============================================================================
+// Peripherals
+//==============================================================================
 
 
 //==============================================================================
 //  Exported types
 //==============================================================================
+typedef enum _eStatus
+{
+    eOK,
+    eDONE,
+    eFAIL,
+    eINVALIDARG,
+    eUNSUPPORTED,
+    eBUSY,
+    eNOTINITIALIZED,
+    eOUTOFMEMORY,
+    eTIMEOUT,
+    eStatusCount
+} eStatus;
 
 //==============================================================================
 //  Exported data
@@ -50,7 +57,4 @@
 //  Exported functions
 //==============================================================================
 
-
-#endif // INC_CONFIG_H
-
-
+#endif // INC_GLOBALS_H

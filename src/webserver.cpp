@@ -1,25 +1,6 @@
 /*==============================================================================
-   DeWille ESP32 firmware
-
-   Copyright 2020 Ivan Vasilev, Zmei Research Ltd.
-
-   Permission is hereby granted, free of charge, to any person obtaining a copy
-   of this software and associated documentation files (the "Software"), to deal
-   in the Software without restriction, including without limitation the rights
-   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-   copies of the Software, and to permit persons to whom the Software is
-   furnished to do so, subject to the following conditions:
-
-   The above copyright notice and this permission notice shall be included in
-   all copies or substantial portions of the Software.
-
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-   SOFTWARE.
+   LoopSystem ESP32
+   
   ============================================================================*/
 
 //==============================================================================
@@ -33,10 +14,13 @@
 #include "ESPAsyncWebServer.h"
 
 #include "config.h"
+#include "globals.h"
+#include "logger.h"
 
 //==============================================================================
 //  Defines
 //==============================================================================
+#define CMP_NAME            "Webserver"
 
 //==============================================================================
 //  Local types
@@ -72,9 +56,10 @@ static void firmwareUpload(AsyncWebServerRequest *request, String filename, size
     // handle upload and update
     if (!index)
     {
-        Serial.printf("Update: %s\n", filename.c_str());
+        Log(eLogInfo, CMP_NAME, "firmwareUpload: Update %s", filename.c_str());
         if (!Update.begin(UPDATE_SIZE_UNKNOWN, U_FLASH))
         { 
+            Log(eLogCrit, CMP_NAME, "firmwareUpload: Error updating!");
             //start with max available size
             Update.printError(Serial);
         }
@@ -91,10 +76,11 @@ static void firmwareUpload(AsyncWebServerRequest *request, String filename, size
         if (Update.end(true))
         { 
             //true to set the size to the current progress
-            Serial.printf("Update Success: %ub written\nRebooting...\n", index+len);
+            Log(eLogInfo, CMP_NAME, "firmwareUpload: Update Success: %ub written\nRebooting...", index+len);
         }
         else
         {
+            Log(eLogCrit, CMP_NAME, "formwareUpload: Error updating!");
             Update.printError(Serial);
         }
     }
@@ -105,9 +91,10 @@ static void spiffsUpload(AsyncWebServerRequest *request, String filename, size_t
 {
     if (!index)
     {
-        Serial.printf("Update: %s\n", filename.c_str());
+        Log(eLogInfo, CMP_NAME, "spiffsUpload: Update %s", filename.c_str());
         if (!Update.begin(UPDATE_SIZE_UNKNOWN, U_SPIFFS))
         { 
+            Log(eLogCrit, CMP_NAME, "spiffsUpload: Error updating!");
             Update.printError(Serial);
         }
     }
@@ -120,11 +107,12 @@ static void spiffsUpload(AsyncWebServerRequest *request, String filename, size_t
     if (final)
     {
         if (Update.end(true))
-        { 
-            Serial.printf("Update Success: %ub written\nRebooting...\n", index+len);
+        {    
+            Log(eLogInfo, CMP_NAME, "spiffsUpload: Update Success: %ub written\nRebooting...", index+len);
         }
         else
         {
+            Log(eLogCrit, CMP_NAME, "spiffsUpload: Error updating!");
             Update.printError(Serial);
         }
     }
@@ -135,43 +123,39 @@ static void spiffsUpload(AsyncWebServerRequest *request, String filename, size_t
 //==============================================================================
 
 // Initialize update webserver
-void WebserverInit(void * params) 
+eStatus WebserverInit(void * params) 
 {
-    // IVA: TODO: Use Logger instead!
-    Serial.begin(115200);
-
     // IVA: TODO: Move SPIFFS and Wifi intialization outside!
     if (!SPIFFS.begin())
     {
-        Serial.println("An Error has occurred while mounting SPIFFS");
-        return;
+        Log(eLogCrit, CMP_NAME, "WebserverInit: An Error has occurred while mounting SPIFFS");
+        return eFAIL;
     }
 
     // Connect to WiFi network
+    Log(eLogInfo, CMP_NAME, "WebserverInit: Connecting to Wifi: %s", WIFI_SSID);
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-    Serial.println("");
 
     // Wait for connection
     while (WiFi.status() != WL_CONNECTED) 
     {
         // IVA: TODO: Use FreeRTOS primitives!
-        delay(500);
-        Serial.print(".");
+        vTaskDelay(500 / portTICK_PERIOD_MS);
+        Log(eLogInfo, CMP_NAME, ".");
     }
   
-    Serial.println("");
-    Serial.print("Connected to ");
-    Serial.println(WIFI_SSID);
-    Serial.print("IP address: ");
-    Serial.println(WiFi.localIP());
+    Log(eLogInfo, CMP_NAME, "WebserverInit: Connected to %s", WIFI_SSID);
+    Log(eLogInfo, CMP_NAME, "IP address: %s", WiFi.localIP());
 
     // Advertise through MDNS
-    if (!MDNS.begin("esp32_control")) 
+    if (!MDNS.begin(WIFI_DEVICE_NAME)) 
     {
-        Serial.println("Error setting up MDNS responder!");
+        Log(eLogWarn, CMP_NAME, "WebserverInit: Error setting up MDNS responder!");
+    } 
+    else
+    {
+        Log(eLogInfo, "mDNS responder started");
     }
-
-    Serial.println("mDNS responder started");
     
     // Web root 
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -215,5 +199,7 @@ void WebserverInit(void * params)
     server.onNotFound(notFoundResponse);
    
     server.begin();
+
+    return eOK;
 }
 

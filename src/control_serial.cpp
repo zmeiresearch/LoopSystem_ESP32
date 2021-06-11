@@ -1,56 +1,56 @@
 /*==============================================================================
-  LoopSystem ESP32
-
+   LoopSystem ESP32
+   
   ============================================================================*/
-
-//==============================================================================
-//  Multi-include guard
-//==============================================================================
-#ifndef INC_CONFIG_H
-#define INC_CONFIG_H
 
 //==============================================================================
 //  Includes
 //==============================================================================
+#include "config.h"
+#include "control_serial.h"
+
+#include "driver/uart.h"    // for UART_PIN_NO_CHANGE
+
+#include "HardwareSerial.h"
 
 //==============================================================================
 //  Defines
 //==============================================================================
 
-// Wifi configuration
-#define WIFI_SSID                   "gr5-c3_leaf"
-#define WIFI_PASSWORD               "AASSDDFFqwer11223344!!"
-#define WIFI_DEVICE_NAME            "loopsystem-esp32"
-
-// Log configuration
-#define     LOG_TASK_PERIOD         5   //  in ms
-#define     LOG_LEVEL_DEFAULT       eLogInfo
-#define     LOG_BUFFER_SIZE         8192
-#define     LOG_SOCKET_PORT         81
-#define     LOG_SOCKET_PATH         "/log"
-
-// Control UART
-#define     CONTROL_SERIAL_PORT     2
-#define     CONTROL_SERIAL_BAUD     19200
-#define     CONTROL_SERIAL_FORMAT   SERIAL_8N2
-#define     CONTROL_SERIAL_RX_PIN   16
-#define     CONTROL_SERIAL_TX_PIN   17
-
-
 
 //==============================================================================
-//  Exported types
+//  Local types
 //==============================================================================
 
 //==============================================================================
-//  Exported data
+//  Local data
 //==============================================================================
+static HardwareSerial       serial(CONTROL_SERIAL_PORT);
+
+//==============================================================================
+//  Local functions
+//==============================================================================
+
 
 //==============================================================================
 //  Exported functions
 //==============================================================================
 
+size_t ControlSerialGetWriteSize()
+{
+    return serial.availableForWrite();
+}
 
-#endif // INC_CONFIG_H
+size_t ControlSerialWrite(const uint8_t * const buffer, const size_t toSend)
+{
+    return serial.write(buffer, toSend);
+}
+
+eStatus ControlSerialInit()
+{
+    serial.begin(CONTROL_SERIAL_BAUD, CONTROL_SERIAL_FORMAT, CONTROL_SERIAL_RX_PIN, CONTROL_SERIAL_TX_PIN); 
+
+    return eOK;
+}
 
 
