@@ -14,6 +14,8 @@
 
 #include "webserver.h"
 
+#include <control_protocol.h>
+
 
 //==============================================================================
 //  Defines
