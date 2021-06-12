@@ -254,20 +254,22 @@ eStatus PacketAllValuesAsciiToAllValues(const PacketAllValuesAscii * const packe
     if (eOK == retVal)
     {
         BcdToVal(packet->values.cEnd,       &values->cEnd); 
-        BcdToVal(packet->values.cAcc,       &values->cEnd);
-        BcdToVal(packet->values.cDec,       &values->cEnd);
-        BcdToVal(packet->values.cTurn,      &values->cEnd);
-        BcdToVal(packet->values.gHome,      &values->cEnd);
-        BcdToVal(packet->values.gEnd,       &values->cEnd);
-        BcdToVal(packet->values.gTurn1,     &values->cEnd);
-        BcdToVal(packet->values.gTurn2,     &values->cEnd);
-        BcdToVal(packet->values.gMaxAcc,    &values->cEnd);
-        BcdToVal(packet->values.gMaxDec,    &values->cEnd);
-        BcdToVal(packet->values.gFMax,      &values->cEnd);
-        BcdToVal(packet->values.gFMin,      &values->cEnd);
-        BcdToVal(packet->values.gMaxTime,   &values->cEnd);
-        BcdToVal(packet->values.gMaxLaps,   &values->cEnd);
-        BcdToVal(packet->values.gServSpeed, &values->cEnd);
+        BcdToVal(packet->values.cAcc,       &values->cAcc);
+        BcdToVal(packet->values.cDec,       &values->cDec);
+        BcdToVal(packet->values.cTurn,      &values->cTurn);
+        BcdToVal(packet->values.gHome,      &values->gHome);
+        BcdToVal(packet->values.gEnd,       &values->gEnd);
+        BcdToVal(packet->values.gTurn1,     &values->gTurn1);
+        BcdToVal(packet->values.gTurn2,     &values->gTurn2);
+        BcdToVal(packet->values.gMaxAcc,    &values->gMaxAcc);
+        BcdToVal(packet->values.gMaxDec,    &values->gMaxDec);
+        BcdToVal(packet->values.gFMax,      &values->gFMax);
+        BcdToVal(packet->values.gFMin,      &values->gFMin);
+        BcdToVal(packet->values.gMaxTime,   &values->gMaxTime);
+        BcdToVal(packet->values.gMaxLaps,   &values->gMaxLaps);
+        BcdToVal(packet->values.gServSpeed, &values->gServSpeed);
     }
+
+    return retVal;
 }
 

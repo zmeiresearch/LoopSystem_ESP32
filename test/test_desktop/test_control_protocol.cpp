@@ -64,10 +64,10 @@ static void setAsciiValuesValid(AllValuesAscii * const values)
 static void setPacketChecksum(PacketAllValuesAscii * const packet)
 {
     uint16_t checksum = 0;
+    uint8_t * ptr = (uint8_t *)packet;
     for (int i = 0; i < sizeof(PacketAllValuesAscii) - 3; i++)
     {
-        uint8_t * ptr = (uint8_t *)&packet[i];
-        checksum = checksum + *ptr;
+        checksum = checksum + *ptr++;
     }
 
     checksum = ~checksum;
@@ -91,7 +91,8 @@ static void test_packet_to_values(void)
     AllValues values;
 
     memset(&packet, 0, sizeof(PacketAllValuesAscii));
-    setPacketChecksum(&packet);
+    memset(&values, 0, sizeof(AllValues));
+//    setPacketChecksum(&packet);
 
     buildPacketValid(&packet);
 
