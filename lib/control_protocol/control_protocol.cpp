@@ -10,7 +10,13 @@
 
 #include "globals.h"
 #include "config.h"
-#include "logger.h"
+
+#ifndef MOCK_LOGGER
+#else
+#include "mock_logger.h"
+#endif
+
+
 #include "control_protocol.h"
 
 //==============================================================================
@@ -24,31 +30,6 @@
 //==============================================================================
 //  Local types
 //==============================================================================
-#pragma pack(push, 1)
-
-typedef struct _PacketAllValues {
-    uint8_t             startByte;
-    uint8_t             packetType;
-    uint8_t             cEnd[3];
-    uint8_t             cAcc[2];
-    uint8_t             cDec[2];
-    uint8_t             cTurn[2];
-    uint8_t             gHome[3];
-    uint8_t             gEnd[3];
-    uint8_t             gTurn1[3];
-    uint8_t             gTurn2[3];
-    uint8_t             gMaxAcc[2];
-    uint8_t             gMaxDec[2];
-    uint8_t             gFMax[2];
-    uint8_t             gFMin[2];
-    uint8_t             gMaxTime[2];
-    uint8_t             gMaxLaps[2];
-    uint8_t             gServSpeed[2];
-    uint8_t             checksum[2];
-    uint8_t             stopByte;
-} PacketAllValues;
-
-#pragma pack(pop)
 
 //==============================================================================
 //  Local data
@@ -79,13 +60,13 @@ static eStatus checkChecksum(const uint8_t * const packet, const size_t packetLe
 {
     eStatus retVal = eFAIL;
 
-    uint16_t fromPacket = (uint16_t)*(&packet[packetLength-3]);
+    uint16_t fromPacket = ((uint16_t)packet[packetLength-3] << 8) + packet[packetLength-2];
     uint16_t calculated = 0;
 
     // two bytes CRC + stop byte
-    for (size_t i; i < packetLength - 3; i++) 
+    for (size_t i = 0; i < packetLength - 3; i++) 
     {
-        calculated += packet[i];
+        calculated = calculated + (uint16_t)packet[i];
     }
 
     calculated = ~calculated;
@@ -122,6 +103,13 @@ static void setStartStop(uint8_t * const packet, const size_t packetLength)
     packet[packetLength - 1] = STOP_BYTE;
 }
 
+static eStatus isBcd(const char val)
+{
+    if (val < '0' || val > '9') return eFAIL;
+
+    return eOK;
+}
+
 //==============================================================================
 //  Exported functions
 //==============================================================================
@@ -148,6 +136,39 @@ eStatus CheckPacketAllValues(const PacketAllValues * const packet)
     }
 
     return retVal;
+}
+
+eStatus BcdToVal(const char * const bcd, uint8_t * const outVal)
+{
+    eStatus retVal = eFAIL;
+
+    if (eOK == isBcd(bcd[0]) && eOK == isBcd(bcd[1]))
+    {
+        *outVal = ((uint8_t)bcd[0] - (uint8_t)0x30) * 10 + ((uint8_t)bcd[1] - (uint8_t)0x30);
+        retVal = eOK;
+    }
+    return retVal;
+}
+
+eStatus BcdToVal(const char * const bcd, uint16_t * const outVal)
+{
+    eStatus retVal = eFAIL;
+
+    if (eOK == isBcd(bcd[0]) && eOK == isBcd(bcd[1]) && eOK == isBcd(bcd[2]))
+    {
+        *outVal = ((uint8_t)bcd[0] - (uint8_t)0x30) * 100 + ((uint8_t)bcd[1] - (uint8_t)0x30) * 10 + ((uint8_t)bcd[2] - (uint8_t)0x30);
+        retVal = eOK;
+    }
+    return retVal;
+
+}
+
+eStatus ValToBcd(const uint8_t val, char * const outBuf)
+{
+}
+
+eStatus ValToBcd(const uint16_t val, char * const outBuf)
+{
 }
 
 
