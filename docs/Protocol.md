@@ -55,11 +55,11 @@ TODO: What is relation with Current Settings: END and TURN2
 ## Packet types
 | Packet code   | Description                           |
 | ------------- | ------------------------------------- |
-| 0x01          | [All Settings](#packet-all-settings)  |  
+| 0x01          | [All Settings](#packet-all-values)    |
 | 0xFE          | [Acknowledge](#packet-acknowledge)    |
 
 
-### Packet All Settings
+### Packet All Values
 | Byte  | Value |   Description         |   Format                  |
 | ----- | ----- | --------------------- | ------------------------- |
 | 0x1   | 0x28  | Start symbol          | Always a star `*`         |
