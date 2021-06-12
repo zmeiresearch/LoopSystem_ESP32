@@ -31,28 +31,105 @@
 //  Local functions
 //==============================================================================
 
-static void setStartByte(PacketAllValuesAscii * const packet)
+static void setPacketStartByte(PacketAllValuesAscii * const packet)
 {
     packet->startByte = 0x2a;
 }
 
-static void setStopByte(PacketAllValuesAscii * const packet)
+static void setPacketStopByte(PacketAllValuesAscii * const packet)
 {
     packet->stopByte = 0x13;
 }
 
-static void setChecksum(PacketAllValuesAscii * const packet)
+static void setAsciiValuesValid(AllValuesAscii * const values)
+{
+    memcpy(&values->cEnd, "123", 3);
+    memcpy(&values->cAcc, "72", 2);
+    memcpy(&values->cDec, "81", 2);
+    memcpy(&values->cTurn, "42", 2);
+    memcpy(&values->gHome, "933", 3);
+    memcpy(&values->gEnd, "178", 3);
+    memcpy(&values->gTurn1, "981", 3);
+    memcpy(&values->gTurn2, "189", 3);
+    memcpy(&values->gMaxAcc, "12", 2);
+    memcpy(&values->gMaxDec, "63", 2);
+    memcpy(&values->gFMax, "97", 2);
+    memcpy(&values->gFMin, "55", 2);
+    memcpy(&values->gMaxTime, "12", 2);
+    memcpy(&values->gMaxLaps, "47", 2);
+    memcpy(&values->gServSpeed, "73", 2);
+
+}
+
+static void setPacketChecksum(PacketAllValuesAscii * const packet)
 {
     uint16_t checksum = 0;
     for (int i = 0; i < sizeof(PacketAllValuesAscii) - 3; i++)
     {
-        checksum = checksum + ((uint8_t*)&packet)[i];
+        uint8_t * ptr = (uint8_t *)&packet[i];
+        checksum = checksum + *ptr;
     }
 
     checksum = ~checksum;
 
-    packet->checksum[0] = (uint8_t)((checksum & 0xFF)>> 8 );
+    packet->checksum[0] = (uint8_t)((checksum & 0xFF00)>> 8 );
     packet->checksum[1] = (uint8_t)(checksum & 0xFF);
+}
+
+
+static void buildPacketValid(PacketAllValuesAscii * const packet)
+{
+    setPacketStartByte(packet);
+    setPacketStopByte(packet);
+    setAsciiValuesValid(&packet->values);
+    setPacketChecksum(packet);
+}
+
+static void test_packet_to_values(void)
+{
+    PacketAllValuesAscii packet;
+    AllValues values;
+
+    memset(&packet, 0, sizeof(PacketAllValuesAscii));
+    setPacketChecksum(&packet);
+
+    buildPacketValid(&packet);
+
+//eStatus PacketAllValuesAsciiToAllValues(const PacketAllValuesAscii * const packet, AllValues * const values);
+    TEST_ASSERT_EQUAL(eOK, PacketAllValuesAsciiToAllValues(&packet, &values));
+    TEST_ASSERT_EQUAL(values.cEnd, 123);
+    TEST_ASSERT_EQUAL(values.cAcc, 72);
+    TEST_ASSERT_EQUAL(values.cDec, 81);
+    TEST_ASSERT_EQUAL(values.cTurn, 42);
+    TEST_ASSERT_EQUAL(values.gHome, 933);
+    TEST_ASSERT_EQUAL(values.gEnd, 178);
+    TEST_ASSERT_EQUAL(values.gTurn1, 981);
+    TEST_ASSERT_EQUAL(values.gTurn2, 189);
+    TEST_ASSERT_EQUAL(values.gMaxAcc, 12);
+    TEST_ASSERT_EQUAL(values.gMaxDec, 63);
+    TEST_ASSERT_EQUAL(values.gFMax, 97);
+    TEST_ASSERT_EQUAL(values.gFMin, 55);
+    TEST_ASSERT_EQUAL(values.gMaxTime, 12);
+    TEST_ASSERT_EQUAL(values.gMaxLaps, 47);
+    TEST_ASSERT_EQUAL(values.gServSpeed, 73);
+
+/* memcpy(&values->cEnd, "123", 3);
+    memcpy(&values->cAcc, "72", 2);
+    memcpy(&values->cDec, "81", 2);
+    memcpy(&values->cTurn, "42", 2);
+    memcpy(&values->gHome, "933", 3);
+    memcpy(&values->gEnd, "178", 3);
+    memcpy(&values->gTurn1, "981", 3);
+    memcpy(&values->gTurn2, "189", 3);
+    memcpy(&values->gMaxAcc, "12", 2);
+    memcpy(&values->gMaxDec, "63", 2);
+    memcpy(&values->gFMax, "97", 2);
+    memcpy(&values->gFMin, "55", 2);
+    memcpy(&values->gMaxTime, "12", 2);
+    memcpy(&values->gMaxLaps, "47", 2);
+    memcpy(&values->gServSpeed, "73", 2);
+*/
+
 }
 
 static void test_bcdToVal_u8(void)
@@ -149,6 +226,8 @@ int main(int argc, char ** argv)
     RUN_TEST(test_bcdToVal_u16);
     RUN_TEST(test_valToBcd_u8);
     RUN_TEST(test_valToBcd_u16);
+
+    RUN_TEST(test_packet_to_values);
     
     UNITY_END();
     return 0;
