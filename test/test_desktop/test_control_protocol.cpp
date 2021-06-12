@@ -90,7 +90,7 @@ static void test_checkPacketAllValues_BadValues(void)
 
 static void test_bcdToVal_u8(void)
 {
-    char in[2];
+    unsigned char in[2];
     uint8_t out;
 
     in[0] = 0x29;
@@ -108,7 +108,7 @@ static void test_bcdToVal_u8(void)
 
 static void test_bcdToVal_u16(void)
 {
-    char in[3];
+    unsigned char in[3];
     uint16_t out;
 
     in[0] = 0x31;
@@ -126,6 +126,50 @@ static void test_bcdToVal_u16(void)
     TEST_ASSERT_EQUAL(832, out);
 }
 
+static void test_valToBcd_u8(void)
+{
+    uint8_t in;
+    unsigned char out[3];
+
+    in = 101;
+    out[0] = 0xde;
+    out[1] = 0xad;
+    out[2] = 0xc0;
+    TEST_ASSERT_EQUAL(eFAIL, ValToBcd(in, &out[0]));
+    TEST_ASSERT_EQUAL(0xde, out[0]);
+    TEST_ASSERT_EQUAL(0xad, out[1]);
+    TEST_ASSERT_EQUAL(0xc0, out[2]);
+
+    in = 73;
+    TEST_ASSERT_EQUAL(eOK, ValToBcd(in, &out[0]));
+    TEST_ASSERT_EQUAL('7', out[0]);
+    TEST_ASSERT_EQUAL('3', out[1]);
+    TEST_ASSERT_EQUAL(0xc0, out[2]);
+}
+
+static void test_valToBcd_u16(void)
+{
+    uint16_t in;
+    unsigned char out[4];
+
+    in = 1001;
+    out[0] = 0xde;
+    out[1] = 0xad;
+    out[2] = 0xc0;
+    out[3] = 0xde;
+    TEST_ASSERT_EQUAL(eFAIL, ValToBcd(in, &out[0]));
+    TEST_ASSERT_EQUAL(0xde, out[0]);
+    TEST_ASSERT_EQUAL(0xad, out[1]);
+    TEST_ASSERT_EQUAL(0xc0, out[2]);
+    TEST_ASSERT_EQUAL(0xde, out[3]);
+
+    in = 739;
+    TEST_ASSERT_EQUAL(eOK, ValToBcd(in, &out[0]));
+    TEST_ASSERT_EQUAL('7', out[0]);
+    TEST_ASSERT_EQUAL('3', out[1]);
+    TEST_ASSERT_EQUAL('9', out[2]);
+    TEST_ASSERT_EQUAL(0xde, out[3]);
+}
 
 //==============================================================================
 //  Exported functions
@@ -142,6 +186,8 @@ int main(int argc, char ** argv)
 
     RUN_TEST(test_bcdToVal_u8);
     RUN_TEST(test_bcdToVal_u16);
+    RUN_TEST(test_valToBcd_u8);
+    RUN_TEST(test_valToBcd_u16);
     
     UNITY_END();
     return 0;

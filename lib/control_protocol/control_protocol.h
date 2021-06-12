@@ -80,10 +80,10 @@ typedef struct _PacketAllValues {
 //  Exported functions
 //==============================================================================
 eStatus CheckPacketAllValues(const PacketAllValues * const packet);
-eStatus BcdToVal(const char * const bcd, uint8_t * const outVal);
-eStatus BcdToVal(const char * const bcd, uint16_t * const outVal);
-eStatus ValToBcd(const uint8_t val, char * const outBuf);
-eStatus ValToBcd(const uint16_t val, char * const outBuf);
+eStatus BcdToVal(const unsigned char * const bcd, uint8_t * const outVal);
+eStatus BcdToVal(const unsigned char * const bcd, uint16_t * const outVal);
+eStatus ValToBcd(const uint8_t val, unsigned char * const outBuf);
+eStatus ValToBcd(const uint16_t val, unsigned char * const outBuf);
 
 
 #endif // INC_CONTROL_PROTOCOL_H

@@ -138,7 +138,7 @@ eStatus CheckPacketAllValues(const PacketAllValues * const packet)
     return retVal;
 }
 
-eStatus BcdToVal(const char * const bcd, uint8_t * const outVal)
+eStatus BcdToVal(const unsigned char * const bcd, uint8_t * const outVal)
 {
     eStatus retVal = eFAIL;
 
@@ -150,7 +150,7 @@ eStatus BcdToVal(const char * const bcd, uint8_t * const outVal)
     return retVal;
 }
 
-eStatus BcdToVal(const char * const bcd, uint16_t * const outVal)
+eStatus BcdToVal(const unsigned char * const bcd, uint16_t * const outVal)
 {
     eStatus retVal = eFAIL;
 
@@ -163,13 +163,28 @@ eStatus BcdToVal(const char * const bcd, uint16_t * const outVal)
 
 }
 
-eStatus ValToBcd(const uint8_t val, char * const outBuf)
+eStatus ValToBcd(const uint8_t val, unsigned char * const outBuf)
 {
+    eStatus retVal = eFAIL;
+    if (val < 100)
+    {
+        outBuf[0] = (uint8_t)val/10 + 0x30;
+        outBuf[1] = (uint8_t)val % 10 + 0x30;
+        retVal = eOK;
+    }
+    return retVal;
 }
 
-eStatus ValToBcd(const uint16_t val, char * const outBuf)
+eStatus ValToBcd(const uint16_t val, unsigned char * const outBuf)
 {
+    eStatus retVal = eFAIL;
+    if (val < 1000)
+    {
+        outBuf[0] = (uint8_t)(val/100) + 0x30;
+        outBuf[1] = (uint8_t)((val % 100) / 10) + 0x30;
+        outBuf[2] = (uint8_t)(val % 10) + 0x30;
+        retVal = eOK;
+    }
+    return retVal;
 }
-
-
 

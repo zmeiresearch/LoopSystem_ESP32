@@ -32,8 +32,8 @@
 //==============================================================================
 //  Exported functions
 //==============================================================================
-size_t      LogSinkSerialGetWriteSize();
-size_t      LogSinkSerialWrite(const uint8_t * const buffer, const size_t toSend);
-eStatus     LogSinkSerialInit();
+size_t      ControlSerialGetWriteSize();
+size_t      ControlSerialWrite(const uint8_t * const buffer, const size_t toSend);
+eStatus     ControlSerialInit();
 
 #endif // INC_CONTROL_SERIAL_H
