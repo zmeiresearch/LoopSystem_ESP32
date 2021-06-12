@@ -44,30 +44,30 @@ typedef struct _AllValues {
 #pragma pack(push, 1)
 
 typedef struct _AllValuesAscii {
-    uint8_t             cEnd[3];
-    uint8_t             cAcc[2];
-    uint8_t             cDec[2];
-    uint8_t             cTurn[2];
-    uint8_t             gHome[3];
-    uint8_t             gEnd[3];
-    uint8_t             gTurn1[3];
-    uint8_t             gTurn2[3];
-    uint8_t             gMaxAcc[2];
-    uint8_t             gMaxDec[2];
-    uint8_t             gFMax[2];
-    uint8_t             gFMin[2];
-    uint8_t             gMaxTime[2];
-    uint8_t             gMaxLaps[2];
-    uint8_t             gServSpeed[2];
+    unsigned char       cEnd[3];
+    unsigned char       cAcc[2];
+    unsigned char       cDec[2];
+    unsigned char       cTurn[2];
+    unsigned char       gHome[3];
+    unsigned char       gEnd[3];
+    unsigned char       gTurn1[3];
+    unsigned char       gTurn2[3];
+    unsigned char       gMaxAcc[2];
+    unsigned char       gMaxDec[2];
+    unsigned char       gFMax[2];
+    unsigned char       gFMin[2];
+    unsigned char       gMaxTime[2];
+    unsigned char       gMaxLaps[2];
+    unsigned char       gServSpeed[2];
 }  AllValuesAscii;
 
-typedef struct _PacketAllValues {
+typedef struct _PacketAllValuesAscii {
     uint8_t             startByte;
     uint8_t             packetType;
     AllValuesAscii      values;
     uint8_t             checksum[2];
     uint8_t             stopByte;
-} PacketAllValues;
+} PacketAllValuesAscii;
 
 #pragma pack(pop)
 
@@ -79,11 +79,15 @@ typedef struct _PacketAllValues {
 //==============================================================================
 //  Exported functions
 //==============================================================================
-eStatus CheckPacketAllValues(const PacketAllValues * const packet);
 eStatus BcdToVal(const unsigned char * const bcd, uint8_t * const outVal);
 eStatus BcdToVal(const unsigned char * const bcd, uint16_t * const outVal);
 eStatus ValToBcd(const uint8_t val, unsigned char * const outBuf);
 eStatus ValToBcd(const uint16_t val, unsigned char * const outBuf);
 
+eStatus CheckAllValuesAscii(const AllValuesAscii * const packet);
+eStatus CheckPacketAllValuesAscii(const PacketAllValuesAscii * const packet);
+
+eStatus AllValuesToPacketAllValuesAscii(const AllValues * const values, PacketAllValuesAscii * const packet);
+eStatus PacketAllValuesAsciiToAllValues(const PacketAllValuesAscii * const packet, AllValues * const values);
 
 #endif // INC_CONTROL_PROTOCOL_H

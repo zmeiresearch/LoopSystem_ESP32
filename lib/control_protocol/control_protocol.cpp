@@ -114,30 +114,6 @@ static eStatus isBcd(const char val)
 //  Exported functions
 //==============================================================================
 
-eStatus CheckPacketAllValues(const PacketAllValues * const packet)
-{
-    eStatus retVal = eOK;
-
-    retVal = checkStartByte((const uint8_t * const)packet);
-    
-    if (eOK != retVal)
-    {
-        Log(eLogWarn, CMP_NAME, "CheckPacketAllValues: error in start byte!");
-    }
-
-    if (eOK == retVal)
-    {
-        retVal = checkChecksum((const uint8_t * const)packet, sizeof(PacketAllValues));
-
-        if (eOK != retVal)
-        {
-            Log(eLogWarn, CMP_NAME, "CheckPacketAllValues: Checksum error!");
-        }
-    }
-
-    return retVal;
-}
-
 eStatus BcdToVal(const unsigned char * const bcd, uint8_t * const outVal)
 {
     eStatus retVal = eFAIL;
@@ -186,5 +162,112 @@ eStatus ValToBcd(const uint16_t val, unsigned char * const outBuf)
         retVal = eOK;
     }
     return retVal;
+}
+
+eStatus CheckAllValuesAscii(const AllValuesAscii * const packet)
+{
+    uint8_t     tmp_u8;
+    uint16_t    tmp_u16;
+
+    eStatus retVal = BcdToVal(packet->cEnd, &tmp_u16);
+    if (eOK == retVal) retVal = BcdToVal(packet->cAcc, &tmp_u8);
+    if (eOK == retVal) retVal = BcdToVal(packet->cDec, &tmp_u16);
+    if (eOK == retVal) retVal = BcdToVal(packet->cTurn, &tmp_u8);
+    if (eOK == retVal) retVal = BcdToVal(packet->gHome, &tmp_u16);
+    if (eOK == retVal) retVal = BcdToVal(packet->gEnd, &tmp_u16);
+    if (eOK == retVal) retVal = BcdToVal(packet->gTurn1, &tmp_u16);
+    if (eOK == retVal) retVal = BcdToVal(packet->gTurn2, &tmp_u16);
+    if (eOK == retVal) retVal = BcdToVal(packet->gMaxAcc, &tmp_u8);
+    if (eOK == retVal) retVal = BcdToVal(packet->gMaxDec, &tmp_u8);
+    if (eOK == retVal) retVal = BcdToVal(packet->gFMax, &tmp_u8);
+    if (eOK == retVal) retVal = BcdToVal(packet->gFMin, &tmp_u8);
+    if (eOK == retVal) retVal = BcdToVal(packet->gMaxTime, &tmp_u8);
+    if (eOK == retVal) retVal = BcdToVal(packet->gMaxLaps, &tmp_u8);
+    if (eOK == retVal) retVal = BcdToVal(packet->gServSpeed, &tmp_u8);
+
+    return retVal;     
+}
+
+eStatus CheckPacketAllValuesAscii(const PacketAllValuesAscii * const packet)
+{
+    eStatus retVal = eOK;
+
+    retVal = checkStartByte((const uint8_t * const)packet);
+    
+    if (eOK != retVal)
+    {
+        Log(eLogWarn, CMP_NAME, "CheckPacketAllValues: error in start byte!");
+    }
+
+    if (eOK == retVal)
+    {
+        retVal = checkChecksum((const uint8_t * const)packet, sizeof(PacketAllValuesAscii));
+
+        if (eOK != retVal)
+        {
+            Log(eLogWarn, CMP_NAME, "CheckPacketAllValues: Checksum error!");
+        }
+    }
+
+    if (eOK == retVal)
+    {
+        retVal = CheckAllValuesAscii(&packet->values);
+
+        if (eOK != retVal)
+        {
+            Log(eLogWarn, CMP_NAME, "CheckPacketAllValues: Invalid values detected!");
+        }
+    }
+
+    return retVal;
+}
+
+eStatus AllValuesToPacketAllValuesAscii(const AllValues * const values, PacketAllValuesAscii * const packet)
+{
+    eStatus retVal = eOK;
+
+    if (eOK == retVal) retVal = ValToBcd(values->cEnd,      packet->values.cEnd);
+    if (eOK == retVal) retVal = ValToBcd(values->cAcc,      packet->values.cAcc);
+    if (eOK == retVal) retVal = ValToBcd(values->cDec,      packet->values.cDec);
+    if (eOK == retVal) retVal = ValToBcd(values->cTurn,     packet->values.cTurn);
+    if (eOK == retVal) retVal = ValToBcd(values->gHome,     packet->values.gHome);
+    if (eOK == retVal) retVal = ValToBcd(values->gEnd,      packet->values.gEnd);
+    if (eOK == retVal) retVal = ValToBcd(values->gTurn1,    packet->values.gTurn1);
+    if (eOK == retVal) retVal = ValToBcd(values->gTurn2,    packet->values.gTurn2);
+    if (eOK == retVal) retVal = ValToBcd(values->gMaxAcc,   packet->values.gMaxAcc);
+    if (eOK == retVal) retVal = ValToBcd(values->gMaxDec,   packet->values.gMaxDec);
+    if (eOK == retVal) retVal = ValToBcd(values->gFMax,     packet->values.gFMax);
+    if (eOK == retVal) retVal = ValToBcd(values->gFMin,     packet->values.gFMin);
+    if (eOK == retVal) retVal = ValToBcd(values->gMaxTime,  packet->values.gMaxTime);
+    if (eOK == retVal) retVal = ValToBcd(values->gMaxLaps,  packet->values.gMaxLaps);
+    if (eOK == retVal) retVal = ValToBcd(values->gServSpeed,packet->values.gServSpeed);
+
+    return retVal;
+}
+
+eStatus PacketAllValuesAsciiToAllValues(const PacketAllValuesAscii * const packet, AllValues * const values)
+{
+    eStatus retVal = eOK;
+
+    retVal = CheckPacketAllValuesAscii(packet);
+
+    if (eOK == retVal)
+    {
+        BcdToVal(packet->values.cEnd,       &values->cEnd); 
+        BcdToVal(packet->values.cAcc,       &values->cEnd);
+        BcdToVal(packet->values.cDec,       &values->cEnd);
+        BcdToVal(packet->values.cTurn,      &values->cEnd);
+        BcdToVal(packet->values.gHome,      &values->cEnd);
+        BcdToVal(packet->values.gEnd,       &values->cEnd);
+        BcdToVal(packet->values.gTurn1,     &values->cEnd);
+        BcdToVal(packet->values.gTurn2,     &values->cEnd);
+        BcdToVal(packet->values.gMaxAcc,    &values->cEnd);
+        BcdToVal(packet->values.gMaxDec,    &values->cEnd);
+        BcdToVal(packet->values.gFMax,      &values->cEnd);
+        BcdToVal(packet->values.gFMin,      &values->cEnd);
+        BcdToVal(packet->values.gMaxTime,   &values->cEnd);
+        BcdToVal(packet->values.gMaxLaps,   &values->cEnd);
+        BcdToVal(packet->values.gServSpeed, &values->cEnd);
+    }
 }
 

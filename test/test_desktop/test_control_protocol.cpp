@@ -31,20 +31,20 @@
 //  Local functions
 //==============================================================================
 
-static void setStartByte(PacketAllValues * const packet)
+static void setStartByte(PacketAllValuesAscii * const packet)
 {
     packet->startByte = 0x2a;
 }
 
-static void setStopByte(PacketAllValues * const packet)
+static void setStopByte(PacketAllValuesAscii * const packet)
 {
     packet->stopByte = 0x13;
 }
 
-static void setChecksum(PacketAllValues * const packet)
+static void setChecksum(PacketAllValuesAscii * const packet)
 {
     uint16_t checksum = 0;
-    for (int i = 0; i < sizeof(PacketAllValues) - 3; i++)
+    for (int i = 0; i < sizeof(PacketAllValuesAscii) - 3; i++)
     {
         checksum = checksum + ((uint8_t*)&packet)[i];
     }
@@ -53,39 +53,6 @@ static void setChecksum(PacketAllValues * const packet)
 
     packet->checksum[0] = (uint8_t)((checksum & 0xFF)>> 8 );
     packet->checksum[1] = (uint8_t)(checksum & 0xFF);
-}
-
-static void setDefaultValues(PacketAllValues * const packet)
-{
-}
-
-static void test_checkPacketAllValues_BadStartByte(void)
-{
-    PacketAllValues packet;
-    memset(&packet, 0, sizeof(PacketAllValues));
-    
-    packet.startByte = 0x22;
-    TEST_ASSERT_EQUAL(eFAIL, CheckPacketAllValues(&packet));
-}
-
-static void test_checkPacketAllValues_BadChecksum(void)
-{
-    PacketAllValues packet;
-    memset(&packet, 0, sizeof(PacketAllValues));
-    
-    packet.startByte = 0x2a;
-    TEST_ASSERT_EQUAL(eFAIL, CheckPacketAllValues(&packet));
-}
-
-static void test_checkPacketAllValues_BadValues(void)
-{
-    PacketAllValues packet;
-    memset(&packet, 0, sizeof(PacketAllValues));
-    
-    packet.startByte = 0x2a;
-    packet.checksum[0] = 0xff;
-    packet.checksum[1] = 0xd5;
-    TEST_ASSERT_EQUAL(eOK, CheckPacketAllValues(&packet));
 }
 
 static void test_bcdToVal_u8(void)
@@ -177,12 +144,6 @@ static void test_valToBcd_u16(void)
 int main(int argc, char ** argv)
 {
     UNITY_BEGIN();
-
-//    RUN_TEST(test_checkPacketAllValues_BadStartByte);
-
-//    RUN_TEST(test_checkPacketAllValues_BadChecksum);
-
-  //  RUN_TEST(test_checkPacketAllValues_GoodChecksum);
 
     RUN_TEST(test_bcdToVal_u8);
     RUN_TEST(test_bcdToVal_u16);
