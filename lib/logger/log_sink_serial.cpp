@@ -46,6 +46,7 @@ size_t LogSinkSerialWrite(const uint8_t * const buffer, const size_t toSend)
 
 eStatus LogSinkSerialInit()
 {
+    Serial.begin(115200);
     return eOK;
 }
 
