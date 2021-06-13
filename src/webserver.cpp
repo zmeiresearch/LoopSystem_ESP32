@@ -145,7 +145,7 @@ eStatus WebserverInit(void * params)
     }
   
     Log(eLogInfo, CMP_NAME, "WebserverInit: Connected to %s", WIFI_SSID);
-    Log(eLogInfo, CMP_NAME, "IP address: %s", WiFi.localIP());
+    Log(eLogInfo, CMP_NAME, "IP address: %s", WiFi.localIP().toString().c_str());
 
     // Advertise through MDNS
     if (!MDNS.begin(WIFI_DEVICE_NAME)) 
@@ -154,7 +154,7 @@ eStatus WebserverInit(void * params)
     } 
     else
     {
-        Log(eLogInfo, "mDNS responder started");
+        Log(eLogInfo, CMP_NAME, "mDNS responder started");
     }
     
     // Web root 
