@@ -85,18 +85,75 @@ static void buildPacketValid(PacketAllValuesAscii * const packet)
     setPacketChecksum(packet);
 }
 
-static void test_packet_to_values(void)
+static void test_packetToValues_BadStart(void)
 {
     PacketAllValuesAscii packet;
     AllValues values;
 
     memset(&packet, 0, sizeof(PacketAllValuesAscii));
     memset(&values, 0, sizeof(AllValues));
-//    setPacketChecksum(&packet);
+
+    setPacketStartByte(&packet);
+    setPacketStopByte(&packet);
+    setAsciiValuesValid(&packet.values);
+
+    packet.startByte =  (uint8_t)(START_BYTE + 1);
+
+    setPacketChecksum(&packet);
+
+    TEST_ASSERT_EQUAL(eFAIL, PacketAllValuesAsciiToAllValues(&packet, &values));
+    TEST_ASSERT_EQUAL(values.cEnd, 0);
+}
+
+static void test_packetToValues_BadChecksum(void)
+{
+    PacketAllValuesAscii packet;
+    AllValues values;
+
+    memset(&packet, 0, sizeof(PacketAllValuesAscii));
+    memset(&values, 0, sizeof(AllValues));
+
+    setPacketStartByte(&packet);
+    setPacketStopByte(&packet);
+    setAsciiValuesValid(&packet.values);
+    setPacketChecksum(&packet);
+
+    packet.checksum[0] =  (uint8_t)(packet.checksum[0] + 1);
+
+    TEST_ASSERT_EQUAL(eFAIL, PacketAllValuesAsciiToAllValues(&packet, &values));
+    TEST_ASSERT_EQUAL(values.cEnd, 0);
+}
+
+static void test_packetToValues_BadValues(void)
+{
+    PacketAllValuesAscii packet;
+    AllValues values;
+
+    memset(&packet, 0, sizeof(PacketAllValuesAscii));
+    memset(&values, 0, sizeof(AllValues));
+
+    setPacketStartByte(&packet);
+    setPacketStopByte(&packet);
+    setAsciiValuesValid(&packet.values);
+
+    packet.values.cEnd[0] =  0x3A;
+
+    setPacketChecksum(&packet);
+    
+    TEST_ASSERT_EQUAL(eFAIL, PacketAllValuesAsciiToAllValues(&packet, &values));
+    TEST_ASSERT_EQUAL(values.cEnd, 0);
+}
+
+static void test_packetToValues_Good(void)
+{
+    PacketAllValuesAscii packet;
+    AllValues values;
+
+    memset(&packet, 0, sizeof(PacketAllValuesAscii));
+    memset(&values, 0, sizeof(AllValues));
 
     buildPacketValid(&packet);
 
-//eStatus PacketAllValuesAsciiToAllValues(const PacketAllValuesAscii * const packet, AllValues * const values);
     TEST_ASSERT_EQUAL(eOK, PacketAllValuesAsciiToAllValues(&packet, &values));
     TEST_ASSERT_EQUAL(values.cEnd, 123);
     TEST_ASSERT_EQUAL(values.cAcc, 72);
@@ -228,7 +285,10 @@ int main(int argc, char ** argv)
     RUN_TEST(test_valToBcd_u8);
     RUN_TEST(test_valToBcd_u16);
 
-    RUN_TEST(test_packet_to_values);
+    RUN_TEST(test_packetToValues_BadStart);
+    RUN_TEST(test_packetToValues_BadChecksum);
+    RUN_TEST(test_packetToValues_BadValues);
+    RUN_TEST(test_packetToValues_Good);
     
     UNITY_END();
     return 0;
