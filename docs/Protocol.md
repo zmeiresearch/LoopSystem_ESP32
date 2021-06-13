@@ -39,12 +39,12 @@ TODO: What is relation with Current Settings: END and TURN2
 * First byte of packet is a start symbol `*`, 0x2A
 * Second byte is packet type - see below [Packet Types](#packet-types)
 * N bytes - fixed-length payload based on packet type
-* 2 bytes checksum [CRC](#checksum-calculation)
-* Stop symbol - Carriage return, 0x13 - TODO! CR in CRC?
+* 2 bytes [checksum](#checksum-calculation)
+* Stop symbol - Carriage return, 0x13
 
 ## Value representation
-* Protocol-native fields - sequence number and CRC are in *BIG ENDIAN*, e.g. if the sequence number is 0x1234, byte 4
-  will be 0x12 and byte 5 will be 0x34
+* Protocol-native fields - checksum is in *LITTLE ENDIAN*, e.g. if the checksum is 0x1234, first transmitted byte will
+  be 0x34 and second will be 0x12
 * All other values are transmitted in BCD (Binary-coded decimal) - e.g. if END is "123", bytes on the line will be 
     1 - 0x31
     2 - 0x32
