@@ -15,7 +15,7 @@
 #include "webserver.h"
 
 #include <control_protocol.h>
-
+#include <control_serial.h>
 
 //==============================================================================
 //  Defines
@@ -59,21 +59,32 @@ typedef struct _Module
 //==============================================================================
 //  Local function definitions
 //==============================================================================
-
+static eStatus keepaliveLoop();
 
 //==============================================================================
 //  Local data
 //==============================================================================
 const Module Modules[] = {
-    { "Logger",     LogInit,        LogLoop,    LOG_TASK_PERIOD,    NULL,   4096,   2 },
-//    { "Blink",      NULL,           blinkLoop,  0,                  NULL,   4096,   1 },
-    { "Webserver",  WebserverInit,  NULL,       5,                  NULL,   4096,   1 }
+   { "Logger",     LogInit,             LogLoop,            LOG_TASK_PERIOD,    NULL,   8192,   2 },
+   { "Keepalive",  NULL,                keepaliveLoop,          0,                  NULL,   4096,   1 },
+//    { "Serial",     ControlSerialInit,  ControlSerialLoop,  5,                  NULL,   4096,   2 },
+    { "Webserver",  WebserverInit,      NULL,               0,                  NULL,   4096,   1 }
 };
 
 
 //==============================================================================
 //  Local functions
 //==============================================================================
+static eStatus keepaliveLoop()
+{
+    vTaskDelay(5000/portTICK_PERIOD_MS);
+    eStatus stat = Log(eLogWarn, CMP_NAME, "Still alive!");
+//    Serial.begin(115200);
+//    Serial.printf("alive: %d", stat);
+
+
+    return eOK;
+}
 
 static void setupHardware()
 {
@@ -141,9 +152,10 @@ void setup()
 
     setupHardware();
 
-    LogSetMinLevel(eLogInfo);
+    LogSetMinLevel(eLogDebug);
 
     retVal = startModules();
+
 }
 
 // All tasks already started during setup()
