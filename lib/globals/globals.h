@@ -46,6 +46,7 @@ typedef enum _eStatus
     eNOTINITIALIZED,
     eOUTOFMEMORY,
     eTIMEOUT,
+    eOVERFLOW,
     eStatusCount
 } eStatus;
 
