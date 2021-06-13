@@ -8,6 +8,7 @@
 //==============================================================================
 #include <stdio.h>
 #include <stdarg.h>
+#include <stdlib.h>
 #include <unity.h>
 
 #include "mock_logger.h"
