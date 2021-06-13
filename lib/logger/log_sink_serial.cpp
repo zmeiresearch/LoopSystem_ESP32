@@ -35,12 +35,13 @@
 
 size_t LogSinkSerialGetWriteSize()
 {
+
     return 256; // TODO: arbitrary
 }
 
 size_t LogSinkSerialWrite(const uint8_t * const buffer, const size_t toSend)
 {
-    Serial.printf("%s", buffer);
+    Serial.write(buffer, toSend);
     return toSend;
 }
 
