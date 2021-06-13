@@ -32,8 +32,9 @@
 //==============================================================================
 //  Exported functions
 //==============================================================================
-size_t      ControlSerialGetWriteSize();
-size_t      ControlSerialWrite(const uint8_t * const buffer, const size_t toSend);
-eStatus     ControlSerialInit();
+//size_t      ControlSerialGetWriteSize();
+//size_t      ControlSerialWrite(const uint8_t * const buffer, const size_t toSend);
+eStatus     ControlSerialInit(void * param);
+eStatus     ControlSerialLoop();
 
 #endif // INC_CONTROL_SERIAL_H
