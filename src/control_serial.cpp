@@ -76,38 +76,54 @@ eStatus ControlSerialInit(void * param)
 
 eStatus ControlSerialLoop()
 {
+    static int total = 0;
     while(serial.available())
     {
         uint8_t tmp = serial.read();
+        total++;
+
+    //    Log(eLogDebug, CMP_NAME, "CSL: %d:%d:%02x:%08x:%08x", total, status, tmp, writePtr, (uint8_t *)&(inPacket.stopByte));
+
         switch (status)
         {
             case eReceiveIdle:
             case eReceiveError:
                 if (START_BYTE == tmp)
                 {
+                    Log(eLogInfo, CMP_NAME, "ControlSerialLoop: Start Byte Received");
                     writePtr = (uint8_t *)&inPacket;
                     *writePtr++ = tmp;
                     status = eReceiveInProgress;
                 }
                 break;
             case eReceiveInProgress:
-                if (writePtr > (uint8_t *)&(inPacket.stopByte))
+                *writePtr = tmp;
+                if (STOP_BYTE == tmp)
                 {
-                    status = eReceiveError;
-                    Log(eLogError, CMP_NAME, "ControlSerialLoop: receive overflow!");
-                }
-                else
-                {
-                    if ( (writePtr == (uint8_t*)&(inPacket.stopByte)) &&
-                         (STOP_BYTE == tmp))
+                    if (writePtr == (uint8_t*)&(inPacket.stopByte))
                     {
-                        *writePtr++ = tmp;
                         Log(eLogInfo, CMP_NAME, "ControlSerialLoop: processing packet");
                         PacketAllValuesAsciiToAllValues(&inPacket, &values);
                         status = eReceiveIdle;
                     }
+                    else
+                    {
+                        Log(eLogError, CMP_NAME, "ControlSerialLoop: Unexpected stop byte received!");
+                        status = eReceiveError;
+                    }
+                }
+                else
+                {
+                    if (writePtr > (uint8_t*)&(inPacket.stopByte))
+                    {
+                        Log(eLogError, CMP_NAME, "ControlSerialLoop: receive overflow!");
+                        status = eReceiveError;
+                    }
+                }
 
-                    *writePtr++ = tmp;
+                if (eReceiveInProgress == status)
+                {
+                    writePtr++;
                 }
                 break;
         }

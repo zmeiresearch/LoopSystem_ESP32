@@ -65,9 +65,9 @@ static eStatus keepaliveLoop();
 //  Local data
 //==============================================================================
 const Module Modules[] = {
-   { "Logger",     LogInit,             LogLoop,            LOG_TASK_PERIOD,    NULL,   8192,   2 },
-   { "Keepalive",  NULL,                keepaliveLoop,          0,                  NULL,   4096,   1 },
-//    { "Serial",     ControlSerialInit,  ControlSerialLoop,  5,                  NULL,   4096,   2 },
+    { "Logger",     LogInit,            LogLoop,            LOG_TASK_PERIOD,    NULL,   8192,   2 },
+    { "Keepalive",  NULL,               keepaliveLoop,      0,                  NULL,   4096,   1 },
+    { "Serial",     ControlSerialInit,  ControlSerialLoop,  5,                  NULL,   4096,   2 },
     { "Webserver",  WebserverInit,      NULL,               0,                  NULL,   4096,   1 }
 };
 
@@ -77,11 +77,8 @@ const Module Modules[] = {
 //==============================================================================
 static eStatus keepaliveLoop()
 {
-    vTaskDelay(5000/portTICK_PERIOD_MS);
+    vTaskDelay(10000/portTICK_PERIOD_MS);
     eStatus stat = Log(eLogWarn, CMP_NAME, "Still alive!");
-//    Serial.begin(115200);
-//    Serial.printf("alive: %d", stat);
-
 
     return eOK;
 }
@@ -152,9 +149,9 @@ void setup()
 
     setupHardware();
 
-    LogSetMinLevel(eLogDebug);
-
     retVal = startModules();
+
+    LogSetMinLevel(eLogDebug);
 
 }
 

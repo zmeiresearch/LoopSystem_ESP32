@@ -69,6 +69,12 @@ static eStatus checkChecksum(const uint8_t * const packet, const size_t packetLe
 
     calculated = ~calculated;
 
+    if (((uint8_t)((calculated & 0xFF00) >> 8) == STOP_BYTE) ||
+         (uint8_t)((calculated & 0xFF) == STOP_BYTE))
+    {
+        calculated = SPECIAL_CHECKSUM;
+    }
+
     Log(eLogDebug, CMP_NAME, "CheckChecksum: packetLength: %d, calculated: %#04x, got: %#04x", 
             packetLength, calculated, fromPacket);
 
@@ -91,6 +97,13 @@ static void writeChecksum(const uint8_t * packet, const size_t packetLength)
 
     *checksum = (uint16_t)(~(*checksum));
 
+    if (((uint8_t)((*checksum & 0xFF00) >> 8) == STOP_BYTE) ||
+         (uint8_t)((*checksum & 0xFF) == STOP_BYTE))
+    {
+        *checksum = SPECIAL_CHECKSUM;
+    }
+
+
     Log(eLogDebug, CMP_NAME, "writeChecksum: calulcated: %#04x", *checksum);
 
 }
@@ -108,9 +121,30 @@ static eStatus isBcd(const char val)
     return eOK;
 }
 
+
 //==============================================================================
 //  Exported functions
 //==============================================================================
+
+void DumpAllValues(const AllValues * const values)
+{
+    Log(eLogInfo, CMP_NAME, "cEnd:%d",          values->cEnd);
+    Log(eLogInfo, CMP_NAME, "cAcc:%d",          values->cAcc);
+    Log(eLogInfo, CMP_NAME, "cDec:%d",          values->cDec);
+    Log(eLogInfo, CMP_NAME, "cTurn:%d",         values->cTurn);
+    Log(eLogInfo, CMP_NAME, "gHome:%d",         values->gHome);
+    Log(eLogInfo, CMP_NAME, "gEnd:%d",          values->gEnd);
+    Log(eLogInfo, CMP_NAME, "gTurn1:%d",        values->gTurn1);
+    Log(eLogInfo, CMP_NAME, "gTurn2:%d",        values->gTurn2);
+    Log(eLogInfo, CMP_NAME, "gMaxAcc:%d",       values->gMaxAcc);
+    Log(eLogInfo, CMP_NAME, "gMaxDec:%d",       values->gMaxDec);
+    Log(eLogInfo, CMP_NAME, "gFMax:%d",         values->gFMax);
+    Log(eLogInfo, CMP_NAME, "gFMin:%d",         values->gFMin);
+    Log(eLogInfo, CMP_NAME, "gMaxTime:%d",      values->gMaxTime);
+    Log(eLogInfo, CMP_NAME, "gMaxLaps:%d",      values->gMaxLaps);
+    Log(eLogInfo, CMP_NAME, "gServSpeed:%d",    values->gServSpeed);
+}
+
 
 eStatus BcdToVal(const unsigned char * const bcd, uint8_t * const outVal)
 {
@@ -257,6 +291,7 @@ eStatus PacketAllValuesAsciiToAllValues(const PacketAllValuesAscii * const packe
 
     if (eOK == retVal)
     {
+        Log(eLogInfo, CMP_NAME, "PacketAllValuesAsciiToAllValues: got good packet, processing!");
         BcdToVal(packet->values.cEnd,       &values->cEnd); 
         BcdToVal(packet->values.cAcc,       &values->cAcc);
         BcdToVal(packet->values.cDec,       &values->cDec);
@@ -272,6 +307,8 @@ eStatus PacketAllValuesAsciiToAllValues(const PacketAllValuesAscii * const packe
         BcdToVal(packet->values.gMaxTime,   &values->gMaxTime);
         BcdToVal(packet->values.gMaxLaps,   &values->gMaxLaps);
         BcdToVal(packet->values.gServSpeed, &values->gServSpeed);
+
+        DumpAllValues(values);
     }
 
     return retVal;
