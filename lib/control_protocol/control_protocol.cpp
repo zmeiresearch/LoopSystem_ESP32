@@ -12,6 +12,7 @@
 #include "config.h"
 
 #ifndef MOCK_LOGGER
+#include "logger.h"
 #else
 #include "mock_logger.h"
 #endif
@@ -23,9 +24,6 @@
 //  Defines
 //==============================================================================
 #define CMP_NAME        "ControlProtocol"
-
-#define START_BYTE      '*'
-#define STOP_BYTE        '\n'
 
 //==============================================================================
 //  Local types
@@ -88,12 +86,12 @@ static void writeChecksum(const uint8_t * packet, const size_t packetLength)
 
     for (size_t i = 0; i < packetLength - 3; i++)
     {
-        *checksum += packet[i];
+        *checksum = *checksum + packet[i];
     }
 
-    *checksum = ~(*checksum);
+    *checksum = (uint16_t)(~(*checksum));
 
-    Log(eLogDebug, CMP_NAME, "writeChecksum: calulcated: %#04x", checksum);
+    Log(eLogDebug, CMP_NAME, "writeChecksum: calulcated: %#04x", *checksum);
 
 }
 
@@ -241,6 +239,12 @@ eStatus AllValuesToPacketAllValuesAscii(const AllValues * const values, PacketAl
     if (eOK == retVal) retVal = ValToBcd(values->gMaxTime,  packet->values.gMaxTime);
     if (eOK == retVal) retVal = ValToBcd(values->gMaxLaps,  packet->values.gMaxLaps);
     if (eOK == retVal) retVal = ValToBcd(values->gServSpeed,packet->values.gServSpeed);
+    
+    if (eOK == retVal) 
+    {
+        setStartStop((uint8_t * const)packet, sizeof(PacketAllValuesAscii));
+        writeChecksum((uint8_t * const)packet, sizeof(PacketAllValuesAscii));
+    }
 
     return retVal;
 }
