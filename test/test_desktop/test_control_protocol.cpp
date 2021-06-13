@@ -18,6 +18,14 @@
 #define START_BYTE      '*'
 #define STOP_BYTE        '\n'
 
+void setUp(void) {
+    // set stuff up here
+}
+
+void tearDown(void) {
+    // clean stuff up here
+}
+
 //==============================================================================
 //  Local types
 //==============================================================================
@@ -190,6 +198,40 @@ static void test_packetToValues_Good(void)
 
 }
 
+static void test_valuesToPacket_Good(void)
+{
+    PacketAllValuesAscii packet;
+    AllValues values;
+
+    memset(&packet, 0, sizeof(PacketAllValuesAscii));
+    memset(&values, 0, sizeof(AllValues));
+
+    AllValuesToPacketAllValuesAscii(&values, &packet);
+    TEST_ASSERT_EQUAL(packet.startByte, START_BYTE);
+    TEST_ASSERT_EQUAL(packet.stopByte, STOP_BYTE);
+//    TEST_ASSERT_EQUAL_UINT8_ARRAY(packet.checksum, ( 0x45, 0xf8) , 2);
+    TEST_ASSERT_EQUAL(0x45, packet.checksum[0]);
+    TEST_ASSERT_EQUAL(0xf9, packet.checksum[1]);
+
+
+/*    TEST_ASSERT_EQUAL(packet.values.cEnd, 123);
+    TEST_ASSERT_EQUAL(packet.values.cAcc, 72);
+    TEST_ASSERT_EQUAL(packet.values.cDec, 81);
+    TEST_ASSERT_EQUAL(packet.values.cTurn, 42);
+    TEST_ASSERT_EQUAL(packet.values.gHome, 933);
+    TEST_ASSERT_EQUAL(packet.values.gEnd, 178);
+    TEST_ASSERT_EQUAL(packet.values.gTurn1, 981);
+    TEST_ASSERT_EQUAL(packet.values.gTurn2, 189);
+    TEST_ASSERT_EQUAL(packet.values.gMaxAcc, 12);
+    TEST_ASSERT_EQUAL(packet.values.gMaxDec, 63);
+    TEST_ASSERT_EQUAL(packet.values.gFMax, 97);
+    TEST_ASSERT_EQUAL(packet.values.gFMin, 55);
+    TEST_ASSERT_EQUAL(packet.values.gMaxTime, 12);
+    TEST_ASSERT_EQUAL(packet.values.gMaxLaps, 47);
+    TEST_ASSERT_EQUAL(packet.values.gServSpeed, 73);*/
+
+}
+
 static void test_bcdToVal_u8(void)
 {
     unsigned char in[2];
@@ -289,7 +331,9 @@ int main(int argc, char ** argv)
     RUN_TEST(test_packetToValues_BadChecksum);
     RUN_TEST(test_packetToValues_BadValues);
     RUN_TEST(test_packetToValues_Good);
-    
+
+    RUN_TEST(test_valuesToPacket_Good);
+
     UNITY_END();
     return 0;
 }
