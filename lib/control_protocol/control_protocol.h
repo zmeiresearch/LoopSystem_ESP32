@@ -27,48 +27,56 @@
 //  Exported types
 //==============================================================================
 
-typedef struct _AllValues {
-    uint16_t            cEnd;
-    uint8_t             cAcc;
-    uint8_t             cDec;
-    uint8_t             cTurn;
-    uint16_t            gHome;
-    uint16_t            gEnd;
-    uint16_t            gTurn1;
-    uint16_t            gTurn2;
-    uint8_t             gMaxAcc;
-    uint8_t             gMaxDec;
-    uint8_t             gFMax;
-    uint8_t             gFMin;
-    uint8_t             gMaxTime;
-    uint8_t             gMaxLaps;
-    uint8_t             gServSpeed;
-}  AllValues;
+typedef struct _ModeValues {
+    uint8_t             mode;
+    uint16_t            end;
+    uint8_t             acc;
+    uint8_t             dec;
+    uint8_t             turn;
+} ModeValues;
+
+typedef struct _GlobalValues {
+    uint16_t            home;
+    uint16_t            end;
+    uint16_t            turn1;
+    uint16_t            turn2;
+    uint8_t             maxAcc;
+    uint8_t             maxDec;
+    uint8_t             fMax;
+    uint8_t             fMin;
+    uint8_t             maxTime;
+    uint8_t             maxLaps;
+    uint8_t             servSpeed;
+} GlobalValues;
 
 #pragma pack(push, 1)
 
-typedef struct _AllValuesAscii {
-    unsigned char       cEnd[3];
-    unsigned char       cAcc[2];
-    unsigned char       cDec[2];
-    unsigned char       cTurn[2];
-    unsigned char       gHome[3];
-    unsigned char       gEnd[3];
-    unsigned char       gTurn1[3];
-    unsigned char       gTurn2[3];
-    unsigned char       gMaxAcc[2];
-    unsigned char       gMaxDec[2];
-    unsigned char       gFMax[2];
-    unsigned char       gFMin[2];
-    unsigned char       gMaxTime[2];
-    unsigned char       gMaxLaps[2];
-    unsigned char       gServSpeed[2];
-}  AllValuesAscii;
+typedef struct _ModeValuesAscii {
+    unsigned char       mode;
+    unsigned char       end[3];
+    unsigned char       acc[2];
+    unsigned char       dec[2];
+    unsigned char       turn[2];
+} ModeValuesAscii;
 
-typedef struct _PacketAllValuesAscii {
+typedef struct GlobalValuesAscii {
+    unsigned char       home[3];
+    unsigned char       end[3];
+    unsigned char       turn1[3];
+    unsigned char       turn2[3];
+    unsigned char       maxAcc[2];
+    unsigned char       maxDec[2];
+    unsigned char       fMax[2];
+    unsigned char       fMin[2];
+    unsigned char       maxTime[2];
+    unsigned char       maxLaps[2];
+    unsigned char       servSpeed[2];
+}  GlobalValuesAscii;
+
+typedef struct _PacketModeValuesAscii {
     uint8_t             startByte;
     uint8_t             packetType;
-    AllValuesAscii      values;
+    ModeValuesAscii     values;
     uint8_t             checksum[2];
     uint8_t             stopByte;
 } PacketAllValuesAscii;
