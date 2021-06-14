@@ -120,7 +120,7 @@ body {
   position: relative;
 }
 
-@media (min-width: 961px),
+@media (min-width: 100px),
 print {
   #muse_css_mq {
     background-color: #FFFFFF;
@@ -149,113 +149,7 @@ print {
   }
   .css_verticalspacer .verticalspacer {
     height: calc(100vh - 613px);
-  }
-  body {
-    min-width: 960px;
-  }
+  } 
 }
 
-@media (min-width: 741px) and (max-width: 960px) {
-  #muse_css_mq {
-    background-color: #0003c0;
-  }
-  #bp_960.active {
-    display: block;
-  }
-  #page {
-    min-height: 571px;
-    padding-left: 228px;
-    padding-right: 227px;
-    padding-bottom: 21px;
-  }
-  #u144 {
-    margin-left: 1px;
-  }
-  #u280 {
-    margin-top: 33px;
-  }
-  #u250-4 {
-    width: 180px;
-    margin-left: 52px;
-  }
-  #u268-4 {
-    margin-top: 55px;
-  }
-  .css_verticalspacer .verticalspacer {
-    height: calc(100vh - 612px);
-  }
-  body {
-    overflow-x: hidden;
-    min-width: 740px;
-  }
-}
 
-@media (min-width: 321px) and (max-width: 740px) {
-  #muse_css_mq {
-    background-color: #0002e4;
-  }
-  #bp_740.active {
-    display: block;
-  }
-  #page {
-    min-height: 571px;
-    padding-left: 17px;
-    padding-right: 18px;
-    padding-bottom: 21px;
-  }
-  #u144 {
-    margin-left: 2px;
-  }
-  #u280 {
-    margin-top: 33px;
-  }
-  #u250-4 {
-    width: 169px;
-    margin-left: 58px;
-  }
-  #u268-4 {
-    margin-top: 55px;
-  }
-  .css_verticalspacer .verticalspacer {
-    height: calc(100vh - 612px);
-  }
-  body {
-    overflow-x: hidden;
-    min-width: 320px;
-  }
-}
-
-@media (max-width: 320px) {
-  #muse_css_mq {
-    background-color: #000140;
-  }
-  #bp_320.active {
-    display: block;
-  }
-  #page {
-    min-height: 586px;
-    padding-left: 18px;
-    padding-right: 17px;
-    padding-bottom: 114px;
-  }
-  #u144 {
-    margin-left: 1px;
-  }
-  #u280 {
-    margin-top: 48px;
-  }
-  #u250-4 {
-    width: 169px;
-    margin-left: 58px;
-  }
-  #u268-4 {
-    margin-top: 55px;
-  }
-  .css_verticalspacer .verticalspacer {
-    height: calc(100vh - 719px);
-  }
-  body {
-    overflow-x: hidden;
-    min-width: 320px;
-  }
-}
