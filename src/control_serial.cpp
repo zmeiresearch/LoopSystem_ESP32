@@ -152,54 +152,49 @@ eStatus ControlSerialReceive()
             case eReceiveStatusTypeReceived:
                 // Packet type received, wait for all values to arrive
                 expectedValueCount = getValuesCount(receivedPacketType);
-                if (receiveIndex <= expectedValueCount + 1) // + 2 for the Start byte and the Packet Type byte
+                if (eOK == IsBcd(tmp))
                 {
-                    if (eOK == IsBcd(tmp))
+                    receiveBuffer[receiveIndex++] = tmp;
+                    // + 2 for the Start byte and the Packet Type byte
+                    if (receiveIndex == expectedValueCount + 2)
                     {
-                        receiveBuffer[receiveIndex++] = tmp;
-                    }
-                    else
-                    {
-                        // Unexpected non-BCD character
-                        receiveStatus = eReceiveStatusError;
-                        Log(eLogWarn, CMP_NAME, "ControlSerialLoop: Invalid character receiving values: 0x%02x", tmp);
+                        receiveStatus = eReceiveStatusValuesReceived;
+                        Log(eLogInfo, CMP_NAME, "ControlSerialLoop: Values reception complete");
                     }
                 }
                 else
                 {
-                    receiveStatus = eReceiveStatusValuesReceived;
-                    Log(eLogInfo, CMP_NAME, "ControlSerialLoop: Values received");
+                    // Unexpected non-BCD character
+                    receiveStatus = eReceiveStatusError;
+                    Log(eLogWarn, CMP_NAME, "ControlSerialLoop: Invalid character receiving values: 0x%02x", tmp);
                 }
                 break;
 
             case eReceiveStatusValuesReceived:
                 // All values received, wait for checksum
                 expectedValueCount = getValuesCount(receivedPacketType);
-                if (receiveIndex <= expectedValueCount + 5) // + 6 for the Start byte and the Packet Type byte and the checksum
+                if (eOK == IsHex(tmp))
                 {
-                    if (eOK == IsHex(tmp))
+                    receiveBuffer[receiveIndex++] = tmp;
+                    // + 6 for the Start byte and the Packet Type byte and the checksum
+                    if (receiveIndex <= expectedValueCount + 6) 
                     {
-                        receiveBuffer[receiveIndex++] = tmp;
-                    }
-                    else
-                    {
-                        // Unexpected non-BCD character
-                        receiveStatus = eReceiveStatusError;
-                        Log(eLogWarn, CMP_NAME, "ControlSerialLoop: Invalid character receiving checksum: 0x%02x", tmp);
+                        receiveStatus = eReceiveStatusChecksumReceived;
                     }
                 }
                 else
                 {
-                    receiveStatus = eReceiveStatusChecksumReceived;
+                    // Unexpected non-BCD character
+                    receiveStatus = eReceiveStatusError;
+                    Log(eLogWarn, CMP_NAME, "ControlSerialLoop: Invalid character receiving checksum: 0x%02x", tmp);
                 }
-    
                 break;
 
             case eReceiveStatusChecksumReceived:
                 // Everything received, wait for stop byte
                 if (STOP_BYTE == tmp) 
                 {
-                    receiveBuffer[receiveIndex++] = 0; // NULL - terminate the buffer
+                    receiveBuffer[receiveIndex] = 0; // NULL - terminate the buffer
                     Log(eLogInfo, CMP_NAME, "ControlSerialLoop: ProcessingPacket");
                     ProcessPacket(&receiveBuffer[0], receiveIndex);
                     receiveStatus = eReceiveStatusIdle;
