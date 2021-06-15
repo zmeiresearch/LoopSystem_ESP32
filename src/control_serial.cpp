@@ -90,20 +90,24 @@ void ProcessPacket(const unsigned char * const buffer, size_t bufferSize)
     const PacketType packetType = (PacketType)buffer[1];
 
     const uint16_t receivedChecksum = ExtractChecksum(buffer, bufferSize);
-
     const uint16_t calculatedChecksum = CalculateChecksum(buffer, bufferSize);
 
-    switch (packetType)
+    if (receivedChecksum == calculatedChecksum)
     {
-        case ePacketGlobalValues:
-        case ePacketModeNovice:
-        case ePacketModeExpert:
-        case ePacketModeAdvanced:
-        case ePacketModeMaster:
-        case ePacketCount:
-        default:
-            Log(eLogWarn, CMP_NAME, "ProcessPacket: Unexpected packet type: %02x", packetType);
-            break;
+        Log(eLogInfo, CMP_NAME, "ProcessPacket: Good packet received, type: %02x", packetType);
+
+        switch (packetType)
+        {
+            case ePacketGlobalValues:
+            case ePacketModeNovice:
+            case ePacketModeExpert:
+            case ePacketModeAdvanced:
+            case ePacketModeMaster:
+            case ePacketCount:
+            default:
+                Log(eLogWarn, CMP_NAME, "ProcessPacket: Unexpected packet type: %02x", packetType);
+                break;
+        }
     }
 }
 

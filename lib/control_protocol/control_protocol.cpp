@@ -60,7 +60,7 @@ static eStatus checkStartByte(const uint8_t * const packet)
 uint16_t ExtractChecksum(const unsigned char * packet, const int packetLength)
 {
     memset(&tmp, 0, TMP_BUFFER_SIZE);
-    memcpy(&tmp, &packet[packetLength-5], 4);   // 4 bytes checksum + stop/null
+    memcpy(&tmp, &packet[packetLength-4], 4);   // 4 bytes checksum + stop/null
     uint16_t fromPacket = strtoul((const char *)&tmp, NULL, 16);
     
     Log(eLogDebug, CMP_NAME, "ExtractChecksum: got: 0x%04x", fromPacket);
