@@ -152,7 +152,7 @@ eStatus ControlSerialReceive()
             case eReceiveStatusTypeReceived:
                 // Packet type received, wait for all values to arrive
                 expectedValueCount = getValuesCount(receivedPacketType);
-                if (receiveIndex <= expectedValueCount + 2) // + 2 for the Start byte and the Packet Type byte
+                if (receiveIndex <= expectedValueCount + 1) // + 2 for the Start byte and the Packet Type byte
                 {
                     if (eOK == IsBcd(tmp))
                     {
@@ -168,13 +168,14 @@ eStatus ControlSerialReceive()
                 else
                 {
                     receiveStatus = eReceiveStatusValuesReceived;
+                    Log(eLogInfo, CMP_NAME, "ControlSerialLoop: Values received");
                 }
                 break;
 
             case eReceiveStatusValuesReceived:
                 // All values received, wait for checksum
                 expectedValueCount = getValuesCount(receivedPacketType);
-                if (receiveIndex <= expectedValueCount + 6) // + 6 for the Start byte and the Packet Type byte and the checksum
+                if (receiveIndex <= expectedValueCount + 5) // + 6 for the Start byte and the Packet Type byte and the checksum
                 {
                     if (eOK == IsHex(tmp))
                     {
