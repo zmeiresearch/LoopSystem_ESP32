@@ -196,31 +196,44 @@ eStatus ValToBcd(const uint16_t val, unsigned char * const outBuf)
     return retVal;
 }
 
-eStatus CheckAllValuesAscii(const AllValuesAscii * const packet)
+eStatus CheckModeValuesAscii(const ModeValuesAscii * const packet)
 {
     uint8_t     tmp_u8;
     uint16_t    tmp_u16;
 
-    eStatus retVal = BcdToVal(packet->cEnd, &tmp_u16);
-    if (eOK == retVal) retVal = BcdToVal(packet->cAcc, &tmp_u8);
-    if (eOK == retVal) retVal = BcdToVal(packet->cDec, &tmp_u16);
-    if (eOK == retVal) retVal = BcdToVal(packet->cTurn, &tmp_u8);
-    if (eOK == retVal) retVal = BcdToVal(packet->gHome, &tmp_u16);
-    if (eOK == retVal) retVal = BcdToVal(packet->gEnd, &tmp_u16);
-    if (eOK == retVal) retVal = BcdToVal(packet->gTurn1, &tmp_u16);
-    if (eOK == retVal) retVal = BcdToVal(packet->gTurn2, &tmp_u16);
-    if (eOK == retVal) retVal = BcdToVal(packet->gMaxAcc, &tmp_u8);
-    if (eOK == retVal) retVal = BcdToVal(packet->gMaxDec, &tmp_u8);
-    if (eOK == retVal) retVal = BcdToVal(packet->gFMax, &tmp_u8);
-    if (eOK == retVal) retVal = BcdToVal(packet->gFMin, &tmp_u8);
-    if (eOK == retVal) retVal = BcdToVal(packet->gMaxTime, &tmp_u8);
-    if (eOK == retVal) retVal = BcdToVal(packet->gMaxLaps, &tmp_u8);
-    if (eOK == retVal) retVal = BcdToVal(packet->gServSpeed, &tmp_u8);
+    eStatus retVal = eOK;
 
-    return retVal;     
+    if (eOK == retVal) retVal = BcdToVal(packet->end, &tmp_u16);
+    if (eOK == retVal) retVal = BcdToVal(packet->acc, &tmp_u8);
+    if (eOK == retVal) retVal = BcdToVal(packet->dec, &tmp_u16);
+    if (eOK == retVal) retVal = BcdToVal(packet->turn, &tmp_u8);
+
+    return retVal;
 }
 
-eStatus CheckPacketAllValuesAscii(const PacketAllValuesAscii * const packet)
+eStatus CheckGlobalValuesAscii(const AllValuesAscii * const packet)
+{
+    uint8_t     tmp_u8;
+    uint16_t    tmp_u16;
+
+    eStatus retVal = eOK;
+    if (eOK == retVal) retVal = BcdToVal(packet->home, &tmp_u16);
+    if (eOK == retVal) retVal = BcdToVal(packet->end, &tmp_u16);
+    if (eOK == retVal) retVal = BcdToVal(packet->turn1, &tmp_u16);
+    if (eOK == retVal) retVal = BcdToVal(packet->turn2, &tmp_u16);
+    if (eOK == retVal) retVal = BcdToVal(packet->maxAcc, &tmp_u8);
+    if (eOK == retVal) retVal = BcdToVal(packet->maxDec, &tmp_u8);
+    if (eOK == retVal) retVal = BcdToVal(packet->fMax, &tmp_u8);
+    if (eOK == retVal) retVal = BcdToVal(packet->fMin, &tmp_u8);
+    if (eOK == retVal) retVal = BcdToVal(packet->maxTime, &tmp_u8);
+    if (eOK == retVal) retVal = BcdToVal(packet->maxLaps, &tmp_u8);
+    if (eOK == retVal) retVal = BcdToVal(packet->servSpeed, &tmp_u8);
+
+    return retVal;     
+
+}
+
+/*eStatus CheckPacketModeValuesAscii(const PacketModeValuesAscii * const packet)
 {
     eStatus retVal = eOK;
 
@@ -228,7 +241,7 @@ eStatus CheckPacketAllValuesAscii(const PacketAllValuesAscii * const packet)
     
     if (eOK != retVal)
     {
-        Log(eLogWarn, CMP_NAME, "CheckPacketAllValues: error in start byte!");
+        Log(eLogWarn, CMP_NAME, "CheckPacketModeValuesAscii: error in start byte!");
     }
 
     if (eOK == retVal)
@@ -237,7 +250,7 @@ eStatus CheckPacketAllValuesAscii(const PacketAllValuesAscii * const packet)
 
         if (eOK != retVal)
         {
-            Log(eLogWarn, CMP_NAME, "CheckPacketAllValues: Checksum error!");
+            Log(eLogWarn, CMP_NAME, "CheckPacketModeValuesAscii: Checksum error!");
         }
     }
 
@@ -247,14 +260,20 @@ eStatus CheckPacketAllValuesAscii(const PacketAllValuesAscii * const packet)
 
         if (eOK != retVal)
         {
-            Log(eLogWarn, CMP_NAME, "CheckPacketAllValues: Invalid values detected!");
+            Log(eLogWarn, CMP_NAME, "CheckPacketModeValuesAscii: Invalid values detected!");
         }
     }
 
     return retVal;
 }
 
-eStatus AllValuesToPacketAllValuesAscii(const AllValues * const values, PacketAllValuesAscii * const packet)
+
+eStatus CheckPacketGlobalValuesAscii(const PacketAllValuesAscii * const packet)
+{
+}
+*/
+
+/*eStatus ModeValuesToPacketModeValuesAscii(ePacketType const type, const ModeValues * const values, PacketModeValuesAscii * const packet)
 {
     eStatus retVal = eOK;
 
@@ -312,5 +331,5 @@ eStatus PacketAllValuesAsciiToAllValues(const PacketAllValuesAscii * const packe
     }
 
     return retVal;
-}
+}*/
 

@@ -25,10 +25,13 @@
 //==============================================================================
 typedef enum _receiveStatus
 {
-    eReceiveIdle,
-    eReceiveInProgress,
-    eReceiveError,
-    eReceiveCount
+    eReceiveStatusIdle,
+    eReceiveStatusStartReceived,
+    eReceiveStatusTypeReceived,
+    eReceiveStatusValuesReceived,
+    eReceiveStatusChecksumReceived,
+    eReceiveStatusError,
+    eReceiveStatusCount
 } receiveStatus;
 
 
@@ -36,13 +39,11 @@ typedef enum _receiveStatus
 //  Local data
 //==============================================================================
 static HardwareSerial           serial(CONTROL_SERIAL_PORT);
-static PacketAllValuesAscii     inPacket;
-static PacketAllValuesAscii     outPacket;
-static AllValues                values;
 
-static uint8_t *                writePtr;
-static receiveStatus            status;
-
+static unsigned char            receiveBuffer[SERIAL_BUFFER_SIZE];
+static size_t                   receiveIndex;
+static receiveStatus            receiveStatus = eReceiveStatusIdle;
+static ePacketType              receivePacketType = ePacketTypeCount;
 //==============================================================================
 //  Local functions
 //==============================================================================
@@ -51,16 +52,6 @@ static receiveStatus            status;
 //==============================================================================
 //  Exported functions
 //==============================================================================
-
-size_t ControlSerialGetWriteSize()
-{
-    return serial.availableForWrite();
-}
-
-size_t ControlSerialWrite(const uint8_t * const buffer, const size_t toSend)
-{
-    return serial.write(buffer, toSend);
-}
 
 eStatus ControlSerialInit(void * param)
 {
@@ -74,9 +65,142 @@ eStatus ControlSerialInit(void * param)
     return eOK;
 }
 
+size_t getValuesCount(ePacketType packetType)
+{
+    size_t expectedValueCount;
+    switch (packetType)
+    {
+        case ePacketGlobalValues:
+            expectedValueCount = sizeof(GlobalValuesAscii);
+            break;
+        case ePacketModeNovice:
+        case ePacketModeExpert:
+        case ePacketModeAdvanced:
+        case ePacketModeMaster:
+            expectedValueCount = sizeof(ModeValuesAscii);
+            break;
+        default:
+            expectedValueCount = 0;
+            break;
+    }
+
+    return expectedValueCount;
+}
+
 eStatus ControlSerialLoop()
 {
-    static int total = 0;
+    // Process as much bytes as buffered
+    while (serial.available())
+    {
+        unsigned char tmp = serial.read();
+        Log(eLogDebug, CMP_NAME, "CSL: %d:%d:%02x:%08x:%08x", total, status, tmp, writePtr, (uint8_t *)&(inPacket.stopByte));
+    }
+
+    switch (receiveStatus)
+    {
+        case eReceiveStatusIdle:
+        case eReceiveStatusError:
+            // Always wait for a start byte
+            if (START_BYTE == tmp)
+            {
+                Log(eLogInfo, CMP_NAME, "ControlSerialLoop: Start Byte Received");
+                receiveIndex = 0;
+                receiveBuffer[receiveIndex++] = tmp;
+                receiveStatus = eReceiveStatusStartReceived;
+            }
+            break;
+        
+        case eReceiveStatusStartReceived:
+            // Next comes the packet type
+            if (((unsigned char)ePacketGlobalValues <= tmp) &&
+                (tmp < (unsigned char)ePacketCount))
+            {
+                // valid packet type
+                Log(eLogInfo, CMP_NAME, "ControlSerialLoop: Valid Packet Type: 0x%02x", tmp);
+                receiveBuffer[receiveIndex++] = tmp;
+                receivedPacketType = tmp;
+                receiveStatus = eReceiveStatusTypeReceived;
+            }
+            else 
+            {
+                receiveStatus = eReceiveStatusError;
+                Log(eLogWarn, CMP_NAME, "ControlSerialLoop: Unknown packet: 0x%02x", tmp);
+
+            }
+            break;
+        
+        case eReceiveStatusTypeReceived:
+            // Packet type received, wait for all values to arrive
+            const size_t expectedValueCount = getValuesCount(receivedPacketType);
+            if (receiveIndex <= expectedValueCount + 2) // + 2 for the Start byte and the Packet Type byte
+            {
+                if (isBcd(tmp))
+                {
+                    receiveBuffer[receiveIndex++] = tmp;
+                }
+                else
+                {
+                    // Unexpected non-BCD character
+                    receiveStatus = eReceiveStatusError;
+                    Log(eLogWarn, CMP_NAME, "ControlSerialLoop: Invalid character receiving values: 0x%02x", tmp);
+                }
+            }
+            else
+            {
+                receiveStatus = eReceiveStatusValuesReceived;
+            }
+            break;
+
+        case eReceiveStatusValuesReceived:
+            // All values received, wait for checksum
+            const size_t expectedValueCount = getValuesCount(receivedPacketType);
+            if (receiveIndex <= expectedValueCount + 6) // + 6 for the Start byte and the Packet Type byte and the checksum
+            {
+                if (isHex(tmp))
+                {
+                    receiveBuffer[receiveIndex++] = tmp;
+                }
+                else
+                {
+                    // Unexpected non-BCD character
+                    receiveStatus = eReceiveStatusError;
+                    Log(eLogWarn, CMP_NAME, "ControlSerialLoop: Invalid character receiving checksum: 0x%02x", tmp);
+                }
+            }
+            else
+            {
+                receiveStatus = eReceiveStatusChecksumReceived;
+            }
+ 
+            break;
+
+        case eReceiveStatusChecksumReceived:
+            // Everything received, wait for stop byte
+            if (STOP_BYTE == tmp) 
+            {
+                Log(eLogInfo, CMP_NAME, "ControlSerialLoop: ProcessingPacket");
+                ProcessPacket(&receiveBuffer, receiveIndex);
+                receiveStatus = eReceiveStatusIdle;
+            }
+            else
+            {
+                receiveStatus = eReceiveStatusError;
+                Log(eLogWarn, CMP_NAME, "ControlSerialLoop: Unexpected character 0x%02x while waiting for stop byte", tmp);
+            }
+
+            break;
+    
+        default:
+            receiveStatus = eReceiveStatusError;
+            break;
+    }
+
+    return eOK; // Always return OK to continue looping
+}
+
+
+eStatus ControlSerialLoop()
+{
     while(serial.available())
     {
         uint8_t tmp = serial.read();

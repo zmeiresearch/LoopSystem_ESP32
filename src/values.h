@@ -7,15 +7,15 @@
 //==============================================================================
 //  Multi-include guard
 //==============================================================================
-#ifndef INC_CONTROL_SERIAL_H
-#define INC_CONTROL_SERIAL_H
+#ifndef INC_VALUES_H
+#define INC_VALUES_H
 
 //==============================================================================
 //  Includes
 //==============================================================================
-
-#include <Arduino.h>
 #include "globals.h"
+
+#include "control_protocol.h"
 
 //==============================================================================
 //  Defines
@@ -24,15 +24,25 @@
 //==============================================================================
 //  Exported types
 //==============================================================================
+typedef enum _Modes
+{
+    eModeNovice,
+    eModeAdvanced,
+    eModeExpert,
+    eModeMaster,
+    eModeCount
+} Modes;
 
 //==============================================================================
 //  Exported data
 //==============================================================================
 
+extern GlobalValues gGlobalValues;
+extern ModeValues   gModeValues[eModeCount];
+
+
 //==============================================================================
 //  Exported functions
 //==============================================================================
-eStatus     ControlSerialInit(void * param);
-eStatus     ControlSerialLoop();
 
-#endif // INC_CONTROL_SERIAL_H
+#endif // INC_VALUES_H

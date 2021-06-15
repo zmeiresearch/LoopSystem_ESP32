@@ -21,14 +21,23 @@
 #define START_BYTE          0x2a
 #define STOP_BYTE           0x0d
 
-#define SPECIAL_CHECKSUM    0xdead
+// Change if bigger packet appears
+#define SERIAL_BUFFER_SIZE  sizeof(PacketGlobalValuesAscii) + 0x1
 
 //==============================================================================
 //  Exported types
 //==============================================================================
 
+typedef enum _PacketType {
+    ePacketGlobalValues = 0x41,
+    ePacketModeNovice = 0x42,
+    ePacketModeExpert = 0x43,
+    ePacketModeAdvanced = 0x44,
+    ePacketModeMaster = 0x45,
+    ePacketCount = 0x46
+} PacketType;
+
 typedef struct _ModeValues {
-    uint8_t             mode;
     uint16_t            end;
     uint8_t             acc;
     uint8_t             dec;
@@ -52,7 +61,6 @@ typedef struct _GlobalValues {
 #pragma pack(push, 1)
 
 typedef struct _ModeValuesAscii {
-    unsigned char       mode;
     unsigned char       end[3];
     unsigned char       acc[2];
     unsigned char       dec[2];
@@ -74,12 +82,21 @@ typedef struct GlobalValuesAscii {
 }  GlobalValuesAscii;
 
 typedef struct _PacketModeValuesAscii {
-    uint8_t             startByte;
-    uint8_t             packetType;
+    unsigned char       startByte;
+    unsigned char       packetType;
     ModeValuesAscii     values;
-    uint8_t             checksum[2];
-    uint8_t             stopByte;
+    unsigned char       checksum[4];
+    unsigned char       stopByte;
 } PacketAllValuesAscii;
+
+typedef struct _PacketGlobalValuesAscii {
+    unsigned char       startByte;
+    unsigned char       packetType;
+    GlobalValuesAscii   values;
+    unsigned char       checksum[4];
+    unsigned char       stopByte;
+} PacketAllValuesAscii;
+
 
 #pragma pack(pop)
 
