@@ -96,10 +96,14 @@ eStatus BcdToVal(const unsigned char * const bcd, uint16_t * const outVal);
 eStatus ValToBcd(const uint8_t val, unsigned char * const outBuf);
 eStatus ValToBcd(const uint16_t val, unsigned char * const outBuf);
 
-eStatus CheckAllValuesAscii(const AllValuesAscii * const packet);
-eStatus CheckPacketAllValuesAscii(const PacketAllValuesAscii * const packet);
+eStatus CheckModeValuesAscii(const AllValuesAscii * const packet);
+eStatus CheckGlobalValuesAscii(const AllValuesAscii * const packet);
+eStatus CheckPacketModeValuesAscii(const PacketAllValuesAscii * const packet);
+eStatus CheckPacketGlobalValuesAscii(const PacketAllValuesAscii * const packet);
 
-eStatus AllValuesToPacketAllValuesAscii(const AllValues * const values, PacketAllValuesAscii * const packet);
-eStatus PacketAllValuesAsciiToAllValues(const PacketAllValuesAscii * const packet, AllValues * const values);
+eStatus ModeValuesToPacketAllValuesAscii(const AllValues * const values, PacketAllValuesAscii * const packet);
+eStatus GlobalValuesToPacketAllValuesAscii(const AllValues * const values, PacketAllValuesAscii * const packet);
+eStatus PacketModeValuesAsciiToAllValues(const PacketAllValuesAscii * const packet, AllValues * const values);
+eStatus PacketGlobalValuesAsciiToAllValues(const PacketAllValuesAscii * const packet, AllValues * const values);
 
 #endif // INC_CONTROL_PROTOCOL_H
