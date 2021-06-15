@@ -79,7 +79,7 @@ const Module Modules[] = {
 static eStatus keepaliveLoop()
 {
     vTaskDelay(10000/portTICK_PERIOD_MS);
-    eStatus stat = Log(eLogWarn, CMP_NAME, "Still alive!");
+    Log(eLogWarn, CMP_NAME, "Still alive!");
 
     return eOK;
 }
@@ -146,11 +146,9 @@ static eStatus startModules()
 
 void setup()
 {
-    eStatus retVal = eOK;
-
     setupHardware();
 
-    retVal = startModules();
+    startModules();
 
     LogSetMinLevel(eLogDebug);
 
