@@ -154,7 +154,7 @@ eStatus ControlSerialReceive()
                 expectedValueCount = getValuesCount(receivedPacketType);
                 if (receiveIndex <= expectedValueCount + 2) // + 2 for the Start byte and the Packet Type byte
                 {
-                    if (IsBcd(tmp))
+                    if (eOK == IsBcd(tmp))
                     {
                         receiveBuffer[receiveIndex++] = tmp;
                     }
@@ -176,7 +176,7 @@ eStatus ControlSerialReceive()
                 expectedValueCount = getValuesCount(receivedPacketType);
                 if (receiveIndex <= expectedValueCount + 6) // + 6 for the Start byte and the Packet Type byte and the checksum
                 {
-                    if (IsHex(tmp))
+                    if (eOK == IsHex(tmp))
                     {
                         receiveBuffer[receiveIndex++] = tmp;
                     }
