@@ -7,6 +7,8 @@
 //  Includes
 //==============================================================================
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "globals.h"
 #include "config.h"
@@ -17,13 +19,13 @@
 #include "mock_logger.h"
 #endif
 
-
 #include "control_protocol.h"
 
 //==============================================================================
 //  Defines
 //==============================================================================
 #define CMP_NAME        "ControlProtocol"
+#define TMP_BUFFER_SIZE 16
 
 //==============================================================================
 //  Local types
@@ -32,6 +34,7 @@
 //==============================================================================
 //  Local data
 //==============================================================================
+static unsigned char tmp[TMP_BUFFER_SIZE];
 
 
 //==============================================================================
@@ -54,41 +57,36 @@ static eStatus checkStartByte(const uint8_t * const packet)
     return retVal;
 }
 
-static eStatus checkChecksum(const uint8_t * const packet, const size_t packetLength)
+uint16_t ExtractChecksum(const unsigned char * packet, const int packetLength)
 {
-    eStatus retVal = eFAIL;
+    memset(&tmp, 0, TMP_BUFFER_SIZE);
+    memcpy(&tmp, &packet[packetLength-5], 4);   // 4 bytes checksum + stop/null
+    uint16_t fromPacket = strtoul((const char *)&tmp, NULL, 16);
+    
+    Log(eLogDebug, CMP_NAME, "ExtractChecksum: got: 0x%04x", fromPacket);
 
-    uint16_t fromPacket = ((uint16_t)packet[packetLength-3] << 8) + packet[packetLength-2];
-    uint16_t calculated = 0;
-
-    // two bytes CRC + stop byte
-    for (size_t i = 0; i < packetLength - 3; i++) 
-    {
-        calculated = calculated + (uint16_t)packet[i];
-    }
-
-    calculated = ~calculated;
-
-    if (((uint8_t)((calculated & 0xFF00) >> 8) == STOP_BYTE) ||
-         (uint8_t)((calculated & 0xFF) == STOP_BYTE))
-    {
-        calculated = SPECIAL_CHECKSUM;
-    }
-
-    Log(eLogDebug, CMP_NAME, "CheckChecksum: packetLength: %d, calculated: %#04x, got: %#04x", 
-            packetLength, calculated, fromPacket);
-
-    if (calculated == fromPacket)
-    {
-        retVal = eOK;
-    }
-
-    return retVal;
+    return fromPacket;
 }
 
-static void writeChecksum(const uint8_t * packet, const size_t packetLength)
+uint16_t CalculateChecksum(const unsigned char * packet, const int packetLength)
 {
-    uint16_t * checksum = (uint16_t *)&packet[packetLength - 3];
+    uint16_t calculated = 0;
+
+    for (size_t i = 0; i < packetLength - 5; i++) 
+    {
+        calculated = calculated + (uint8_t)packet[i];
+    }
+
+    calculated = (uint16_t)~calculated;
+
+    Log(eLogDebug, CMP_NAME, "CalculateChecksum: calculated: 0x%04x", calculated);
+
+    return calculated;
+}
+
+static void writeChecksum(const unsigned char * packet, const int packetLength)
+{
+  /*  uint16_t * checksum = (uint16_t *)&packet[packetLength - 3];
 
     for (size_t i = 0; i < packetLength - 3; i++)
     {
@@ -97,15 +95,11 @@ static void writeChecksum(const uint8_t * packet, const size_t packetLength)
 
     *checksum = (uint16_t)(~(*checksum));
 
-    if (((uint8_t)((*checksum & 0xFF00) >> 8) == STOP_BYTE) ||
-         (uint8_t)((*checksum & 0xFF) == STOP_BYTE))
-    {
-        *checksum = SPECIAL_CHECKSUM;
-    }
-
-
-    Log(eLogDebug, CMP_NAME, "writeChecksum: calulcated: %#04x", *checksum);
-
+    snprintf((char *)&tmp, TMP_BUFFER_SIZE, "%04x", checksum);
+    Log(eLogDebug, CMP_NAME, "writeChecksum: calulcated: %s", tmp);
+    
+    memcpy((void *)&packet[packetLength-5], tmp, 4);    // 4 charactes checksum, just before the end of the packet
+*/
 }
 
 static void setStartStop(uint8_t * const packet, const size_t packetLength)
@@ -114,89 +108,53 @@ static void setStartStop(uint8_t * const packet, const size_t packetLength)
     packet[packetLength - 1] = STOP_BYTE;
 }
 
-static eStatus isBcd(const char val)
-{
-    if (val < '0' || val > '9') return eFAIL;
 
-    return eOK;
-}
 
 
 //==============================================================================
 //  Exported functions
 //==============================================================================
 
-void DumpAllValues(const AllValues * const values)
+void DumpModeValues(const ModeValues * const values)
 {
-    Log(eLogInfo, CMP_NAME, "cEnd:%d",          values->cEnd);
-    Log(eLogInfo, CMP_NAME, "cAcc:%d",          values->cAcc);
-    Log(eLogInfo, CMP_NAME, "cDec:%d",          values->cDec);
-    Log(eLogInfo, CMP_NAME, "cTurn:%d",         values->cTurn);
-    Log(eLogInfo, CMP_NAME, "gHome:%d",         values->gHome);
-    Log(eLogInfo, CMP_NAME, "gEnd:%d",          values->gEnd);
-    Log(eLogInfo, CMP_NAME, "gTurn1:%d",        values->gTurn1);
-    Log(eLogInfo, CMP_NAME, "gTurn2:%d",        values->gTurn2);
-    Log(eLogInfo, CMP_NAME, "gMaxAcc:%d",       values->gMaxAcc);
-    Log(eLogInfo, CMP_NAME, "gMaxDec:%d",       values->gMaxDec);
-    Log(eLogInfo, CMP_NAME, "gFMax:%d",         values->gFMax);
-    Log(eLogInfo, CMP_NAME, "gFMin:%d",         values->gFMin);
-    Log(eLogInfo, CMP_NAME, "gMaxTime:%d",      values->gMaxTime);
-    Log(eLogInfo, CMP_NAME, "gMaxLaps:%d",      values->gMaxLaps);
-    Log(eLogInfo, CMP_NAME, "gServSpeed:%d",    values->gServSpeed);
+    Log(eLogInfo, CMP_NAME, "End:%d",           values->end);
+    Log(eLogInfo, CMP_NAME, "Acc:%d",           values->acc);
+    Log(eLogInfo, CMP_NAME, "Dec:%d",           values->dec);
+    Log(eLogInfo, CMP_NAME, "Turn:%d",          values->turn);
+}
+
+void DumpGlobalValues(const GlobalValues * const values)
+{
+    Log(eLogInfo, CMP_NAME, "gHome:%d",         values->home);
+    Log(eLogInfo, CMP_NAME, "gEnd:%d",          values->end);
+    Log(eLogInfo, CMP_NAME, "gTurn1:%d",        values->turn1);
+    Log(eLogInfo, CMP_NAME, "gTurn2:%d",        values->turn2);
+    Log(eLogInfo, CMP_NAME, "gMaxAcc:%d",       values->maxAcc);
+    Log(eLogInfo, CMP_NAME, "gMaxDec:%d",       values->maxDec);
+    Log(eLogInfo, CMP_NAME, "gFMax:%d",         values->maxSpeed);
+    Log(eLogInfo, CMP_NAME, "gFMin:%d",         values->homingSpeed);
+    Log(eLogInfo, CMP_NAME, "gMaxTime:%d",      values->maxTime);
+    Log(eLogInfo, CMP_NAME, "gMaxLaps:%d",      values->maxLaps);
+    Log(eLogInfo, CMP_NAME, "gServSpeed:%d",    values->servSpeed);
+}
+
+eStatus IsBcd(const char val)
+{
+    if (val < '0' || val > '9') return eFAIL;
+
+    return eOK;
+}
+
+eStatus IsHex(const char val)
+{
+    if (eOK == IsBcd(val)) return eOK;
+    if ( ('a' <= val ) && (val <= 'f')) return eOK;
+    if ( ('A' <= val ) && (val <= 'F')) return eOK;
+    return eFAIL;
 }
 
 
-eStatus BcdToVal(const unsigned char * const bcd, uint8_t * const outVal)
-{
-    eStatus retVal = eFAIL;
-
-    if (eOK == isBcd(bcd[0]) && eOK == isBcd(bcd[1]))
-    {
-        *outVal = ((uint8_t)bcd[0] - (uint8_t)0x30) * 10 + ((uint8_t)bcd[1] - (uint8_t)0x30);
-        retVal = eOK;
-    }
-    return retVal;
-}
-
-eStatus BcdToVal(const unsigned char * const bcd, uint16_t * const outVal)
-{
-    eStatus retVal = eFAIL;
-
-    if (eOK == isBcd(bcd[0]) && eOK == isBcd(bcd[1]) && eOK == isBcd(bcd[2]))
-    {
-        *outVal = ((uint8_t)bcd[0] - (uint8_t)0x30) * 100 + ((uint8_t)bcd[1] - (uint8_t)0x30) * 10 + ((uint8_t)bcd[2] - (uint8_t)0x30);
-        retVal = eOK;
-    }
-    return retVal;
-
-}
-
-eStatus ValToBcd(const uint8_t val, unsigned char * const outBuf)
-{
-    eStatus retVal = eFAIL;
-    if (val < 100)
-    {
-        outBuf[0] = (uint8_t)val/10 + 0x30;
-        outBuf[1] = (uint8_t)val % 10 + 0x30;
-        retVal = eOK;
-    }
-    return retVal;
-}
-
-eStatus ValToBcd(const uint16_t val, unsigned char * const outBuf)
-{
-    eStatus retVal = eFAIL;
-    if (val < 1000)
-    {
-        outBuf[0] = (uint8_t)(val/100) + 0x30;
-        outBuf[1] = (uint8_t)((val % 100) / 10) + 0x30;
-        outBuf[2] = (uint8_t)(val % 10) + 0x30;
-        retVal = eOK;
-    }
-    return retVal;
-}
-
-eStatus CheckModeValuesAscii(const ModeValuesAscii * const packet)
+/*eStatus CheckModeValuesAscii(const ModeValuesAscii * const packet)
 {
     uint8_t     tmp_u8;
     uint16_t    tmp_u16;
@@ -233,7 +191,7 @@ eStatus CheckGlobalValuesAscii(const AllValuesAscii * const packet)
 
 }
 
-/*eStatus CheckPacketModeValuesAscii(const PacketModeValuesAscii * const packet)
+eStatus CheckPacketModeValuesAscii(const PacketModeValuesAscii * const packet)
 {
     eStatus retVal = eOK;
 

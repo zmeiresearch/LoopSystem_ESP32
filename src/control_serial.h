@@ -33,6 +33,7 @@
 //  Exported functions
 //==============================================================================
 eStatus     ControlSerialInit(void * param);
-eStatus     ControlSerialLoop();
+eStatus     ControlSerialReceive();
+eStatus     ControlSerialTransmit();
 
 #endif // INC_CONTROL_SERIAL_H
