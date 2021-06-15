@@ -177,9 +177,10 @@ eStatus ControlSerialReceive()
                 {
                     receiveBuffer[receiveIndex++] = tmp;
                     // + 6 for the Start byte and the Packet Type byte and the checksum
-                    if (receiveIndex <= expectedValueCount + 6) 
+                    if (receiveIndex == expectedValueCount + 6) 
                     {
                         receiveStatus = eReceiveStatusChecksumReceived;
+                        Log(eLogInfo, CMP_NAME, "ControlSerialLoop: Checksum reception complete");
                     }
                 }
                 else
