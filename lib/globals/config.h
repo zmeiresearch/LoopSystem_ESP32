@@ -17,6 +17,11 @@
 //  Defines
 //==============================================================================
 
+// In demo mode, a specific task is started that periodically changes mode and
+// global values
+#define DEMO_MODE   1
+
+
 // Wifi configuration
 #define WIFI_SSID                   "gr5-c3_leaf"
 #define WIFI_PASSWORD               "AASSDDFFqwer11223344!!"

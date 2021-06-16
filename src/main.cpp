@@ -17,6 +17,8 @@
 #include <control_protocol.h>
 #include <control_serial.h>
 
+#include "values.h"
+
 //==============================================================================
 //  Defines
 //==============================================================================
@@ -69,6 +71,9 @@ const Module Modules[] = {
     { "Keepalive",      NULL,               keepaliveLoop,          0,                  NULL,   4096,   1 },
     { "SerialReceive",  ControlSerialInit,  ControlSerialReceive,   5,                  NULL,   4096,   2 },
     { "SerialTransmit", ControlSerialInit,  ControlSerialTransmit,  10000,              NULL,   4096,   2 },
+#if defined(DEMO_MODE)
+    { "ValuesDemo",     DemoModeInit,       DemoModeLoop,           1000,               NULL,   4096,   2 },
+#endif // DEMO_MODE
     { "Webserver",      WebserverInit,      NULL,                   0,                  NULL,   4096,   1 }
 };
 

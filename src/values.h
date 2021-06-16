@@ -14,6 +14,7 @@
 //  Includes
 //==============================================================================
 #include "globals.h"
+#include "config.h"
 
 #include "control_protocol.h"
 
@@ -44,5 +45,10 @@ extern ModeValues   gModeValues[eModeCount];
 //==============================================================================
 //  Exported functions
 //==============================================================================
+#if defined(DEMO_MODE)
+eStatus DemoModeInit(void *);
+eStatus DemoModeLoop();
+#endif // DEMO_MODE
+
 
 #endif // INC_VALUES_H

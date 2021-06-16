@@ -125,35 +125,37 @@ static void getModeValues(AsyncWebServerRequest *request)
 {
     const int paramCount = request->params();
 
+    Log(eLogWarn, CMP_NAME, "getModeValues: got %d params", paramCount);
+
     for (int i = 0; i < paramCount; i++)
     {
         AsyncWebParameter* p = request->getParam(i);
+        Log(eLogInfo, CMP_NAME, "getModeValues: id: %s:%s", p->name().c_str(), p->value().c_str());
 
-        if (0 == p->name().compareTo("id"))
+        if (0 == p->name().compareTo("mode"))
         {
-            Log(eLogInfo, "getModeValues: id: %s:%s", p->name().c_str(), p->value().c_str());
             int mode = -1;
 
-            if (0 == p->name().compareTo("novice"))
+            if (0 == p->value().compareTo("novice"))
             {
                 mode = 0;
             } 
-            else if (0 == p->name().compareTo("expert"))
+            else if (0 == p->value().compareTo("expert"))
             {
                 mode = 1;
             } 
-            else if (0 == p->name().compareTo("advanced"))
+            else if (0 == p->value().compareTo("advanced"))
             {
                 mode = 2;
             }
-            else if (0 == p->name().compareTo("master"))
+            else if (0 == p->value().compareTo("master"))
             {
                 mode = 3;
             }
             
             if (-1 == mode)
             {
-                Log(eLogWarn, "getModeValues: Unknown mode!");
+                Log(eLogWarn, CMP_NAME, "getModeValues: Unknown mode!");
             }
             else
             {
@@ -168,6 +170,25 @@ static void getModeValues(AsyncWebServerRequest *request)
             }
         }
     }
+}
+
+static void getGlobalValues(AsyncWebServerRequest *request)
+{
+    AsyncResponseStream *response = request->beginResponseStream("application/json");
+    DynamicJsonDocument json(1024);
+    json["home"] = String(gGlobalValues.home);
+    json["end"] = String(gGlobalValues.end);
+    json["turn1"] = String(gGlobalValues.turn1);
+    json["turn2"] = String(gGlobalValues.turn2);
+    json["maxAcc"] = String(gGlobalValues.maxAcc);
+    json["maxDec"] = String(gGlobalValues.maxDec);
+    json["maxSpeed"] = String(gGlobalValues.maxSpeed);
+    json["homingSpeed"] = String(gGlobalValues.homingSpeed);
+    json["maxTime"] = String(gGlobalValues.maxTime);
+    json["maxLaps"] = String(gGlobalValues.maxLaps);
+    json["servSpeed"] = String(gGlobalValues.servSpeed);
+    serializeJson(json, *response);
+    request->send(response);
 }
 
 //==============================================================================
@@ -218,7 +239,13 @@ eStatus WebserverInit(void * params)
     });
 
     server.on("/modeValues", HTTP_GET, [](AsyncWebServerRequest *request){
+        Log(eLogDebug, CMP_NAME, "modeValues received");
         getModeValues(request);
+    });
+
+    server.on("/globalValues", HTTP_GET, [](AsyncWebServerRequest *request){
+        Log(eLogDebug, CMP_NAME, "modeValues received");
+        getGlobalValues(request);
     });
 
     // Firmware update handler
