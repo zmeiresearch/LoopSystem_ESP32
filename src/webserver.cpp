@@ -6,16 +6,19 @@
 //==============================================================================
 //  Includes
 //==============================================================================
+#include <string>
 #include <WiFi.h>
 #include <WiFiClient.h>
 #include <ESPmDNS.h>
 #include <Update.h>
+#include <ArduinoJson.h>
 #include "SPIFFS.h"
 #include "ESPAsyncWebServer.h"
 
 #include "config.h"
 #include "globals.h"
 #include "logger.h"
+#include "values.h"
 
 //==============================================================================
 //  Defines
@@ -118,6 +121,55 @@ static void spiffsUpload(AsyncWebServerRequest *request, String filename, size_t
     }
 }
 
+static void getModeValues(AsyncWebServerRequest *request)
+{
+    const int paramCount = request->params();
+
+    for (int i = 0; i < paramCount; i++)
+    {
+        AsyncWebParameter* p = request->getParam(i);
+
+        if (0 == p->name().compareTo("id"))
+        {
+            Log(eLogInfo, "getModeValues: id: %s:%s", p->name().c_str(), p->value().c_str());
+            int mode = -1;
+
+            if (0 == p->name().compareTo("novice"))
+            {
+                mode = 0;
+            } 
+            else if (0 == p->name().compareTo("expert"))
+            {
+                mode = 1;
+            } 
+            else if (0 == p->name().compareTo("advanced"))
+            {
+                mode = 2;
+            }
+            else if (0 == p->name().compareTo("master"))
+            {
+                mode = 3;
+            }
+            
+            if (-1 == mode)
+            {
+                Log(eLogWarn, "getModeValues: Unknown mode!");
+            }
+            else
+            {
+                AsyncResponseStream *response = request->beginResponseStream("application/json");
+                DynamicJsonDocument json(1024);
+                json["end"] = String(gModeValues[mode].end);
+                json["acc"] = String(gModeValues[mode].acc);
+                json["dec"] = String(gModeValues[mode].dec);
+                json["turn"] = String(gModeValues[mode].turn);
+                serializeJson(json, *response);
+                request->send(response);
+            }
+        }
+    }
+}
+
 //==============================================================================
 //  Exported functions
 //==============================================================================
@@ -163,6 +215,10 @@ eStatus WebserverInit(void * params)
         response->addHeader("Connection", "close");
         request->send(response);
 
+    });
+
+    server.on("/modeValues", HTTP_GET, [](AsyncWebServerRequest *request){
+        getModeValues(request);
     });
 
     // Firmware update handler
