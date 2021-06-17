@@ -254,7 +254,7 @@ eStatus WebserverInit(void * params)
     while (WiFi.status() != WL_CONNECTED) 
     {
         // IVA: TODO: Use FreeRTOS primitives!
-        vTaskDelay(500 / portTICK_PERIOD_MS);
+        vTaskDelay(5000 / portTICK_PERIOD_MS);
         Log(eLogInfo, CMP_NAME, ".");
     }
   

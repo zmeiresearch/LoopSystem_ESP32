@@ -33,12 +33,12 @@
 //==============================================================================
 
 typedef enum _PacketType {
-    ePacketGlobalValues = 0x30,
-    ePacketModeNovice = 0x31,
-    ePacketModeExpert = 0x32,
-    ePacketModeAdvanced = 0x33,
-    ePacketModeMaster = 0x34,
-    ePacketStatus = 0x35,
+    ePacketStatus = 0x30,
+    ePacketGlobalValues = 0x31,
+    ePacketModeNovice = 0x32,
+    ePacketModeExpert = 0x33,
+    ePacketModeAdvanced = 0x34,
+    ePacketModeMaster = 0x35,
     ePacketCount = 0x36
 } PacketType;
 

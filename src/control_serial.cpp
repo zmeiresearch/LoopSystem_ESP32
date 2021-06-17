@@ -89,6 +89,14 @@ size_t getValuesCount(PacketType packetType)
     return expectedValueCount;
 }
 
+uint32_t TenByteBcdToUint32(const char * const data)
+{
+    char tmp[11];
+
+    memcpy(&tmp, data, 10);
+    tmp[]
+}
+
 void ParseStatus(PacketStatus const * const statusPacket)
 {
     Log(eLogDebug, CMP_NAME, "ParseStatus");
@@ -167,7 +175,7 @@ eStatus ControlSerialReceive()
             
             case eReceiveStatusStartReceived:
                 // Next comes the packet type
-                if (((unsigned char)ePacketGlobalValues <= tmp) &&
+                if (((unsigned char)ePacketStatus <= tmp) &&
                     (tmp < (unsigned char)ePacketCount))
                 {
                     // valid packet type
