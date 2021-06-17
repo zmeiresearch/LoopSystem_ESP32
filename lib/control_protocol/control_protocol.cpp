@@ -170,7 +170,7 @@ uint32_t TenByteBcdToUint32(const char * const data)
     tmp[10]  = 0;
 
     uint32_t retVal =  strtol(&tmp[0], NULL, 10);
-    Log(eLogDebug, CMP_NAME, "TenByteBcdToUint32: tmp: %s: ret:%u", tmp, retVal);
+    //Log(eLogDebug, CMP_NAME, "TenByteBcdToUint32: tmp: %s: ret:%u", tmp, retVal);
     return retVal;
 }
 
@@ -182,7 +182,7 @@ uint32_t FiveByteBcdToUint32(const char * const data)
     tmp[5]  = 0;
 
     uint32_t retVal =  strtol(&tmp[0], NULL, 10);
-    Log(eLogDebug, CMP_NAME, "FiveByteBcdToUint32: tmp: %s: ret:%u", tmp, retVal);
+    //Log(eLogDebug, CMP_NAME, "FiveByteBcdToUint32: tmp: %s: ret:%u", tmp, retVal);
     return retVal;
 }
 
