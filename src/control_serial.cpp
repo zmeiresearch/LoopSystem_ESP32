@@ -120,7 +120,7 @@ void SendPacketGlobalValuesAscii(void)
 {
     PacketGlobalValuesAscii packet;
 
-    packet.startByte = START_BYTE;
+    packet.startByte = START_BYTE_WRITE;
     packet.packetType = ePacketGlobalValues;
 
     // All lines print out a null terminator, but it gets overwritten by the next one
@@ -220,7 +220,7 @@ eStatus ControlSerialReceive()
             case eReceiveStatusIdle:
             case eReceiveStatusError:
                 // Always wait for a start byte
-                if (START_BYTE == tmp)
+                if (START_BYTE_READ == tmp)
                 {
                     //Log(eLogInfo, CMP_NAME, "ControlSerialLoop: Start Byte Received");
                     receiveIndex = 0;

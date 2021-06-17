@@ -41,22 +41,6 @@ static unsigned char tmp[TMP_BUFFER_SIZE];
 //  Local functions
 //==============================================================================
 
-/*static eStatus checkStartByte(const uint8_t * const packet)
-{
-    eStatus retVal = eFAIL;
-
-    uint8_t fromPacket = (uint8_t)packet[0];
-
-    Log(eLogDebug, CMP_NAME, "checkStartByte: expected: %#02x, got: %#02x", START_BYTE, fromPacket);
-
-    if (START_BYTE == fromPacket) 
-    {
-        retVal = eOK;
-    }
-
-    return retVal;
-}*/
-
 uint16_t ExtractChecksum(const unsigned char * packet, const int packetLength)
 {
     memset(&tmp, 0, TMP_BUFFER_SIZE);
@@ -83,34 +67,6 @@ uint16_t CalculateChecksum(const unsigned char * packet, const int packetLength)
 
     return calculated;
 }
-
-/*
-static void writeChecksum(const unsigned char * packet, const int packetLength)
-{
-    uint16_t * checksum = (uint16_t *)&packet[packetLength - 3];
-
-    for (size_t i = 0; i < packetLength - 3; i++)
-    {
-        *checksum = *checksum + packet[i];
-    }
-
-    *checksum = (uint16_t)(~(*checksum));
-
-    snprintf((char *)&tmp, TMP_BUFFER_SIZE, "%04x", checksum);
-    Log(eLogDebug, CMP_NAME, "writeChecksum: calulcated: %s", tmp);
-    
-    memcpy((void *)&packet[packetLength-5], tmp, 4);    // 4 charactes checksum, just before the end of the packet
-
-}*/
-
-void setStartStop(uint8_t * const packet, const size_t packetLength)
-{
-    packet[0] = START_BYTE;
-    packet[packetLength - 1] = STOP_BYTE;
-}
-
-
-
 
 //==============================================================================
 //  Exported functions

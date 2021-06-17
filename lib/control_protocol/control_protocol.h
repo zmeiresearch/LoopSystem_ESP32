@@ -18,7 +18,8 @@
 //==============================================================================
 //  Defines
 //==============================================================================
-#define START_BYTE              0x2a        // '*'
+#define START_BYTE_READ         0x2a        // '*'
+#define START_BYTE_WRITE        0x25        // %
 #define STOP_BYTE               0x0d        // Carriage return
 
 #define REQUEST_GLOBAL_VALUES   "#1\r"
@@ -26,6 +27,8 @@
 #define REQUEST_MODE_EXPERT     "#3\r"
 #define REQUEST_MODE_ADVANCED   "#4\r"
 #define REQUEST_MODE_MASTER     "#5\r"
+
+
 
 // Change if bigger packet appears
 #define SERIAL_BUFFER_SIZE      sizeof(PacketGlobalValuesAscii) + 0x1
