@@ -63,7 +63,7 @@ uint16_t ExtractChecksum(const unsigned char * packet, const int packetLength)
     memcpy(&tmp, &packet[packetLength-4], 4);   // 4 bytes checksum + stop/null
     uint16_t fromPacket = strtoul((const char *)&tmp, NULL, 16);
     
-    Log(eLogDebug, CMP_NAME, "ExtractChecksum: got: 0x%04x", fromPacket);
+    //Log(eLogDebug, CMP_NAME, "ExtractChecksum: got: 0x%04x", fromPacket);
 
     return fromPacket;
 }
@@ -79,7 +79,7 @@ uint16_t CalculateChecksum(const unsigned char * packet, const int packetLength)
 
     calculated = (uint16_t)~calculated;
 
-    Log(eLogDebug, CMP_NAME, "CalculateChecksum: calculated: 0x%04x", calculated);
+    //Log(eLogDebug, CMP_NAME, "CalculateChecksum: calculated: 0x%04x", calculated);
 
     return calculated;
 }

@@ -222,7 +222,7 @@ eStatus ControlSerialReceive()
                 // Always wait for a start byte
                 if (START_BYTE == tmp)
                 {
-                    Log(eLogInfo, CMP_NAME, "ControlSerialLoop: Start Byte Received");
+                    //Log(eLogInfo, CMP_NAME, "ControlSerialLoop: Start Byte Received");
                     receiveIndex = 0;
                     receiveBuffer[receiveIndex++] = tmp;
                     receiveStatus = eReceiveStatusStartReceived;
@@ -235,7 +235,7 @@ eStatus ControlSerialReceive()
                     (tmp < (unsigned char)ePacketCount))
                 {
                     // valid packet type
-                    Log(eLogInfo, CMP_NAME, "ControlSerialLoop: Valid Packet Type: 0x%02x", tmp);
+                    //Log(eLogInfo, CMP_NAME, "ControlSerialLoop: Valid Packet Type: 0x%02x", tmp);
                     receiveBuffer[receiveIndex++] = tmp;
                     receivedPacketType = (PacketType)tmp;
                     receiveStatus = eReceiveStatusTypeReceived;
@@ -258,7 +258,7 @@ eStatus ControlSerialReceive()
                     if (receiveIndex == expectedValueCount + 2)
                     {
                         receiveStatus = eReceiveStatusValuesReceived;
-                        Log(eLogInfo, CMP_NAME, "ControlSerialLoop: Values reception complete");
+                        //Log(eLogInfo, CMP_NAME, "ControlSerialLoop: Values reception complete");
                     }
                 }
                 else
@@ -279,7 +279,7 @@ eStatus ControlSerialReceive()
                     if (receiveIndex == expectedValueCount + 6) 
                     {
                         receiveStatus = eReceiveStatusChecksumReceived;
-                        Log(eLogInfo, CMP_NAME, "ControlSerialLoop: Checksum reception complete");
+                        //Log(eLogInfo, CMP_NAME, "ControlSerialLoop: Checksum reception complete");
                     }
                 }
                 else
