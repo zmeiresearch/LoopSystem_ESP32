@@ -266,6 +266,9 @@ eStatus ControlSerialReceive()
                     // Unexpected non-BCD character
                     receiveStatus = eReceiveStatusError;
                     Log(eLogWarn, CMP_NAME, "ControlSerialLoop: Invalid character receiving values: 0x%02x", tmp);
+                    receiveBuffer[receiveIndex++] = tmp;
+                    receiveBuffer[receiveIndex] = 0;
+                    Log(eLogWarn, CMP_NAME, "%s", receiveBuffer)
                 }
                 break;
 
