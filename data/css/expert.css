@@ -270,9 +270,7 @@ print {
   #page {
     width: 285px;
     min-height: 638px;
-    padding-left: 338px;
-    padding-right: 337px;
-    padding-bottom: 19px;
+    padding: 5px 30px 18px 5px;
   }
   #u1323 {
     width: 75px;
