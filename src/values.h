@@ -38,8 +38,9 @@ typedef enum _Modes
 //  Exported data
 //==============================================================================
 
-extern GlobalValues gGlobalValues;
-extern ModeValues   gModeValues[eModeCount];
+extern GlobalValues   gGlobalValues;
+extern ModeValues     gModeValues[eModeCount];
+extern CurrentStatus  gStatus;
 
 
 //==============================================================================

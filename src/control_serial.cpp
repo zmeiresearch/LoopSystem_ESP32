@@ -9,11 +9,13 @@
 #include <HardwareSerial.h>
 #include "driver/uart.h"    // for UART_PIN_NO_CHANGE
 
+#include <logger.h>
+#include <control_protocol.h>
+
 #include "config.h"
 #include "control_serial.h"
 
-#include <logger.h>
-#include <control_protocol.h>
+#include "values.h"
 
 //==============================================================================
 //  Defines
@@ -76,6 +78,9 @@ size_t getValuesCount(PacketType packetType)
         case ePacketModeMaster:
             expectedValueCount = sizeof(ModeValuesAscii);
             break;
+        case ePacketStatus:
+            expectedValueCount = sizeof(StatusAscii);
+            break;
         default:
             expectedValueCount = 0;
             break;
@@ -83,6 +88,25 @@ size_t getValuesCount(PacketType packetType)
 
     return expectedValueCount;
 }
+
+void ParseStatus(PacketStatus const * const statusPacket)
+{
+    Log(eLogDebug, CMP_NAME, "ParseStatus");
+
+    uint8_t mode = (uint8_t)statusPacket->status.mode - 0x30;
+
+    gStatus.systemStatus = statusPacket->status.systemStatus;
+
+    if ((eModeNovice <= mode) && (mode <= eModeMaster))
+    {
+        gStatus.mode = mode;
+    }
+    else 
+    {
+        Log(eLogWarn, CMP_NAME, "ParseStatus: invalid mode: 0x%02x", statusPacket->status.mode);
+    }
+}
+
 
 void ProcessPacket(const unsigned char * const buffer, size_t bufferSize)
 {
@@ -103,11 +127,18 @@ void ProcessPacket(const unsigned char * const buffer, size_t bufferSize)
             case ePacketModeExpert:
             case ePacketModeAdvanced:
             case ePacketModeMaster:
+            case ePacketStatus:
+                ParseStatus((PacketStatus const * const )buffer);
+                break;
             case ePacketCount:
             default:
                 Log(eLogWarn, CMP_NAME, "ProcessPacket: Unexpected packet type: %02x", packetType);
                 break;
         }
+    }
+    else
+    {
+        Log(eLogWarn, CMP_NAME, "ProcessPacket: bad checksum: received: 0x%04x, calculated: 0x%04x", receivedChecksum, calculatedChecksum);
     }
 }
 
@@ -118,7 +149,7 @@ eStatus ControlSerialReceive()
     while (serial.available())
     {
         unsigned char tmp = serial.read();
-        Log(eLogDebug, CMP_NAME, "CSL: %d:%d:%02x", receiveStatus, receiveIndex, tmp);
+        //Log(eLogDebug, CMP_NAME, "CSL: %d:%d:%02x", receiveStatus, receiveIndex, tmp);
 
         switch (receiveStatus)
         {

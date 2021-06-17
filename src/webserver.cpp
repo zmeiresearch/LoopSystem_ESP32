@@ -191,6 +191,18 @@ static void getGlobalValues(AsyncWebServerRequest *request)
     request->send(response);
 }
 
+static void getStatus(AsyncWebServerRequest *request)
+{
+    AsyncResponseStream *response = request->beginResponseStream("application/json");
+    DynamicJsonDocument json(1024);
+    json["mode"] = String(gStatus.mode);
+    json["completedLaps"] = String(gStatus.completedLaps);
+    json["position"] = String(gStatus.position);
+    json["systemStatus"] = String(gStatus.systemStatus);
+    serializeJson(json, *response);
+    request->send(response);
+}
+
 static void postGlobalValues(AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total)
 {
 
@@ -265,6 +277,11 @@ eStatus WebserverInit(void * params)
         response->addHeader("Connection", "close");
         request->send(response);
 
+    });
+
+    server.on("/status", HTTP_GET, [](AsyncWebServerRequest *request){
+        //Log(eLogDebug, CMP_NAME, "get modeValues received");
+        getStatus(request);
     });
 
     server.on("/modeValues", HTTP_GET, [](AsyncWebServerRequest *request){

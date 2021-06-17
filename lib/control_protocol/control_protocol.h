@@ -38,7 +38,8 @@ typedef enum _PacketType {
     ePacketModeExpert = 0x32,
     ePacketModeAdvanced = 0x33,
     ePacketModeMaster = 0x34,
-    ePacketCount = 0x35
+    ePacketStatus = 0x35,
+    ePacketCount = 0x36
 } PacketType;
 
 typedef struct _ModeValues {
@@ -62,6 +63,13 @@ typedef struct _GlobalValues {
     uint32_t            servSpeed;
 } GlobalValues;
 
+typedef struct _CurrentStatus {
+    uint8_t             mode;
+    uint32_t            completedLaps;
+    uint8_t             position;
+    uint32_t            systemStatus;
+} CurrentStatus;
+
 #pragma pack(push, 1)
 
 typedef struct _ModeValuesAscii {
@@ -71,7 +79,7 @@ typedef struct _ModeValuesAscii {
     unsigned char       turn[10];
 } ModeValuesAscii;
 
-typedef struct GlobalValuesAscii {
+typedef struct _GlobalValuesAscii {
     unsigned char       home[10];
     unsigned char       end[10];
     unsigned char       turn1[10];
@@ -85,6 +93,13 @@ typedef struct GlobalValuesAscii {
     unsigned char       servSpeed[5];
 }  GlobalValuesAscii;
 
+typedef struct _StatusAscii {
+    unsigned char       mode;
+    unsigned char       completedLaps[5];
+    unsigned char       position[10];
+    unsigned char       systemStatus;
+} StatusAscii;
+
 typedef struct _PacketModeValuesAscii {
     unsigned char       startByte;
     unsigned char       packetType;
@@ -92,6 +107,14 @@ typedef struct _PacketModeValuesAscii {
     unsigned char       checksum[4];
     unsigned char       stopByte;
 } PacketModeValuesAscii;
+
+typedef struct _PacketStatus {
+    unsigned char       startByte;
+    unsigned char       packetType;
+    StatusAscii         status;
+    unsigned char       checksum[4];
+    unsigned char       stopByte;
+} PacketStatus;
 
 typedef struct _PacketGlobalValuesAscii {
     unsigned char       startByte;

@@ -19,7 +19,7 @@
 
 // In demo mode, a specific task is started that periodically changes mode and
 // global values
-#define DEMO_MODE   1
+//#define DEMO_MODE   1
 
 
 // Wifi configuration
