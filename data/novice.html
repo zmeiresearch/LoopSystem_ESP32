@@ -8,6 +8,8 @@
   
   <title>Novice</title>
   <!-- CSS -->
+  <script type="text/javascript" src="scripts/jquery-3.6.0.min.js"></script>
+  <script type="text/javascript" src="scripts/mode-settings.js"></script>
   <link rel="stylesheet" type="text/css" href="css/site_global.css?crc=444006867"/>
   <link rel="stylesheet" type="text/css" href="css/novice.css?crc=357694059" id="pagesheet"/>
 </head>
@@ -20,7 +22,9 @@
      <p id="u1083-2">NOVICE</p>
     </div>
     <div class="clearfix colelem shared_content" id="u1247-4" data-content-guid="u1247-4_content"><!-- content -->
-     <p>END TURNING POINT ( CURRENT SETTINGS )</p>
+     <p>END TURNING POINT ( CURRENT SETTINGS )
+      <input class ="clearfix grpelem" type="number" id="mode_end">
+     </p>
     </div>
     <div class="clearfix colelem shared_content" id="pu1077-4" data-content-guid="pu1077-4_content"><!-- group -->
      <div class="clearfix grpelem" id="u1077-4"><!-- content -->
@@ -64,7 +68,7 @@
      </div>
     </div>
     <div class="rounded-corners clearfix colelem shared_content" id="u1082-4" data-content-guid="u1082-4_content"><!-- content -->
-     <p id="u1082-2">SET</p>
+     <p id="u1082-2 onclick="save_mode_settings()">SET</p>
     </div>
     <div class="verticalspacer" data-offset-top="662" data-content-above-spacer="662" data-content-below-spacer="18"></div>
    </div>
@@ -117,6 +121,7 @@
     <div class="verticalspacer" data-offset-top="581" data-content-above-spacer="581" data-content-below-spacer="102"></div>
    </div>
   </div>
+  <p id="mode_id" style="display: none">novice</p>
   <!-- Other scripts -->
   </body>
 </html>

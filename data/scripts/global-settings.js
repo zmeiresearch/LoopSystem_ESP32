@@ -46,7 +46,7 @@ function set_periodic_update() {
     setInterval(updateValues, 1000);
 }
 
-$(document).ready(setPeriodicUpdate)
+$(document).ready()
 {
     update_values();
 }

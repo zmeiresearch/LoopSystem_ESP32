@@ -1,6 +1,7 @@
-function update_mode_values(mode)
+function update_mode_values()
 {
     //console.log("Updating values");
+    var mode = $('#mode_id').text();
 
     $.get( "/modeValues", { 'mode' : mode }, function( data ) {
         //console.log("Received: " + data);
@@ -14,6 +15,7 @@ function update_mode_values(mode)
 
 function save_mode_values()
 {
+    var mode = $('#mode_id').text();
     val = {
         'end' : $('#mode_end').val(),
         'acc' : $('#mode_acc').val(),
@@ -32,8 +34,7 @@ function set_periodic_update() {
     setInterval(updateValues, 1000);
 }
 
-$(document).ready(setPeriodicUpdate)
+$(document).ready()
 {
-    var mode = $('#mode_id').text();
-    update_mode_values(mode);
+    update_mode_values();
 }
