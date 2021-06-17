@@ -84,10 +84,7 @@ size_t getValuesCount(PacketType packetType)
         case ePacketGlobalValues:
             expectedValueCount = sizeof(GlobalValuesAscii);
             break;
-        case ePacketModeNovice:
-        case ePacketModeExpert:
-        case ePacketModeAdvanced:
-        case ePacketModeMaster:
+        case ePacketMode:
             expectedValueCount = sizeof(ModeValuesAscii);
             break;
         case ePacketStatus:
@@ -105,9 +102,9 @@ void ParsePacketGlobalValueAscii(PacketGlobalValuesAscii const * const packet)
 {
     Log(eLogInfo, CMP_NAME, "ParsePacketGlobalValueAscii");
     gGlobalValues.home = TenByteBcdToUint32((const char *)&packet->values.home[0]);
-    gGlobalValues.end = TenByteBcdToUint32((const char *)&packet->values.end[0]);
-    gGlobalValues.turn1 = TenByteBcdToUint32((const char *)&packet->values.turn1[0]);
-    gGlobalValues.turn2 = TenByteBcdToUint32((const char *)&packet->values.turn2[0]);
+    gGlobalValues.maxEnd = TenByteBcdToUint32((const char *)&packet->values.maxEnd[0]);
+    gGlobalValues.maxTurn1 = TenByteBcdToUint32((const char *)&packet->values.maxTurn1[0]);
+    gGlobalValues.minTurn2 = TenByteBcdToUint32((const char *)&packet->values.minTurn2[0]);
     gGlobalValues.maxAcc = FiveByteBcdToUint32((const char *)&packet->values.maxAcc[0]);
     gGlobalValues.maxDec = FiveByteBcdToUint32((const char *)&packet->values.maxDec[0]);
     gGlobalValues.maxSpeed = FiveByteBcdToUint32((const char *)&packet->values.maxSpeed[0]);
@@ -128,9 +125,9 @@ void SendPacketGlobalValuesAscii(void)
 
     // All lines print out a null terminator, but it gets overwritten by the next one
     snprintf((char *)&packet.values.home[0], 11, "%010u", gGlobalValues.home);
-    snprintf((char *)&packet.values.end[0], 11, "%010u", gGlobalValues.end);
-    snprintf((char *)&packet.values.turn1[0], 11, "%010u", gGlobalValues.turn1);
-    snprintf((char *)&packet.values.turn2[0], 11, "%010u", gGlobalValues.turn2);
+    snprintf((char *)&packet.values.maxEnd[0], 11, "%010u", gGlobalValues.maxEnd);
+    snprintf((char *)&packet.values.maxTurn1[0], 11, "%010u", gGlobalValues.maxTurn1);
+    snprintf((char *)&packet.values.minTurn2[0], 11, "%010u", gGlobalValues.minTurn2);
     snprintf((char *)&packet.values.maxAcc[0], 6, "%05u", gGlobalValues.maxAcc);
     snprintf((char *)&packet.values.maxDec[0], 6, "%05u", gGlobalValues.maxDec);
     snprintf((char *)&packet.values.maxSpeed[0], 6, "%05u", gGlobalValues.maxSpeed);
@@ -148,6 +145,11 @@ void SendPacketGlobalValuesAscii(void)
     {
         vTaskDelay(100/portTICK_PERIOD_MS);
     }
+}
+
+void ParsePacketModeValuesAscii(PacketModeValuesAscii const * const buffer)
+{
+    // IVA: TODO
 }
 
 void ParsePacketStatusAscii(PacketStatusAscii const * const statusPacket)
@@ -187,10 +189,8 @@ void ProcessPacket(const unsigned char * const buffer, size_t bufferSize)
         {
             case ePacketGlobalValues:
                 ParsePacketGlobalValueAscii((PacketGlobalValuesAscii const * const)buffer);
-            case ePacketModeNovice:
-            case ePacketModeExpert:
-            case ePacketModeAdvanced:
-            case ePacketModeMaster:
+            case ePacketMode:
+                ParsePacketModeValuesAscii((PacketModeValuesAscii const * const )buffer);
             case ePacketStatus:
                 ParsePacketStatusAscii((PacketStatusAscii const * const )buffer);
                 break;
@@ -340,44 +340,43 @@ static eStatus queueForTransmit(const char * const buffer, size_t size)
     return retVal;
 }
 
-static PacketType toSend = ePacketGlobalValues;
+static int toSend = 0;
 eStatus     ControlRefreshTask()
 {
     switch (toSend)
     {
-        case ePacketGlobalValues:
+        case 0:
             if (eOK == queueForTransmit(REQUEST_GLOBAL_VALUES, 3))
             {
-                toSend = ePacketModeNovice;
+                toSend = 1;
             }
             break;
-        case ePacketModeNovice:
+        case 1:
             if (eOK == queueForTransmit(REQUEST_MODE_NOVICE, 3))
             {
-                toSend = ePacketModeExpert;
+                toSend = 2;
             }
             break;
-        case ePacketModeExpert:
+        case 2:
             if (eOK == queueForTransmit(REQUEST_MODE_EXPERT, 3))
             {
-                toSend = ePacketModeAdvanced;
+                toSend = 3;
             }
             break;
-        case ePacketModeAdvanced:
+        case 3:
             if (eOK == queueForTransmit(REQUEST_MODE_ADVANCED, 3))
             {
-                toSend = ePacketModeMaster;
+                toSend = 4;
             }
             break;
-        case ePacketModeMaster:
+        case 4:
             if (eOK == queueForTransmit(REQUEST_MODE_MASTER, 3))
             {
-                toSend = ePacketGlobalValues;
+                toSend = 5;
             }
             break;
-        case ePacketStatus:
         default:
-            toSend = ePacketGlobalValues;
+            toSend = 0;
             break;
     }
 

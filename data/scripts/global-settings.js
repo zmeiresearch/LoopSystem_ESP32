@@ -5,9 +5,9 @@ function update_values()
     $.get( "/globalValues", function( data ) {
         //console.log("Received: " + data);
         $('#global_home').val(data["home"]);
-        $('#global_end').val(data["end"]);
-        $('#global_turn1').val(data["turn1"]);
-        $('#global_turn2').val(data["turn2"]);
+        $('#global_max_end').val(data["maxEnd"]);
+        $('#global_max_turn1').val(data["maxTurn1"]);
+        $('#global_min_turn2').val(data["minTurn2"]);
         $('#global_maxAcc').val(data["maxAcc"]);
         $('#global_maxDec').val(data["maxDec"]);
         $('#global_maxSpeed').val(data["maxSpeed"]);
@@ -22,9 +22,9 @@ function save_global_settings()
 {
     val = {
         'home' : $('#global_home').val(),
-        'end' : $('#global_end').val(),
-        'turn1' : $('#global_turn1').val(),
-        'turn2' : $('#global_turn2').val(),
+        'maxEnd' : $('#global_max_end').val(),
+        'maxTurn1' : $('#global_max_turn1').val(),
+        'minTurn2' : $('#global_min_turn2').val(),
         'maxAcc' : $('#global_maxAcc').val(),
         'maxDec' : $('#global_maxDec').val(),
         'maxSpeed' : $('#global_maxSpeed').val(),

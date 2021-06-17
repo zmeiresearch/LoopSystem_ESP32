@@ -168,10 +168,10 @@ static void getModeValues(AsyncWebServerRequest *request)
             {
                 AsyncResponseStream *response = request->beginResponseStream("application/json");
                 DynamicJsonDocument json(1024);
-                json["end"] = String(gModeValues[mode].end);
+                json["turn1"] = String(gModeValues[mode].turn1);
                 json["acc"] = String(gModeValues[mode].acc);
                 json["dec"] = String(gModeValues[mode].dec);
-                json["turn"] = String(gModeValues[mode].turn);
+                json["turn2"] = String(gModeValues[mode].turn2);
                 serializeJson(json, *response);
                 request->send(response);
             }
@@ -204,13 +204,13 @@ static void postModeValues(AsyncWebServerRequest * request, uint8_t *data, size_
 
             if (eModeCount != mode)
             {
-                const char* end = json["values"]["end"];
-                if (end) {
-                    gModeValues[mode].end = json["values"]["end"].as<uint32_t>();
+                const char* turn1 = json["values"]["turn1"];
+                if (turn1) {
+                    gModeValues[mode].turn1 = json["values"]["turn1"].as<uint32_t>();
                 }
                 else
                 {
-                    Log(eLogWarn, CMP_NAME, "postModeValues: no end!");
+                    Log(eLogWarn, CMP_NAME, "postModeValues: no turn1!");
                 }
 
                 const char* acc = json["values"]["acc"];
@@ -231,13 +231,13 @@ static void postModeValues(AsyncWebServerRequest * request, uint8_t *data, size_
                     Log(eLogWarn, CMP_NAME, "postModeValues: no dec!");
                 }
 
-                const char* turn = json["values"]["turn"];
-                if (turn) {
-                    gModeValues[mode].turn = json["values"]["turn"].as<uint32_t>();
+                const char* turn2 = json["values"]["turn2"];
+                if (turn2) {
+                    gModeValues[mode].turn2 = json["values"]["turn2"].as<uint32_t>();
                 }
                 else
                 {
-                    Log(eLogWarn, CMP_NAME, "postModeValues: no turn!");
+                    Log(eLogWarn, CMP_NAME, "postModeValues: no turn2!");
                 }
             }
         }
@@ -249,9 +249,9 @@ static void getGlobalValues(AsyncWebServerRequest *request)
     AsyncResponseStream *response = request->beginResponseStream("application/json");
     DynamicJsonDocument json(1024);
     json["home"] = String(gGlobalValues.home);
-    json["end"] = String(gGlobalValues.end);
-    json["turn1"] = String(gGlobalValues.turn1);
-    json["turn2"] = String(gGlobalValues.turn2);
+    json["maxEnd"] = String(gGlobalValues.maxEnd);
+    json["maxTurn1"] = String(gGlobalValues.maxTurn1);
+    json["minTurn2"] = String(gGlobalValues.minTurn2);
     json["maxAcc"] = String(gGlobalValues.maxAcc);
     json["maxDec"] = String(gGlobalValues.maxDec);
     json["maxSpeed"] = String(gGlobalValues.maxSpeed);
@@ -299,32 +299,32 @@ static void postGlobalValues(AsyncWebServerRequest * request, uint8_t *data, siz
             Log(eLogWarn, CMP_NAME, "postGlobalValues: no home!");
         }
 
-        const char* end = json["values"]["end"];
-        if (end) {
-            gGlobalValues.end = json["values"]["end"].as<uint32_t>();
+        const char* maxEnd = json["values"]["maxEnd"];
+        if (maxEnd) {
+            gGlobalValues.maxEnd = json["values"]["maxEnd"].as<uint32_t>();
         }
         else
         {
-            Log(eLogWarn, CMP_NAME, "postGlobalValues: no end!");
+            Log(eLogWarn, CMP_NAME, "postGlobalValues: no maxEnd!");
         }
 
-        const char* turn1 = json["values"]["turn1"];
-        if (turn1) {
-            gGlobalValues.turn1 = json["values"]["turn1"].as<uint32_t>();
+        const char* maxTurn1 = json["values"]["maxTurn1"];
+        if (maxTurn1) {
+            gGlobalValues.maxTurn1 = json["values"]["maxTurn1"].as<uint32_t>();
         }
         else
         {
-            Log(eLogWarn, CMP_NAME, "postGlobalValues: no turn1!");
+            Log(eLogWarn, CMP_NAME, "postGlobalValues: no maxTurn1!");
         }
 
 
-        const char* turn2 = json["values"]["turn2"];
-        if (turn2) {
-            gGlobalValues.turn2 = json["values"]["turn2"].as<uint32_t>();
+        const char* minTurn2 = json["values"]["minTurn2"];
+        if (minTurn2) {
+            gGlobalValues.minTurn2 = json["values"]["minTurn2"].as<uint32_t>();
         }
         else
         {
-            Log(eLogWarn, CMP_NAME, "postGlobalValues: no turn2!");
+            Log(eLogWarn, CMP_NAME, "postGlobalValues: no minTurn2!");
         }
 
 

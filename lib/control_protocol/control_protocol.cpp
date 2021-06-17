@@ -41,7 +41,7 @@ static unsigned char tmp[TMP_BUFFER_SIZE];
 //  Local functions
 //==============================================================================
 
-static eStatus checkStartByte(const uint8_t * const packet)
+/*static eStatus checkStartByte(const uint8_t * const packet)
 {
     eStatus retVal = eFAIL;
 
@@ -55,7 +55,7 @@ static eStatus checkStartByte(const uint8_t * const packet)
     }
 
     return retVal;
-}
+}*/
 
 uint16_t ExtractChecksum(const unsigned char * packet, const int packetLength)
 {
@@ -118,18 +118,18 @@ void setStartStop(uint8_t * const packet, const size_t packetLength)
 
 void DumpModeValues(const ModeValues * const values)
 {
-    Log(eLogInfo, CMP_NAME, "End:%d",           values->end);
+    Log(eLogInfo, CMP_NAME, "Turn 1:%d",        values->turn1);
     Log(eLogInfo, CMP_NAME, "Acc:%d",           values->acc);
     Log(eLogInfo, CMP_NAME, "Dec:%d",           values->dec);
-    Log(eLogInfo, CMP_NAME, "Turn:%d",          values->turn);
+    Log(eLogInfo, CMP_NAME, "Turn 2:%d",        values->turn2);
 }
 
 void DumpGlobalValues(const GlobalValues * const values)
 {
     Log(eLogInfo, CMP_NAME, "gHome:%d",         values->home);
-    Log(eLogInfo, CMP_NAME, "gEnd:%d",          values->end);
-    Log(eLogInfo, CMP_NAME, "gTurn1:%d",        values->turn1);
-    Log(eLogInfo, CMP_NAME, "gTurn2:%d",        values->turn2);
+    Log(eLogInfo, CMP_NAME, "gMaxEnd:%d",       values->maxEnd);
+    Log(eLogInfo, CMP_NAME, "gMaxTurn1:%d",     values->maxTurn1);
+    Log(eLogInfo, CMP_NAME, "gMinTurn2:%d",     values->minTurn2);
     Log(eLogInfo, CMP_NAME, "gMaxAcc:%d",       values->maxAcc);
     Log(eLogInfo, CMP_NAME, "gMaxDec:%d",       values->maxDec);
     Log(eLogInfo, CMP_NAME, "gFMax:%d",         values->maxSpeed);

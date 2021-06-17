@@ -39,25 +39,22 @@
 typedef enum _PacketType {
     ePacketStatus = 0x30,
     ePacketGlobalValues = 0x31,
-    ePacketModeNovice = 0x32,
-    ePacketModeExpert = 0x33,
-    ePacketModeAdvanced = 0x34,
-    ePacketModeMaster = 0x35,
+    ePacketMode = 0x32,
     ePacketCount = 0x36
 } PacketType;
 
 typedef struct _ModeValues {
-    uint32_t            end;
+    uint32_t            turn1;
     uint32_t            acc;
     uint32_t            dec;
-    uint32_t            turn;
+    uint32_t            turn2;
 } ModeValues;
 
 typedef struct _GlobalValues {
     uint32_t            home;
-    uint32_t            end;
-    uint32_t            turn1;
-    uint32_t            turn2;
+    uint32_t            maxEnd;
+    uint32_t            maxTurn1;
+    uint32_t            minTurn2;
     uint32_t            maxAcc;
     uint32_t            maxDec;
     uint32_t            maxSpeed;
@@ -70,24 +67,25 @@ typedef struct _GlobalValues {
 typedef struct _CurrentStatus {
     uint8_t             mode;
     uint32_t            completedLaps;
-    uint32_t             position;
+    uint32_t            position;
     uint32_t            systemStatus;
 } CurrentStatus;
 
 #pragma pack(push, 1)
 
 typedef struct _ModeValuesAscii {
-    unsigned char       end[10];
+    unsigned char       mode;
+    unsigned char       turn1[10];
     unsigned char       acc[10];
     unsigned char       dec[10];
-    unsigned char       turn[10];
+    unsigned char       turn2[10];
 } ModeValuesAscii;
 
 typedef struct _GlobalValuesAscii {
     unsigned char       home[10];
-    unsigned char       end[10];
-    unsigned char       turn1[10];
-    unsigned char       turn2[10];
+    unsigned char       maxEnd[10];
+    unsigned char       maxTurn1[10];
+    unsigned char       minTurn2[10];
     unsigned char       maxAcc[5];
     unsigned char       maxDec[5];
     unsigned char       maxSpeed[5];
