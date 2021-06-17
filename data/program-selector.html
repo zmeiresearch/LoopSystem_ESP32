@@ -7,6 +7,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/> 
   
   <title>Program Selector</title>
+
+  <script type="text/javascript" src="scripts/jquery-3.6.0.min.js"></script>
+  <script type="text/javascript" src="scripts/status.js"></script>
+
   <!-- CSS -->
   <link rel="stylesheet" type="text/css" href="css/site_global.css?crc=444006867"/>
   <link rel="stylesheet" type="text/css" href="css/program-selector.css?crc=411228881" id="pagesheet"/>
@@ -25,7 +29,32 @@
     <a class="nonblock nontext rounded-corners clearfix colelem shared_content" id="u864-4" href="advanced.html" data-content-guid="u864-4_content"><!-- content --><p id="u864-2">ADVANCED</p></a>
     <a class="nonblock nontext rounded-corners clearfix colelem shared_content" id="u888-4" href="master.html" data-content-guid="u888-4_content"><!-- content --><p id="u888-2">MASTER</p></a>
     <a class="nonblock nontext rounded-corners clearfix colelem shared_content" id="u987-4" href="global-settings.html" data-content-guid="u987-4_content"><!-- content --><p id="u987-2">GLOBAL SETTINGS</p></a>
+
+    <div class="clearfix colelem shared_content" id="u999-4" data-content-guid="u999-4_content"><!-- content -->
+      <p id="u999-2">SYSTEM STATUS</p>
+      <div style="display: flex" class="nonblock nontext rounded-corners clearfix colelem shared_content" id="u1200-4"><!-- content -->
+          <p>Mode:</p>
+          <p id="status_mode">mode_val</p>
+      </div>
+      <div  style="display: flex" class="nonblock nontext rounded-corners clearfix colelem shared_content" id="u1201-4"><!-- content -->
+        <p>Completed laps:</p>
+       <p id="status_completed_laps">laps_val</p>
+      </div>
+      <div  style="display: flex" class="nonblock nontext rounded-corners clearfix colelem shared_content" id="u1200-4"><!-- content -->
+        <p>Current Position:</p>
+       <p id="status_position">position_val</p>
+      </div>
+      <div  style="display: flex" class="nonblock nontext rounded-corners clearfix colelem shared_content" id="u1200-4"><!-- content -->
+        <p>System Status</p>
+       <p id="status_system_status">system status_val</p>
+      </div>
+     </div>
+
+
     <div class="verticalspacer" data-offset-top="660" data-content-above-spacer="660" data-content-below-spacer="18"></div>
+    
+    
+
    </div>
   </div>
   </div>
