@@ -125,7 +125,7 @@ static void getModeValues(AsyncWebServerRequest *request)
 {
     const int paramCount = request->params();
 
-    Log(eLogWarn, CMP_NAME, "getModeValues: got %d params", paramCount);
+    Log(eLogInfo, CMP_NAME, "getModeValues: got %d params", paramCount);
 
     for (int i = 0; i < paramCount; i++)
     {
@@ -191,6 +191,35 @@ static void getGlobalValues(AsyncWebServerRequest *request)
     request->send(response);
 }
 
+static void postGlobalValues(AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total)
+{
+
+    Log(eLogInfo, CMP_NAME, "postGlobalValues: Processing %d bytes: %s", len, data);
+
+    //DynamicJsonDocument doc(total);
+    DynamicJsonDocument json(1024);
+    auto resultError = deserializeJson(json, (const char *) data, len);
+
+    if (resultError)
+    {
+        Log(eLogWarn, CMP_NAME, "postGlobalValues: Deserialization error: %s", resultError.c_str());
+    }
+    else
+    {
+        const char* home = json["values"]["home"];
+        if (home) {
+            gGlobalValues.home = json["values"]["home"].as<uint32_t>();
+        }
+        else
+        {
+            Log(eLogWarn, CMP_NAME, "postGlobalValues: no home!");
+        }
+    }         
+}
+
+
+
+
 //==============================================================================
 //  Exported functions
 //==============================================================================
@@ -239,13 +268,36 @@ eStatus WebserverInit(void * params)
     });
 
     server.on("/modeValues", HTTP_GET, [](AsyncWebServerRequest *request){
-        Log(eLogDebug, CMP_NAME, "modeValues received");
+        //Log(eLogDebug, CMP_NAME, "get modeValues received");
         getModeValues(request);
     });
 
     server.on("/globalValues", HTTP_GET, [](AsyncWebServerRequest *request){
-        Log(eLogDebug, CMP_NAME, "modeValues received");
+        //Log(eLogDebug, CMP_NAME, "get globalValues received");
         getGlobalValues(request);
+    });
+
+    server.on("/globalValues", HTTP_POST,
+    [](AsyncWebServerRequest * request){
+        Log(eLogDebug, CMP_NAME, "post globalValues received");
+        int params = request->params();
+        Log(eLogDebug, CMP_NAME, "Save settings, %d params", params);
+        for(int i = 0; i < params; i++) {
+        AsyncWebParameter* p = request->getParam(i);
+            if(p->isFile()){
+                Log(eLogDebug, CMP_NAME, "_FILE[%s]: %s, size: %u", p->name().c_str(), p->value().c_str(), p->size());
+            } else if(p->isPost()){
+                Log(eLogDebug, CMP_NAME, "_POST[%s]: %s", p->name().c_str(), p->value().c_str());
+            } else {
+                Log(eLogDebug, CMP_NAME, "_GET[%s]: %s", p->name().c_str(), p->value().c_str());
+            }
+        }
+    },
+    NULL,
+    [](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total) {
+        Log(eLogDebug, CMP_NAME, "post globalValues body handling");
+        postGlobalValues(request, data, len, index, total);
+        AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", "OK");
     });
 
     // Firmware update handler

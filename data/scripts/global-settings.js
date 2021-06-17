@@ -1,9 +1,9 @@
 function updateValues()
 {
-    console.log("Updating values");
+    //console.log("Updating values");
 
     $.get( "/globalValues", function( data ) {
-        console.log("Received: " + data);
+        //console.log("Received: " + data);
         $('#global_home').val(data["home"]);
         $('#global_end').val(data["end"]);
         $('#global_turn1').val(data["turn1"]);
