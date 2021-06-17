@@ -89,21 +89,11 @@ size_t getValuesCount(PacketType packetType)
     return expectedValueCount;
 }
 
-uint32_t TenByteBcdToUint32(const char * const data)
-{
-    char tmp[11];
-
-    memcpy(&tmp, data, 10);
-    tmp[]
-}
-
 void ParseStatus(PacketStatus const * const statusPacket)
 {
     Log(eLogDebug, CMP_NAME, "ParseStatus");
 
     uint8_t mode = (uint8_t)statusPacket->status.mode - 0x30;
-
-    gStatus.systemStatus = statusPacket->status.systemStatus;
 
     if ((eModeNovice <= mode) && (mode <= eModeMaster))
     {
@@ -113,6 +103,10 @@ void ParseStatus(PacketStatus const * const statusPacket)
     {
         Log(eLogWarn, CMP_NAME, "ParseStatus: invalid mode: 0x%02x", statusPacket->status.mode);
     }
+
+    gStatus.completedLaps = FiveByteBcdToUint32((const char *)&statusPacket->status.completedLaps[0]);
+    gStatus.position = TenByteBcdToUint32((const char *)&statusPacket->status.position[0]);
+    gStatus.systemStatus = statusPacket->status.systemStatus;
 }
 
 

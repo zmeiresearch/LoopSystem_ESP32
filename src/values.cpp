@@ -31,7 +31,7 @@
 //==============================================================================
 GlobalValues    gGlobalValues;
 ModeValues      gModeValues[MODE_COUNT];
-CurrentStatus  gStatus;
+CurrentStatus   gStatus;
 
 
 //==============================================================================

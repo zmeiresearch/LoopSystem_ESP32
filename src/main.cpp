@@ -86,6 +86,8 @@ static eStatus keepaliveLoop()
     vTaskDelay(10000/portTICK_PERIOD_MS);
     Log(eLogWarn, CMP_NAME, "Still alive!");
 
+    //DumpStatus(&gStatus);
+
     return eOK;
 }
 

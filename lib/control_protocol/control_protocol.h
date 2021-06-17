@@ -21,7 +21,7 @@
 #define START_BYTE              0x2a        // '*'
 #define STOP_BYTE               0x0d        // Carriage return
 
-#define REQUEST_GLOBAL_VALUES   "#0\r"
+#define REQUEST_GLOBAL_VALUES   "#1\r"
 
 // Change if bigger packet appears
 #define SERIAL_BUFFER_SIZE      sizeof(PacketGlobalValuesAscii) + 0x1
@@ -66,7 +66,7 @@ typedef struct _GlobalValues {
 typedef struct _CurrentStatus {
     uint8_t             mode;
     uint32_t            completedLaps;
-    uint8_t             position;
+    uint32_t             position;
     uint32_t            systemStatus;
 } CurrentStatus;
 
@@ -135,6 +135,10 @@ typedef struct _PacketGlobalValuesAscii {
 //==============================================================================
 //  Exported functions
 //==============================================================================
+void DumpModeValues(const ModeValues * const values);
+void DumpGlobalValues(const GlobalValues * const values);
+void DumpStatus( const CurrentStatus * const status);
+
 //eStatus BcdToVal(const unsigned char * const bcd, uint8_t * const outVal);
 //eStatus BcdToVal(const unsigned char * const bcd, uint16_t * const outVal);
 //eStatus ValToBcd(const uint8_t val, unsigned char * const outBuf);
@@ -145,6 +149,9 @@ eStatus IsHex(const char val);
 
 uint16_t ExtractChecksum(const unsigned char * packet, const int packetLength);
 uint16_t CalculateChecksum(const unsigned char * packet, const int packetLength);
+
+uint32_t TenByteBcdToUint32(const char * const data);
+uint32_t FiveByteBcdToUint32(const char * const data);
 
 
 //eStatus CheckModeValuesAscii(const AllValuesAscii * const packet);

@@ -138,6 +138,14 @@ void DumpGlobalValues(const GlobalValues * const values)
     Log(eLogInfo, CMP_NAME, "gServSpeed:%d",    values->servSpeed);
 }
 
+void DumpStatus( const CurrentStatus * const status)
+{
+    Log(eLogInfo, CMP_NAME, "mode:%d",          status->mode);
+    Log(eLogInfo, CMP_NAME, "completedLaps:%d", status->completedLaps);
+    Log(eLogInfo, CMP_NAME, "position:%d",      status->position);
+    Log(eLogInfo, CMP_NAME, "systemStatus:%d",  status->systemStatus);
+}
+
 eStatus IsBcd(const char val)
 {
     if (val < '0' || val > '9') return eFAIL;
@@ -151,6 +159,30 @@ eStatus IsHex(const char val)
     if ( ('a' <= val ) && (val <= 'f')) return eOK;
     if ( ('A' <= val ) && (val <= 'F')) return eOK;
     return eFAIL;
+}
+
+uint32_t TenByteBcdToUint32(const char * const data)
+{
+    char tmp[11];
+
+    memcpy(&tmp, data, 10);
+    tmp[10]  = 0;
+
+    uint32_t retVal =  strtol(&tmp[0], NULL, 10);
+    Log(eLogDebug, CMP_NAME, "TenByteBcdToUint32: tmp: %s: ret:%u", tmp, retVal);
+    return retVal;
+}
+
+uint32_t FiveByteBcdToUint32(const char * const data)
+{
+    char tmp[6];
+
+    memcpy(&tmp, data, 5);
+    tmp[5]  = 0;
+
+    uint32_t retVal =  strtol(&tmp[0], NULL, 10);
+    Log(eLogDebug, CMP_NAME, "FiveByteBcdToUint32: tmp: %s: ret:%u", tmp, retVal);
+    return retVal;
 }
 
 
