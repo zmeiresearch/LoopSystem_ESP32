@@ -16,7 +16,6 @@ function update_values()
         $('#global_maxLaps').val(data["maxLaps"]);
         $('#global_servSpeed').val(data["servSpeed"]); 
     });
-
 }
 
 function save_global_settings()
@@ -40,10 +39,6 @@ function save_global_settings()
         contentType : 'application/json',
         type : 'POST'
         });
-}
-
-function set_periodic_update() {
-    setInterval(updateValues, 1000);
 }
 
 $(document).ready()

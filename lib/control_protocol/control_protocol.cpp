@@ -83,6 +83,7 @@ uint16_t CalculateChecksum(const unsigned char * packet, const int packetLength)
 
     return calculated;
 }
+
 /*
 static void writeChecksum(const unsigned char * packet, const int packetLength)
 {
@@ -100,14 +101,14 @@ static void writeChecksum(const unsigned char * packet, const int packetLength)
     
     memcpy((void *)&packet[packetLength-5], tmp, 4);    // 4 charactes checksum, just before the end of the packet
 
-}
+}*/
 
-static void setStartStop(uint8_t * const packet, const size_t packetLength)
+void setStartStop(uint8_t * const packet, const size_t packetLength)
 {
     packet[0] = START_BYTE;
     packet[packetLength - 1] = STOP_BYTE;
 }
-*/
+
 
 
 

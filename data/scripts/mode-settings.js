@@ -30,10 +30,6 @@ function save_mode_values()
         });
 }
 
-function set_periodic_update() {
-    setInterval(updateValues, 1000);
-}
-
 $(document).ready()
 {
     update_mode_values();

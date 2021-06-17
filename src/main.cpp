@@ -70,7 +70,8 @@ const Module Modules[] = {
     { "Logger",         LogInit,            LogLoop,                LOG_TASK_PERIOD,    NULL,   8192,   2 },
     { "Keepalive",      NULL,               keepaliveLoop,          0,                  NULL,   4096,   1 },
     { "SerialReceive",  ControlSerialInit,  ControlSerialReceive,   5,                  NULL,   4096,   2 },
-    { "SerialTransmit", ControlSerialInit,  ControlSerialTransmit,  10000,              NULL,   4096,   2 },
+    { "SerialTransmit", ControlSerialInit,  ControlSerialTransmit,  5,                  NULL,   4096,   2 },
+    { "SerialRefresh",  NULL,               ControlRefreshTask,     2000,               NULL,   4096,   2 },
 #if defined(DEMO_MODE)
     { "ValuesDemo",     DemoModeInit,       DemoModeLoop,           1000,               NULL,   4096,   2 },
 #endif // DEMO_MODE

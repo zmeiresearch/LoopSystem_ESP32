@@ -19,6 +19,7 @@
 #include "globals.h"
 #include "logger.h"
 #include "values.h"
+#include "control_serial.h"
 
 //==============================================================================
 //  Defines
@@ -393,7 +394,9 @@ static void postGlobalValues(AsyncWebServerRequest * request, uint8_t *data, siz
         {
             Log(eLogWarn, CMP_NAME, "postGlobalValues: no servSpeed!");
         }
-    }         
+    }       
+
+    SendPacketGlobalValuesAscii();
 }
 
 

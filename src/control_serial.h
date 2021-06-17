@@ -35,5 +35,7 @@
 eStatus     ControlSerialInit(void * param);
 eStatus     ControlSerialReceive();
 eStatus     ControlSerialTransmit();
+eStatus     ControlRefreshTask();
+void        SendPacketGlobalValuesAscii(void);
 
 #endif // INC_CONTROL_SERIAL_H

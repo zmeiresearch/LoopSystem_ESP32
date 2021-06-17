@@ -36,11 +36,23 @@ typedef enum _ReceiveStatus
     eReceiveStatusCount
 } ReceiveStatus;
 
+typedef enum _SendStatus
+{
+    eSendStatusIdle,
+    eSendStatusQueued,
+    eSendStatusInProgress,
+    eSendStatusComplete,
+    eSendStatusError
+} SendStatus;
 
 //==============================================================================
 //  Local data
 //==============================================================================
 static HardwareSerial           serial(CONTROL_SERIAL_PORT);
+
+static unsigned char            sendBuffer[SERIAL_BUFFER_SIZE];
+static size_t                   sendCount;
+static SendStatus               sendStatus = eSendStatusIdle;
 
 static unsigned char            receiveBuffer[SERIAL_BUFFER_SIZE];
 static size_t                   receiveIndex;
@@ -49,7 +61,7 @@ static PacketType               receivedPacketType = ePacketCount;
 //==============================================================================
 //  Local functions
 //==============================================================================
-
+static eStatus queueForTransmit(const char * const buffer, size_t size);
 
 //==============================================================================
 //  Exported functions
@@ -91,7 +103,51 @@ size_t getValuesCount(PacketType packetType)
 
 void ParsePacketGlobalValueAscii(PacketGlobalValuesAscii const * const packet)
 {
-    
+    Log(eLogInfo, CMP_NAME, "ParsePacketGlobalValueAscii");
+    gGlobalValues.home = TenByteBcdToUint32((const char *)&packet->values.home[0]);
+    gGlobalValues.end = TenByteBcdToUint32((const char *)&packet->values.end[0]);
+    gGlobalValues.turn1 = TenByteBcdToUint32((const char *)&packet->values.turn1[0]);
+    gGlobalValues.turn2 = TenByteBcdToUint32((const char *)&packet->values.turn2[0]);
+    gGlobalValues.maxAcc = FiveByteBcdToUint32((const char *)&packet->values.maxAcc[0]);
+    gGlobalValues.maxDec = FiveByteBcdToUint32((const char *)&packet->values.maxDec[0]);
+    gGlobalValues.maxSpeed = FiveByteBcdToUint32((const char *)&packet->values.maxSpeed[0]);
+    gGlobalValues.homingSpeed = FiveByteBcdToUint32((const char *)&packet->values.homingSpeed[0]);
+    gGlobalValues.maxTime = FiveByteBcdToUint32((const char *)&packet->values.maxTime[0]);
+    gGlobalValues.maxLaps = FiveByteBcdToUint32((const char *)&packet->values.maxLaps[0]);
+    gGlobalValues.servSpeed = FiveByteBcdToUint32((const char *)&packet->values.servSpeed[0]);
+
+    DumpGlobalValues(&gGlobalValues);
+}
+
+void SendPacketGlobalValuesAscii(void)
+{
+    PacketGlobalValuesAscii packet;
+
+    packet.startByte = START_BYTE;
+    packet.packetType = ePacketGlobalValues;
+
+    // All lines print out a null terminator, but it gets overwritten by the next one
+    snprintf((char *)&packet.values.home[0], 11, "%010u", gGlobalValues.home);
+    snprintf((char *)&packet.values.end[0], 11, "%010u", gGlobalValues.end);
+    snprintf((char *)&packet.values.turn1[0], 11, "%010u", gGlobalValues.turn1);
+    snprintf((char *)&packet.values.turn2[0], 11, "%010u", gGlobalValues.turn2);
+    snprintf((char *)&packet.values.maxAcc[0], 6, "%05u", gGlobalValues.maxAcc);
+    snprintf((char *)&packet.values.maxDec[0], 6, "%05u", gGlobalValues.maxDec);
+    snprintf((char *)&packet.values.maxSpeed[0], 6, "%05u", gGlobalValues.maxSpeed);
+    snprintf((char *)&packet.values.homingSpeed[0], 6, "%05u", gGlobalValues.homingSpeed);
+    snprintf((char *)&packet.values.maxTime[0], 6, "%05u", gGlobalValues.maxTime);
+    snprintf((char *)&packet.values.maxLaps[0], 6, "%05u", gGlobalValues.maxLaps);
+    snprintf((char *)&packet.values.servSpeed[0], 6, "%05u", gGlobalValues.servSpeed);
+
+    uint16_t checksum = CalculateChecksum((const unsigned char *)&packet, sizeof(PacketGlobalValuesAscii));
+
+    snprintf((char*)&packet.checksum[0], 5, "%04x", checksum);
+    packet.stopByte = STOP_BYTE;
+
+    while (eOK != queueForTransmit((const char *)&packet, sizeof(PacketGlobalValuesAscii)))
+    {
+        vTaskDelay(100/portTICK_PERIOD_MS);
+    }
 }
 
 void ParsePacketStatusAscii(PacketStatusAscii const * const statusPacket)
@@ -260,8 +316,83 @@ eStatus ControlSerialReceive()
     return eOK; // Always return OK to continue looping
 }
 
+static eStatus queueForTransmit(const char * const buffer, size_t size)
+{
+    eStatus retVal = eOK;
+    if ((sendStatus == eSendStatusIdle) ||
+        (sendStatus == eSendStatusComplete))
+    {
+        if (size <= SERIAL_BUFFER_SIZE)
+        {
+            memcpy(sendBuffer, buffer, size);
+            sendCount = size;
+            sendStatus = eSendStatusQueued;
+        }
+        else
+        {
+            retVal = eOVERFLOW;
+        }
+    }
+    else 
+    {
+        retVal = eBUSY;
+    }
+    return retVal;
+}
+
+static PacketType toSend = ePacketGlobalValues;
+eStatus     ControlRefreshTask()
+{
+    switch (toSend)
+    {
+        case ePacketGlobalValues:
+            if (eOK == queueForTransmit(REQUEST_GLOBAL_VALUES, 3))
+            {
+                toSend = ePacketModeNovice;
+            }
+            break;
+        case ePacketModeNovice:
+            if (eOK == queueForTransmit(REQUEST_MODE_NOVICE, 3))
+            {
+                toSend = ePacketModeExpert;
+            }
+            break;
+        case ePacketModeExpert:
+            if (eOK == queueForTransmit(REQUEST_MODE_EXPERT, 3))
+            {
+                toSend = ePacketModeAdvanced;
+            }
+            break;
+        case ePacketModeAdvanced:
+            if (eOK == queueForTransmit(REQUEST_MODE_ADVANCED, 3))
+            {
+                toSend = ePacketModeMaster;
+            }
+            break;
+        case ePacketModeMaster:
+            if (eOK == queueForTransmit(REQUEST_MODE_MASTER, 3))
+            {
+                toSend = ePacketGlobalValues;
+            }
+            break;
+        case ePacketStatus:
+        default:
+            toSend = ePacketGlobalValues;
+            break;
+    }
+
+    return eOK; // Always return OK to continue looping
+
+}
+
 eStatus     ControlSerialTransmit()
 {
-    serial.write(REQUEST_GLOBAL_VALUES);
-    return eOK; // Always return OK to continue looping
+    if (eSendStatusQueued == sendStatus)
+    {
+        sendStatus = eSendStatusInProgress;
+        serial.write(&sendBuffer[0], sendCount);   
+    }
+    sendStatus = eSendStatusIdle;
+
+    return eOK;    
 }
