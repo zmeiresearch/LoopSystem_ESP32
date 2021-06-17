@@ -108,13 +108,13 @@ typedef struct _PacketModeValuesAscii {
     unsigned char       stopByte;
 } PacketModeValuesAscii;
 
-typedef struct _PacketStatus {
+typedef struct _PacketStatusAscii {
     unsigned char       startByte;
     unsigned char       packetType;
     StatusAscii         status;
     unsigned char       checksum[4];
     unsigned char       stopByte;
-} PacketStatus;
+} PacketStatusAscii;
 
 typedef struct _PacketGlobalValuesAscii {
     unsigned char       startByte;

@@ -89,7 +89,12 @@ size_t getValuesCount(PacketType packetType)
     return expectedValueCount;
 }
 
-void ParseStatus(PacketStatus const * const statusPacket)
+void ParsePacketGlobalValueAscii(PacketGlobalValuesAscii const * const packet)
+{
+    
+}
+
+void ParsePacketStatusAscii(PacketStatusAscii const * const statusPacket)
 {
     Log(eLogDebug, CMP_NAME, "ParseStatus");
 
@@ -125,12 +130,13 @@ void ProcessPacket(const unsigned char * const buffer, size_t bufferSize)
         switch (packetType)
         {
             case ePacketGlobalValues:
+                ParsePacketGlobalValueAscii((PacketGlobalValuesAscii const * const)buffer);
             case ePacketModeNovice:
             case ePacketModeExpert:
             case ePacketModeAdvanced:
             case ePacketModeMaster:
             case ePacketStatus:
-                ParseStatus((PacketStatus const * const )buffer);
+                ParsePacketStatusAscii((PacketStatusAscii const * const )buffer);
                 break;
             case ePacketCount:
             default:

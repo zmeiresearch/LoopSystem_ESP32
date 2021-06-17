@@ -121,6 +121,29 @@ static void spiffsUpload(AsyncWebServerRequest *request, String filename, size_t
     }
 }
 
+static Modes modeFromString(String modeStr)
+{
+    Modes mode = eModeCount;
+    if (0 == modeStr.compareTo("novice"))
+    {
+        mode = eModeNovice;
+    } 
+    else if (0 == modeStr.compareTo("expert"))
+    {
+        mode = eModeExpert;
+    } 
+    else if (0 == modeStr.compareTo("advanced"))
+    {
+        mode = eModeAdvanced;
+    }
+    else if (0 == modeStr.compareTo("master"))
+    {
+        mode = eModeMaster;
+    }
+
+    return mode;
+}
+
 static void getModeValues(AsyncWebServerRequest *request)
 {
     const int paramCount = request->params();
@@ -134,26 +157,9 @@ static void getModeValues(AsyncWebServerRequest *request)
 
         if (0 == p->name().compareTo("mode"))
         {
-            int mode = -1;
-
-            if (0 == p->value().compareTo("novice"))
-            {
-                mode = 0;
-            } 
-            else if (0 == p->value().compareTo("expert"))
-            {
-                mode = 1;
-            } 
-            else if (0 == p->value().compareTo("advanced"))
-            {
-                mode = 2;
-            }
-            else if (0 == p->value().compareTo("master"))
-            {
-                mode = 3;
-            }
+            Modes mode =  modeFromString(p->value());
             
-            if (-1 == mode)
+            if (eModeCount == mode)
             {
                 Log(eLogWarn, CMP_NAME, "getModeValues: Unknown mode!");
             }
@@ -167,6 +173,71 @@ static void getModeValues(AsyncWebServerRequest *request)
                 json["turn"] = String(gModeValues[mode].turn);
                 serializeJson(json, *response);
                 request->send(response);
+            }
+        }
+    }
+}
+
+
+static void postModeValues(AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total)
+{
+    Log(eLogInfo, CMP_NAME, "postModeValues: Processing %d bytes: %s", len, data);
+
+    //DynamicJsonDocument doc(total);
+    DynamicJsonDocument json(1024);
+    auto resultError = deserializeJson(json, (const char *) data, len);
+
+    if (resultError)
+    {
+        Log(eLogWarn, CMP_NAME, "postModeValues: Deserialization error: %s", resultError.c_str());
+    }
+    else
+    {
+        const char * modeStr = json["mode"];
+
+        if (modeStr)
+        {
+            Modes mode = modeFromString(String(modeStr));
+
+            Log(eLogInfo, CMP_NAME, "posModeValues: got mode %d", mode);
+
+            if (eModeCount != mode)
+            {
+                const char* end = json["values"]["end"];
+                if (end) {
+                    gModeValues[mode].end = json["values"]["end"].as<uint32_t>();
+                }
+                else
+                {
+                    Log(eLogWarn, CMP_NAME, "postModeValues: no end!");
+                }
+
+                const char* acc = json["values"]["acc"];
+                if (acc) {
+                    gModeValues[mode].acc = json["values"]["acc"].as<uint32_t>();
+                }
+                else
+                {
+                    Log(eLogWarn, CMP_NAME, "postModeValues: no acc!");
+                }
+
+                const char* dec = json["values"]["dec"];
+                if (dec) {
+                    gModeValues[mode].dec = json["values"]["dec"].as<uint32_t>();
+                }
+                else
+                {
+                    Log(eLogWarn, CMP_NAME, "postModeValues: no dec!");
+                }
+
+                const char* turn = json["values"]["turn"];
+                if (turn) {
+                    gModeValues[mode].turn = json["values"]["turn"].as<uint32_t>();
+                }
+                else
+                {
+                    Log(eLogWarn, CMP_NAME, "postModeValues: no turn!");
+                }
             }
         }
     }
@@ -390,28 +461,27 @@ eStatus WebserverInit(void * params)
         getGlobalValues(request);
     });
 
+    server.on("/modeValues", HTTP_POST,
+    [](AsyncWebServerRequest * request){
+        Log(eLogDebug, CMP_NAME, "post modeValues received");
+        },
+        NULL,
+        [](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total) {
+            Log(eLogDebug, CMP_NAME, "post modeValues body handling");
+            postModeValues(request, data, len, index, total);
+            AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", "OK");
+        });
+
     server.on("/globalValues", HTTP_POST,
     [](AsyncWebServerRequest * request){
-        Log(eLogDebug, CMP_NAME, "post globalValues received");
-        int params = request->params();
-        Log(eLogDebug, CMP_NAME, "Save settings, %d params", params);
-        for(int i = 0; i < params; i++) {
-        AsyncWebParameter* p = request->getParam(i);
-            if(p->isFile()){
-                Log(eLogDebug, CMP_NAME, "_FILE[%s]: %s, size: %u", p->name().c_str(), p->value().c_str(), p->size());
-            } else if(p->isPost()){
-                Log(eLogDebug, CMP_NAME, "_POST[%s]: %s", p->name().c_str(), p->value().c_str());
-            } else {
-                Log(eLogDebug, CMP_NAME, "_GET[%s]: %s", p->name().c_str(), p->value().c_str());
-            }
-        }
-    },
-    NULL,
-    [](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total) {
-        Log(eLogDebug, CMP_NAME, "post globalValues body handling");
-        postGlobalValues(request, data, len, index, total);
-        AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", "OK");
-    });
+            Log(eLogDebug, CMP_NAME, "post globalValues received");
+        },
+        NULL,
+        [](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total) {
+            Log(eLogDebug, CMP_NAME, "post globalValues body handling");
+            postGlobalValues(request, data, len, index, total);
+            AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", "OK");
+        });
 
     // Firmware update handler
     server.on("/updateFirmware", HTTP_POST, [](AsyncWebServerRequest *request) {
