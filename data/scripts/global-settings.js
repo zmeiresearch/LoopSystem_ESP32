@@ -1,4 +1,4 @@
-function updateValues()
+function update_values()
 {
     //console.log("Updating values");
 
@@ -19,8 +19,34 @@ function updateValues()
 
 }
 
-function setPeriodicUpdate() {
+function save_global_settings()
+{
+    val = {
+        'home' : $('#global_home').val(),
+        'end' : $('#global_end').val(),
+        'turn1' : $('#global_turn1').val(),
+        'turn2' : $('#global_turn2').val(),
+        'maxAcc' : $('#global_maxAcc').val(),
+        'maxDec' : $('#global_maxDec').val(),
+        'maxSpeed' : $('#global_maxSpeed').val(),
+        'homingSpeed' : $('#global_homingSpeed').val(),
+        'maxTime' : $('#global_maxTime').val(),
+        'maxLaps' : $('#global_maxLaps').val(),
+        'servSpeed' : $('#global_servSpeed').val()
+    };
+
+    $.ajax("globalValues", {
+        data : JSON.stringify({"values": val}),
+        contentType : 'application/json',
+        type : 'POST'
+        });
+}
+
+function set_periodic_update() {
     setInterval(updateValues, 1000);
 }
 
-$(document).ready(setPeriodicUpdate);
+$(document).ready(setPeriodicUpdate)
+{
+    update_values();
+}

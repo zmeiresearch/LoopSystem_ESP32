@@ -226,6 +226,102 @@ static void postGlobalValues(AsyncWebServerRequest * request, uint8_t *data, siz
         {
             Log(eLogWarn, CMP_NAME, "postGlobalValues: no home!");
         }
+
+        const char* end = json["values"]["end"];
+        if (end) {
+            gGlobalValues.end = json["values"]["end"].as<uint32_t>();
+        }
+        else
+        {
+            Log(eLogWarn, CMP_NAME, "postGlobalValues: no end!");
+        }
+
+        const char* turn1 = json["values"]["turn1"];
+        if (turn1) {
+            gGlobalValues.turn1 = json["values"]["turn1"].as<uint32_t>();
+        }
+        else
+        {
+            Log(eLogWarn, CMP_NAME, "postGlobalValues: no turn1!");
+        }
+
+
+        const char* turn2 = json["values"]["turn2"];
+        if (turn2) {
+            gGlobalValues.turn2 = json["values"]["turn2"].as<uint32_t>();
+        }
+        else
+        {
+            Log(eLogWarn, CMP_NAME, "postGlobalValues: no turn2!");
+        }
+
+
+        const char* maxAcc = json["values"]["maxAcc"];
+        if (maxAcc) {
+            gGlobalValues.maxAcc = json["values"]["maxAcc"].as<uint32_t>();
+        }
+        else
+        {
+            Log(eLogWarn, CMP_NAME, "postGlobalValues: no maxAcc!");
+        }
+
+
+        const char* maxDec = json["values"]["maxDec"];
+        if (maxDec) {
+            gGlobalValues.maxDec = json["values"]["maxDec"].as<uint32_t>();
+        }
+        else
+        {
+            Log(eLogWarn, CMP_NAME, "postGlobalValues: no maxDec!");
+        }
+
+
+        const char* maxSpeed = json["values"]["maxSpeed"];
+        if (maxSpeed) {
+            gGlobalValues.maxSpeed = json["values"]["maxSpeed"].as<uint32_t>();
+        }
+        else
+        {
+            Log(eLogWarn, CMP_NAME, "postGlobalValues: no maxSpeed!");
+        }
+
+
+        const char* homingSpeed = json["values"]["homingSpeed"];
+        if (homingSpeed) {
+            gGlobalValues.homingSpeed = json["values"]["homingSpeed"].as<uint32_t>();
+        }
+        else
+        {
+            Log(eLogWarn, CMP_NAME, "postGlobalValues: no homingSpeed!");
+        }
+
+
+        const char* maxTime = json["values"]["maxTime"];
+        if (maxTime) {
+            gGlobalValues.maxTime = json["values"]["maxTime"].as<uint32_t>();
+        }
+        else
+        {
+            Log(eLogWarn, CMP_NAME, "postGlobalValues: no maxTime!");
+        }
+
+        const char* maxLaps = json["values"]["maxLaps"];
+        if (maxLaps) {
+            gGlobalValues.maxLaps = json["values"]["maxLaps"].as<uint32_t>();
+        }
+        else
+        {
+            Log(eLogWarn, CMP_NAME, "postGlobalValues: no maxLaps!");
+        }
+
+        const char* servSpeed = json["values"]["servSpeed"];
+        if (servSpeed) {
+            gGlobalValues.servSpeed = json["values"]["servSpeed"].as<uint32_t>();
+        }
+        else
+        {
+            Log(eLogWarn, CMP_NAME, "postGlobalValues: no servSpeed!");
+        }
     }         
 }
 
