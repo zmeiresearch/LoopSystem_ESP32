@@ -16,9 +16,11 @@ async function update_mode_values()
             //console.log("Received: " + data);
             $('#mode_speed').val(data["speed"]);
             $('#mode_turn1').val(data["turn1"]);
+            $('#mode_turn2').val(data["turn2"]);
+            $('#mode_brake_time').val(data["brakeTime"]);
             $('#mode_acc').val(data["acc"]);
             $('#mode_dec').val(data["dec"]);
-            $('#mode_turn2').val(data["turn2"]);
+            
             
             done = true;
         });
@@ -32,9 +34,10 @@ function save_mode_values()
     val = {
         'speed' : $('#mode_speed').val(),
         'turn1' : $('#mode_turn1').val(),
+        'turn2' : $('#mode_turn2').val(),
+        'brakeTime' : $('#mode_brake_time').val(),
         'acc' : $('#mode_acc').val(),
         'dec' : $('#mode_dec').val(),
-        'turn2' : $('#mode_turn2').val(),
     };
 
     $.ajax("modeValues", {

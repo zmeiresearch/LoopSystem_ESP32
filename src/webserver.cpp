@@ -170,9 +170,10 @@ static void getModeValues(AsyncWebServerRequest *request)
                 DynamicJsonDocument json(1024);
                 json["speed"] = String(gModeValues[mode].speed);
                 json["turn1"] = String(gModeValues[mode].turn1);
+                json["turn2"] = String(gModeValues[mode].turn2);
+                json["brakeTime"] = String(gModeValues[mode].brakeTime);
                 json["acc"] = String(gModeValues[mode].acc);
                 json["dec"] = String(gModeValues[mode].dec);
-                json["turn2"] = String(gModeValues[mode].turn2);
                 serializeJson(json, *response);
                 request->send(response);
             }
@@ -224,6 +225,24 @@ static void postModeValues(AsyncWebServerRequest * request, uint8_t *data, size_
                     Log(eLogWarn, CMP_NAME, "postModeValues: no turn1!");
                 }
 
+                const char* turn2 = json["values"]["turn2"];
+                if (turn2) {
+                    gModeValues[mode].turn2 = json["values"]["turn2"].as<uint32_t>();
+                }
+                else
+                {
+                    Log(eLogWarn, CMP_NAME, "postModeValues: no turn2!");
+                }
+
+                const char* brakeTime = json["values"]["brakeTime"];
+                if (brakeTime) {
+                    gModeValues[mode].brakeTime = json["values"]["brakeTime"].as<uint32_t>();
+                }
+                else
+                {
+                    Log(eLogWarn, CMP_NAME, "postModeValues: no brakeTime!");
+                }
+
                 const char* acc = json["values"]["acc"];
                 if (acc) {
                     gModeValues[mode].acc = json["values"]["acc"].as<uint32_t>();
@@ -242,14 +261,7 @@ static void postModeValues(AsyncWebServerRequest * request, uint8_t *data, size_
                     Log(eLogWarn, CMP_NAME, "postModeValues: no dec!");
                 }
 
-                const char* turn2 = json["values"]["turn2"];
-                if (turn2) {
-                    gModeValues[mode].turn2 = json["values"]["turn2"].as<uint32_t>();
-                }
-                else
-                {
-                    Log(eLogWarn, CMP_NAME, "postModeValues: no turn2!");
-                }
+                
 
                 Log(eLogInfo, CMP_NAME, "postModeValues: updated mode %s", modeStr);
                 DumpModeValues(&gModeValues[mode]);

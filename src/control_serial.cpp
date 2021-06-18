@@ -158,9 +158,10 @@ void SendPacketModeValuesAscii(Modes mode)
     snprintf((char *)&packet.values.mode, 2, "%01u", mode);
     snprintf((char *)&packet.values.speed[0], 6, "%05u", gModeValues[mode].speed);
     snprintf((char *)&packet.values.turn1[0], 11, "%010u", gModeValues[mode].turn1);
+    snprintf((char *)&packet.values.turn2[0], 11, "%010u", gModeValues[mode].turn2);
+    snprintf((char *)&packet.values.brakeTime[0], 6, "%05u", gModeValues[mode].brakeTime);
     snprintf((char *)&packet.values.acc[0], 6, "%05u", gModeValues[mode].acc);
     snprintf((char *)&packet.values.dec[0], 6, "%05u", gModeValues[mode].dec);
-    snprintf((char *)&packet.values.turn2[0], 11, "%010u", gModeValues[mode].turn2);
 
     uint16_t checksum = CalculateChecksum((const unsigned char *)&packet, sizeof(PacketModeValuesAscii));
 

@@ -49,9 +49,11 @@ typedef enum _PacketType {
 typedef struct _ModeValues {
     uint32_t            speed;
     uint32_t            turn1;
+    uint32_t            turn2;
+    uint32_t            brakeTime;
     uint32_t            acc;
     uint32_t            dec;
-    uint32_t            turn2;
+    
 } ModeValues;
 
 typedef struct _GlobalValues {
@@ -81,9 +83,11 @@ typedef struct _ModeValuesAscii {
     unsigned char       mode;
     unsigned char       speed[5];
     unsigned char       turn1[10];
+    unsigned char       turn2[10];
+    unsigned char       brakeTime[5];
     unsigned char       acc[5];
     unsigned char       dec[5];
-    unsigned char       turn2[10];
+
 } ModeValuesAscii;
 
 typedef struct _GlobalValuesAscii {
