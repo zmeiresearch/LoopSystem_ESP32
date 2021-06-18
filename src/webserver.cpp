@@ -168,6 +168,7 @@ static void getModeValues(AsyncWebServerRequest *request)
             {
                 AsyncResponseStream *response = request->beginResponseStream("application/json");
                 DynamicJsonDocument json(1024);
+                json["speed"] = String(gModeValues[mode].speed);
                 json["turn1"] = String(gModeValues[mode].turn1);
                 json["acc"] = String(gModeValues[mode].acc);
                 json["dec"] = String(gModeValues[mode].dec);
@@ -204,6 +205,16 @@ static void postModeValues(AsyncWebServerRequest * request, uint8_t *data, size_
 
             if (eModeCount != mode)
             {
+                const char* speed = json["values"]["speed"];
+                if (speed) {
+                    gModeValues[mode].speed = json["values"]["speed"].as<uint32_t>();
+                }
+                else
+                {
+                    Log(eLogWarn, CMP_NAME, "postModeValues: no speed!");
+                }
+
+
                 const char* turn1 = json["values"]["turn1"];
                 if (turn1) {
                     gModeValues[mode].turn1 = json["values"]["turn1"].as<uint32_t>();
@@ -239,6 +250,11 @@ static void postModeValues(AsyncWebServerRequest * request, uint8_t *data, size_
                 {
                     Log(eLogWarn, CMP_NAME, "postModeValues: no turn2!");
                 }
+
+                Log(eLogInfo, CMP_NAME, "postModeValues: updated mode %s", modeStr);
+                DumpModeValues(&gModeValues[mode]);
+
+                SendPacketModeValuesAscii(mode);
             }
         }
     }

@@ -84,7 +84,7 @@ size_t getValuesCount(PacketType packetType)
         case ePacketGlobalValues:
             expectedValueCount = sizeof(GlobalValuesAscii);
             break;
-        case ePacketMode:
+        case ePacketModeValues:
             expectedValueCount = sizeof(ModeValuesAscii);
             break;
         case ePacketStatus:
@@ -147,6 +147,34 @@ void SendPacketGlobalValuesAscii(void)
     }
 }
 
+void SendPacketModeValuesAscii(Modes mode)
+{
+    PacketModeValuesAscii packet;
+
+    packet.startByte = START_BYTE_WRITE;
+    packet.packetType = ePacketModeValues;
+
+    // All lines print out a null terminator, but it gets overwritten by the next one
+    snprintf((char *)&packet.values.mode, 2, "%01u", mode);
+    snprintf((char *)&packet.values.speed[0], 6, "%05u", gModeValues[mode].speed);
+    snprintf((char *)&packet.values.turn1[0], 11, "%010u", gModeValues[mode].turn1);
+    snprintf((char *)&packet.values.acc[0], 6, "%05u", gModeValues[mode].acc);
+    snprintf((char *)&packet.values.dec[0], 6, "%05u", gModeValues[mode].dec);
+    snprintf((char *)&packet.values.turn2[0], 11, "%010u", gModeValues[mode].turn2);
+
+    uint16_t checksum = CalculateChecksum((const unsigned char *)&packet, sizeof(PacketModeValuesAscii));
+
+    snprintf((char*)&packet.checksum[0], 5, "%04x", checksum);
+    packet.stopByte = STOP_BYTE;
+
+    Log(eLogDebug, CMP_NAME, "SendPacketModeValuesAscii: %s", &packet);
+
+    while (eOK != queueForTransmit((const char *)&packet, sizeof(PacketModeValuesAscii)))
+    {
+        vTaskDelay(100/portTICK_PERIOD_MS);
+    }
+}
+
 void ParsePacketModeValuesAscii(PacketModeValuesAscii const * const buffer)
 {
     // IVA: TODO
@@ -189,7 +217,7 @@ void ProcessPacket(const unsigned char * const buffer, size_t bufferSize)
         {
             case ePacketGlobalValues:
                 ParsePacketGlobalValueAscii((PacketGlobalValuesAscii const * const)buffer);
-            case ePacketMode:
+            case ePacketModeValues:
                 ParsePacketModeValuesAscii((PacketModeValuesAscii const * const )buffer);
             case ePacketStatus:
                 ParsePacketStatusAscii((PacketStatusAscii const * const )buffer);
@@ -268,7 +296,7 @@ eStatus ControlSerialReceive()
                     Log(eLogWarn, CMP_NAME, "ControlSerialLoop: Invalid character receiving values: 0x%02x", tmp);
                     receiveBuffer[receiveIndex++] = tmp;
                     receiveBuffer[receiveIndex] = 0;
-                    Log(eLogWarn, CMP_NAME, "%s", receiveBuffer)
+                    Log(eLogWarn, CMP_NAME, "%s", receiveBuffer);
                 }
                 break;
 
@@ -355,25 +383,25 @@ eStatus     ControlRefreshTask()
             }
             break;
         case 1:
-            if (eOK == queueForTransmit(REQUEST_MODE_NOVICE, 3))
+            //if (eOK == queueForTransmit(REQUEST_MODE_NOVICE, 3))
             {
                 toSend = 2;
             }
             break;
         case 2:
-            if (eOK == queueForTransmit(REQUEST_MODE_EXPERT, 3))
+            //if (eOK == queueForTransmit(REQUEST_MODE_EXPERT, 3))
             {
                 toSend = 3;
             }
             break;
         case 3:
-            if (eOK == queueForTransmit(REQUEST_MODE_ADVANCED, 3))
+            //if (eOK == queueForTransmit(REQUEST_MODE_ADVANCED, 3))
             {
                 toSend = 4;
             }
             break;
         case 4:
-            if (eOK == queueForTransmit(REQUEST_MODE_MASTER, 3))
+            //if (eOK == queueForTransmit(REQUEST_MODE_MASTER, 3))
             {
                 toSend = 5;
             }

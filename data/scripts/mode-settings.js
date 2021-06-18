@@ -1,26 +1,40 @@
-function update_mode_values()
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+async function update_mode_values()
 {
-    //console.log("Updating values");
-    var mode = $('#mode_id').text();
+    var done = false;
 
-    $.get( "/modeValues", { 'mode' : mode }, function( data ) {
-        //console.log("Received: " + data);
-        $('#mode_end').val(data["end"]);
-        $('#mode_acc').val(data["acc"]);
-        $('#mode_dec').val(data["dec"]);
-        $('#mode_turn').val(data["turn"]);
-    });
+    while (!done)
+    {
+        //console.log("Updating values");
+        
+        var mode = $('#mode_id').text();
 
+        $.get( "/modeValues", { 'mode' : mode }, function( data ) {
+            //console.log("Received: " + data);
+            $('#mode_speed').val(data["speed"]);
+            $('#mode_turn1').val(data["turn1"]);
+            $('#mode_acc').val(data["acc"]);
+            $('#mode_dec').val(data["dec"]);
+            $('#mode_turn2').val(data["turn2"]);
+            
+            done = true;
+        });
+        await sleep(200);
+    }
 }
 
 function save_mode_values()
 {
     var mode = $('#mode_id').text();
     val = {
-        'end' : $('#mode_end').val(),
+        'speed' : $('#mode_speed').val(),
+        'turn1' : $('#mode_turn1').val(),
         'acc' : $('#mode_acc').val(),
         'dec' : $('#mode_dec').val(),
-        'turn' : $('#mode_turn').val(),
+        'turn2' : $('#mode_turn2').val(),
     };
 
     $.ajax("modeValues", {

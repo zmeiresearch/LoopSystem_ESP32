@@ -16,6 +16,7 @@
 
 #include <Arduino.h>
 #include "globals.h"
+#include "values.h"
 
 //==============================================================================
 //  Defines
@@ -37,5 +38,6 @@ eStatus     ControlSerialReceive();
 eStatus     ControlSerialTransmit();
 eStatus     ControlRefreshTask();
 void        SendPacketGlobalValuesAscii(void);
+void        SendPacketModeValuesAscii(Modes mode);
 
 #endif // INC_CONTROL_SERIAL_H

@@ -42,11 +42,12 @@
 typedef enum _PacketType {
     ePacketStatus = 0x30,
     ePacketGlobalValues = 0x31,
-    ePacketMode = 0x32,
+    ePacketModeValues = 0x32,
     ePacketCount = 0x36
 } PacketType;
 
 typedef struct _ModeValues {
+    uint32_t            speed;
     uint32_t            turn1;
     uint32_t            acc;
     uint32_t            dec;
@@ -78,9 +79,10 @@ typedef struct _CurrentStatus {
 
 typedef struct _ModeValuesAscii {
     unsigned char       mode;
+    unsigned char       speed[5];
     unsigned char       turn1[10];
-    unsigned char       acc[10];
-    unsigned char       dec[10];
+    unsigned char       acc[5];
+    unsigned char       dec[5];
     unsigned char       turn2[10];
 } ModeValuesAscii;
 
