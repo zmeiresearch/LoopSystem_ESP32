@@ -174,6 +174,13 @@ void SendPacketModeValuesAscii(Modes mode)
     {
         vTaskDelay(100/portTICK_PERIOD_MS);
     }
+
+    vTaskDelay(300/portTICK_PERIOD_MS);
+
+    while (eOK !=  queueForTransmit(REQUEST_MODE_NOVICE, 3))
+    {
+        vTaskDelay(100/portTICK_PERIOD_MS);
+    }
 }
 
 void ParsePacketModeValuesAscii(PacketModeValuesAscii const * const modePacket)
@@ -396,7 +403,7 @@ eStatus     ControlRefreshTask()
     switch (toSend)
     {
         case 0:
-            if (eOK == queueForTransmit(REQUEST_GLOBAL_VALUES, 3))
+            //if (eOK == queueForTransmit(REQUEST_GLOBAL_VALUES, 3))
             {
                 toSend = 1;
             }
