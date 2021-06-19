@@ -138,7 +138,7 @@ void SendPacketGlobalValuesAscii(void)
 
     uint16_t checksum = CalculateChecksum((const unsigned char *)&packet, sizeof(PacketGlobalValuesAscii));
 
-    snprintf((char*)&packet.checksum[0], 5, "%04x", checksum);
+    snprintf((char*)&packet.checksum[0], 5, "%04X", checksum);
     packet.stopByte = STOP_BYTE;
 
     while (eOK != queueForTransmit((const char *)&packet, sizeof(PacketGlobalValuesAscii)))
@@ -165,7 +165,7 @@ void SendPacketModeValuesAscii(Modes mode)
 
     uint16_t checksum = CalculateChecksum((const unsigned char *)&packet, sizeof(PacketModeValuesAscii));
 
-    snprintf((char*)&packet.checksum[0], 5, "%04x", checksum);
+    snprintf((char*)&packet.checksum[0], 5, "%04X", checksum);
     packet.stopByte = STOP_BYTE;
 
     Log(eLogDebug, CMP_NAME, "SendPacketModeValuesAscii: %s", &packet);
@@ -439,7 +439,9 @@ eStatus     ControlSerialTransmit()
     if (eSendStatusQueued == sendStatus)
     {
         sendStatus = eSendStatusInProgress;
-        serial.write(&sendBuffer[0], sendCount);   
+        serial.write(&sendBuffer[0], sendCount);
+        sendBuffer[sendCount] = 0;
+        Log(eLogDebug, CMP_NAME, "Wrote: %s", &sendBuffer);
     }
     sendStatus = eSendStatusIdle;
 
