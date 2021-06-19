@@ -298,7 +298,7 @@ static void getStatus(AsyncWebServerRequest *request)
     json["mode"] = String(gStatus.mode);
     json["completedLaps"] = String(gStatus.completedLaps);
     json["position"] = String(gStatus.position);
-    json["systemStatus"] = String(gStatus.systemStatus);
+    json["systemStatus"] = String(gStatus.systemStatus - 0x30);
     serializeJson(json, *response);
     request->send(response);
 }
