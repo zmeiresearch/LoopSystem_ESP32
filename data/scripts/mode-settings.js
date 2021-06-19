@@ -28,7 +28,7 @@ async function update_mode_values()
     }
 }
 
-function save_mode_values()
+async function save_mode_values()
 {
     var mode = $('#mode_id').text();
     val = {
@@ -44,7 +44,11 @@ function save_mode_values()
         data : JSON.stringify({"mode" : mode, "values": val}),
         contentType : 'application/json',
         type : 'POST'
-        });
+        }).done(function() {
+            await sleep(600);
+            update_mode_values()
+          });
+
 }
 
 $(document).ready()
