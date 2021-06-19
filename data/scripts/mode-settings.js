@@ -45,7 +45,7 @@ async function save_mode_values()
         contentType : 'application/json',
         type : 'POST'
         }).always(function(done) {
-            setTimeout(update_mode_values, 500);
+            setTimeout(update_mode_values, 600);
         });
 }
 

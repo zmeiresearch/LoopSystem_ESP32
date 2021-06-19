@@ -175,12 +175,12 @@ void SendPacketModeValuesAscii(Modes mode)
         vTaskDelay(100/portTICK_PERIOD_MS);
     }
 
-    vTaskDelay(500/portTICK_PERIOD_MS);
+    //vTaskDelay(500/portTICK_PERIOD_MS);
 
-    while (eOK !=  queueForTransmit(REQUEST_MODE_NOVICE, 3))
-    {
-        vTaskDelay(100/portTICK_PERIOD_MS);
-    }
+    //while (eOK !=  queueForTransmit(REQUEST_MODE_NOVICE, 3))
+    //{
+    //    vTaskDelay(100/portTICK_PERIOD_MS);
+    //}
 }
 
 void        SendPacketRequestModeValues(Modes mode)
