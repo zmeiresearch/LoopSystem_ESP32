@@ -183,6 +183,46 @@ void SendPacketModeValuesAscii(Modes mode)
     }
 }
 
+void        SendPacketRequestModeValues(Modes mode)
+{
+    switch (mode)
+    {
+        case eModeNovice:
+            while (eOK !=  queueForTransmit(REQUEST_MODE_NOVICE, 3))
+            {
+                vTaskDelay(100/portTICK_PERIOD_MS);
+            }
+            break;
+        case eModeAdvanced:
+            while (eOK !=  queueForTransmit(REQUEST_MODE_ADVANCED, 3))
+            {
+                vTaskDelay(100/portTICK_PERIOD_MS);
+            }
+            break;
+        
+        case eModeExpert:
+            while (eOK !=  queueForTransmit(REQUEST_MODE_EXPERT, 3))
+            {
+                vTaskDelay(100/portTICK_PERIOD_MS);
+            }
+            break;
+        
+        case eModeMaster:
+            while (eOK  !=  queueForTransmit(REQUEST_MODE_MASTER, 3))
+            {
+                vTaskDelay(100/portTICK_PERIOD_MS);
+            }
+            break;
+        
+        default:
+            Log(eLogWarn, CMP_NAME, "SendPacketRequestModeValues: invalid mode 0x%02x", mode);
+            break;
+    }
+
+    
+
+}
+
 void ParsePacketModeValuesAscii(PacketModeValuesAscii const * const modePacket)
 {
     uint8_t mode = (uint8_t)modePacket->values.mode - 0x30;
