@@ -227,7 +227,7 @@ void ProcessPacket(const unsigned char * const buffer, size_t bufferSize)
 
     if (receivedChecksum == calculatedChecksum)
     {
-        Log(eLogInfo, CMP_NAME, "ProcessPacket: Good packet received, type: %02x", packetType);
+        //Log(eLogInfo, CMP_NAME, "ProcessPacket: Good packet received, type: %02x", packetType);
 
         switch (packetType)
         {
