@@ -22,11 +22,11 @@
 #define START_BYTE_WRITE        0x25        // %
 #define STOP_BYTE               0x0d        // Carriage return
 
-#define REQUEST_GLOBAL_VALUES   "#1\r"
-#define REQUEST_MODE_NOVICE     "#2\r"
-#define REQUEST_MODE_EXPERT     "#3\r"
-#define REQUEST_MODE_ADVANCED   "#4\r"
-#define REQUEST_MODE_MASTER     "#5\r"
+#define REQUEST_GLOBAL_VALUES   "#0\r"
+#define REQUEST_MODE_NOVICE     "#1\r"
+#define REQUEST_MODE_EXPERT     "#2\r"
+#define REQUEST_MODE_ADVANCED   "#3\r"
+#define REQUEST_MODE_MASTER     "#4\r"
 
 
 
