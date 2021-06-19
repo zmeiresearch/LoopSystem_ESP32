@@ -314,11 +314,11 @@ print {
   #u1083-4 {
     width: 281px;
     margin-left: 2px;
-    margin-top: 21px;
+    margin-top: 1px;
   }
   #u1247-4 {
     margin-left: 2px;
-    margin-top: 29px;
+    margin-top: 10px;
   }
   #pu1077-4 {
     margin-left: 2px;
@@ -352,7 +352,7 @@ print {
   }
   #u1082-4 {
     left: -1px;
-    margin-top: 38px;
+    margin-top: 10px;
   }
   .css_verticalspacer .verticalspacer {
     height: calc(100vh - 680px);
