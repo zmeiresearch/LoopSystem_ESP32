@@ -188,12 +188,11 @@ void ParsePacketModeValuesAscii(PacketModeValuesAscii const * const modePacket)
         gModeValues[mode].brakeTime = FiveByteBcdToUint32((const char *)&modePacket->values.brakeTime[0]);
         gModeValues[mode].acc = FiveByteBcdToUint32((const char *)&modePacket->values.acc[0]);
         gModeValues[mode].dec = FiveByteBcdToUint32((const char *)&modePacket->values.dec[0]);
-        //gStatus.position = TenByteBcdToUint32((const char *)&statusPacket->status.position[0]);
-        //gStatus.systemStatus = statusPacket->status.systemStatus;
+        Log(eLogDebug, CMP_NAME, "ParsePacketModeValuesAscii: Updated mode 0x%02x", mode);
     }
     else 
     {
-        Log(eLogWarn, CMP_NAME, "ParseStatus: invalid mode: 0x%02x", mode);
+        Log(eLogWarn, CMP_NAME, "ParsePacketModeValuesAscii: invalid mode: 0x%02x", mode);
     }
 }
 
