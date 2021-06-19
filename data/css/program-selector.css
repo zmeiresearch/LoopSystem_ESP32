@@ -3,6 +3,12 @@
   background-color: #82DAD1;
 }
 
+table, th, td {
+  border: 1px solid black;
+  font-size: 18px;
+  text-align: left;
+}
+
 #page {
   background-color: transparent;
   border-width: 0px;
