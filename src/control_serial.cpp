@@ -176,9 +176,25 @@ void SendPacketModeValuesAscii(Modes mode)
     }
 }
 
-void ParsePacketModeValuesAscii(PacketModeValuesAscii const * const buffer)
+void ParsePacketModeValuesAscii(PacketModeValuesAscii const * const modePacket)
 {
-    // IVA: TODO
+    uint8_t mode = (uint8_t)modePacket->values.mode - 0x30;
+
+    if ((eModeNovice <= mode) && (mode <= eModeMaster))
+    {
+        gModeValues[mode].speed = FiveByteBcdToUint32((const char *)&modePacket->values.speed[0]);
+        gModeValues[mode].turn1 = TenByteBcdToUint32((const char *)&modePacket->values.turn1[0]);
+        gModeValues[mode].turn2 = TenByteBcdToUint32((const char *)&modePacket->values.turn2[0]);
+        gModeValues[mode].brakeTime = FiveByteBcdToUint32((const char *)&modePacket->values.brakeTime[0]);
+        gModeValues[mode].acc = FiveByteBcdToUint32((const char *)&modePacket->values.acc[0]);
+        gModeValues[mode].dec = FiveByteBcdToUint32((const char *)&modePacket->values.dec[0]);
+        //gStatus.position = TenByteBcdToUint32((const char *)&statusPacket->status.position[0]);
+        //gStatus.systemStatus = statusPacket->status.systemStatus;
+    }
+    else 
+    {
+        Log(eLogWarn, CMP_NAME, "ParseStatus: invalid mode: 0x%02x", mode);
+    }
 }
 
 void ParsePacketStatusAscii(PacketStatusAscii const * const statusPacket)
@@ -319,6 +335,9 @@ eStatus ControlSerialReceive()
                     // Unexpected non-BCD character
                     receiveStatus = eReceiveStatusError;
                     Log(eLogWarn, CMP_NAME, "ControlSerialLoop: Invalid character receiving checksum: 0x%02x", tmp);
+                    receiveBuffer[receiveIndex++] = tmp;
+                    receiveBuffer[receiveIndex] = 0;
+                    Log(eLogWarn, CMP_NAME, "%s", receiveBuffer);
                 }
                 break;
 

@@ -27,6 +27,7 @@
 //==============================================================================
 typedef enum _Modes
 {
+    eModeSerivce,
     eModeNovice,
     eModeAdvanced,
     eModeExpert,
