@@ -44,10 +44,9 @@ async function save_mode_values()
         data : JSON.stringify({"mode" : mode, "values": val}),
         contentType : 'application/json',
         type : 'POST'
-        }).done(function() {
+        }).always(function(done) {
             setTimeout(update_mode_values, 1000);
-          });
-
+        });
 }
 
 $(document).ready()
