@@ -169,6 +169,8 @@ static void getModeValues(AsyncWebServerRequest *request)
 
                 SendPacketRequestModeValues(mode);
 
+                vTaskDelay(500/portTICK_PERIOD_MS);
+
                 AsyncResponseStream *response = request->beginResponseStream("application/json");
                 DynamicJsonDocument json(1024);
                 json["speed"] = String(gModeValues[mode].speed);
