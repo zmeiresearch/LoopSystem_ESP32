@@ -183,6 +183,14 @@ void SendPacketModeValuesAscii(Modes mode)
     //}
 }
 
+void SendPacketRequestGlobalValues()
+{
+    while (eOK !=  queueForTransmit(REQUEST_GLOBAL_VALUES, 3))
+            {
+                vTaskDelay(100/portTICK_PERIOD_MS);
+            }
+}
+
 void        SendPacketRequestModeValues(Modes mode)
 {
     switch (mode)
@@ -245,7 +253,7 @@ void ParsePacketModeValuesAscii(PacketModeValuesAscii const * const modePacket)
 
 void ParsePacketStatusAscii(PacketStatusAscii const * const statusPacket)
 {
-    Log(eLogDebug, CMP_NAME, "ParseStatus");
+    //Log(eLogDebug, CMP_NAME, "ParseStatus");
 
     uint8_t mode = (uint8_t)statusPacket->status.mode - 0x30;
 

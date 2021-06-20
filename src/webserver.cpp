@@ -279,6 +279,11 @@ static void postModeValues(AsyncWebServerRequest * request, uint8_t *data, size_
 
 static void getGlobalValues(AsyncWebServerRequest *request)
 {
+    SendPacketRequestGlobalValues();
+
+    vTaskDelay(500/portTICK_PERIOD_MS);
+
+
     AsyncResponseStream *response = request->beginResponseStream("application/json");
     DynamicJsonDocument json(1024);
     json["home"] = String(gGlobalValues.home);

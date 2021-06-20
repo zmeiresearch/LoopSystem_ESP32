@@ -40,5 +40,6 @@ eStatus     ControlRefreshTask();
 void        SendPacketGlobalValuesAscii(void);
 void        SendPacketModeValuesAscii(Modes mode);
 void        SendPacketRequestModeValues(Modes mode);
+void        SendPacketRequestGlobalValues(void);
 
 #endif // INC_CONTROL_SERIAL_H
