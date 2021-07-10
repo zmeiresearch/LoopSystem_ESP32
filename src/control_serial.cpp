@@ -342,7 +342,7 @@ eStatus ControlSerialReceive()
             case eReceiveStatusTypeReceived:
                 // Packet type received, wait for all values to arrive
                 expectedValueCount = getValuesCount(receivedPacketType);
-                if (eOK == IsBcd(tmp))
+                if (eOK == IsBcdOrMinus(tmp))
                 {
                     receiveBuffer[receiveIndex++] = tmp;
                     // + 2 for the Start byte and the Packet Type byte

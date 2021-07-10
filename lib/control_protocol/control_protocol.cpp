@@ -110,6 +110,19 @@ eStatus IsBcd(const char val)
     return eOK;
 }
 
+eStatus IsBcdOrMinus(const char val)
+{
+    eStatus retVal = eFAIL;
+
+    if ((( '0' <= val) && (val <= '9')) ||
+         ( '-' == val))
+    {
+        retVal = eOK;
+    }
+
+    return retVal;
+}
+
 eStatus IsHex(const char val)
 {
     if (eOK == IsBcd(val)) return eOK;

@@ -48,8 +48,8 @@ typedef enum _PacketType {
 
 typedef struct _ModeValues {
     uint32_t            speed;
-    uint32_t            turn1;
-    uint32_t            turn2;
+    int32_t             turn1;
+    int32_t             turn2;
     uint32_t            brakeTime;
     uint32_t            acc;
     uint32_t            dec;
@@ -57,10 +57,10 @@ typedef struct _ModeValues {
 } ModeValues;
 
 typedef struct _GlobalValues {
-    uint32_t            home;
-    uint32_t            maxEnd;
-    uint32_t            maxTurn1;
-    uint32_t            minTurn2;
+    int32_t             home;
+    int32_t             maxEnd;
+    int32_t             maxTurn1;
+    int32_t             minTurn2;
     uint32_t            maxAcc;
     uint32_t            maxDec;
     uint32_t            maxSpeed;
@@ -73,7 +73,7 @@ typedef struct _GlobalValues {
 typedef struct _CurrentStatus {
     uint8_t             mode;
     uint32_t            completedLaps;
-    uint32_t            position;
+    int32_t             position;
     uint32_t            systemStatus;
 } CurrentStatus;
 
@@ -156,6 +156,7 @@ void DumpStatus( const CurrentStatus * const status);
 //eStatus ValToBcd(const uint16_t val, unsigned char * const outBuf);
 
 eStatus IsBcd(const char val);
+eStatus IsBcdOrMinus(const char val);
 eStatus IsHex(const char val);
 
 uint16_t ExtractChecksum(const unsigned char * packet, const int packetLength);
