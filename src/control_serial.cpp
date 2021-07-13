@@ -218,9 +218,14 @@ void        SendPacketRequestModeValues(Modes mode)
             Log(eLogWarn, CMP_NAME, "SendPacketRequestModeValues: invalid mode 0x%02x", mode);
             break;
     }
+}
 
-    
-
+void SendPacketRequestGlobalValues()
+{
+    while (eOK  !=  queueForTransmit(REQUEST_GLOBAL_VALUES, 3))
+    {
+        vTaskDelay(100/portTICK_PERIOD_MS);
+    }
 }
 
 void ParsePacketModeValuesAscii(PacketModeValuesAscii const * const modePacket)
@@ -400,6 +405,9 @@ eStatus ControlSerialReceive()
                 {
                     receiveStatus = eReceiveStatusError;
                     Log(eLogWarn, CMP_NAME, "ControlSerialLoop: Unexpected character 0x%02x while waiting for stop byte", tmp);
+                    receiveBuffer[receiveIndex++] = tmp;
+                    receiveBuffer[receiveIndex] = 0;
+                    Log(eLogWarn, CMP_NAME, "%s", receiveBuffer);
                 }
 
                 break;
