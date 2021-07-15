@@ -283,7 +283,6 @@ static void getGlobalValues(AsyncWebServerRequest *request)
 
     vTaskDelay(500/portTICK_PERIOD_MS);
 
-
     AsyncResponseStream *response = request->beginResponseStream("application/json");
     DynamicJsonDocument json(1024);
     json["home"] = String(gGlobalValues.home);
