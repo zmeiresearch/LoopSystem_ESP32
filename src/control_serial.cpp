@@ -67,6 +67,7 @@ static eStatus queueForTransmit(const char * const buffer, size_t size);
 //  Exported functions
 //==============================================================================
 
+// Task interface
 eStatus ControlSerialInit(void * param)
 {
     Log(eLogInfo, CMP_NAME, "ControlSerialInit");
@@ -181,14 +182,6 @@ void SendPacketModeValuesAscii(Modes mode)
     //{
     //    vTaskDelay(100/portTICK_PERIOD_MS);
     //}
-}
-
-void SendPacketRequestGlobalValues()
-{
-    while (eOK !=  queueForTransmit(REQUEST_GLOBAL_VALUES, 3))
-            {
-                vTaskDelay(100/portTICK_PERIOD_MS);
-            }
 }
 
 void        SendPacketRequestModeValues(Modes mode)
