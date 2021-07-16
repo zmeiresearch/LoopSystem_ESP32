@@ -1,6 +1,5 @@
 /*==============================================================================
   LoopSystem ESP32
-
   ============================================================================*/
 
 //==============================================================================
@@ -12,20 +11,20 @@
 //==============================================================================
 //  Includes
 //==============================================================================
+#include "config_local.h"
 
 //==============================================================================
 //  Defines
 //==============================================================================
 
-// In demo mode, a specific task is started that periodically changes mode and
-// global values
-//#define DEMO_MODE   1
+// Board will first try connecting to the WiFi network that is in run-time
+// config. If that fails for some time, a hotspot with default credentials will 
+// be started to allow configuration.
+#define     WIFI_AP_SSID          "loopsystem-esp32-config"
+#define     WIFI_AP_PASSWORD      "looploop"
 
-
-// Wifi configuration
-#define WIFI_SSID                   "gr5-c3_leaf"
-#define WIFI_PASSWORD               "AASSDDFFqwer11223344!!"
-#define WIFI_DEVICE_NAME            "loopsystem-esp32"
+// Name the board will advertise once connected to a network
+#define     WIFI_DEVICE_NAME      "loopsystem-esp32"
 
 // Log configuration
 #define     LOG_TASK_PERIOD         5   //  in ms
@@ -41,8 +40,6 @@
 #define     CONTROL_SERIAL_RX_PIN   16
 #define     CONTROL_SERIAL_TX_PIN   17
 
-
-
 //==============================================================================
 //  Exported types
 //==============================================================================
@@ -57,5 +54,3 @@
 
 
 #endif // INC_CONFIG_H
-
-

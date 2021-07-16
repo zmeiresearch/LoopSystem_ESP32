@@ -72,9 +72,6 @@ const Module Modules[] = {
     { "SerialReceive",  ControlSerialInit,  ControlSerialReceive,   5,                  NULL,   4096,   2 },
     { "SerialTransmit", ControlSerialInit,  ControlSerialTransmit,  5,                  NULL,   4096,   2 },
     { "SerialRefresh",  NULL,               ControlRefreshTask,     2000,               NULL,   4096,   2 },
-#if defined(DEMO_MODE)
-    { "ValuesDemo",     DemoModeInit,       DemoModeLoop,           1000,               NULL,   4096,   2 },
-#endif // DEMO_MODE
     { "Webserver",      WebserverInit,      NULL,                   0,                  NULL,   4096,   1 }
 };
 

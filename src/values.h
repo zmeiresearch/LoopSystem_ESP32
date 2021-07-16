@@ -47,10 +47,5 @@ extern CurrentStatus  gStatus;
 //==============================================================================
 //  Exported functions
 //==============================================================================
-#if defined(DEMO_MODE)
-eStatus DemoModeInit(void *);
-eStatus DemoModeLoop();
-#endif // DEMO_MODE
-
 
 #endif // INC_VALUES_H
