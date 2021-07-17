@@ -5,40 +5,25 @@
 //==============================================================================
 //  Multi-include guard
 //==============================================================================
-#ifndef INC_MODULE_HOST_H
-#define INC_MODULE_HOST_H
+#ifndef INC_RUNTIME_CONFIG_H
+#define INC_RUNTIME_CONFIG_H
 
 //==============================================================================
 //  Includes
 //==============================================================================
+#include "WString.h"
+
 #include "globals.h"
 
 //==============================================================================
 //  Defines
 //==============================================================================
+#define CONFIG_STRUCT_VERSION   1
+#define CONFIG_NAMESPACE        "loop32"
 
 //==============================================================================
 //  Exported types
 //==============================================================================
-// Function pointers for the pseudo-modules. Each module gets a separate task,
-// in which 1) It's Init function is executed; 2) If init is OK, the Loop
-// function is called  periodically until it returns != OK, after which, the
-// task is deleted. Loop can also not return at all, but in this case, it needs
-// to call delay/yield on it's own
-typedef eStatus (*ModuleInitFn)(void * params);
-typedef eStatus (*ModuleLoopFn)();
-
-typedef struct _Module
-{
-    const char *    Name;
-    ModuleInitFn    Init;
-    ModuleLoopFn    Loop;
-    uint32_t        Period;
-    void *          Params;
-    uint32_t        StackSize;
-    uint8_t         Priority;   // Priority, with 3 (configMAX_PRIORITIES - 1)
-                                // being the highest, and 0 being the lowest.
-} Module;
 
 //==============================================================================
 //  Exported data
@@ -47,6 +32,17 @@ typedef struct _Module
 //==============================================================================
 //  Exported functions
 //==============================================================================
-eStatus StartModules(const Module * const modules, const uint32_t moduleCount);
 
-#endif // INC_MODULE_HOST_H
+void        ConfigInit();
+void        Finalize();
+bool        ConfigIsDefault();
+uint32_t    ConfigVersion();
+uint32_t    ConfigUpdateCount();
+
+// Data starts here
+String      ConfigWifiSSID();
+String      ConfigWifiPassword();
+bool        ConfigWriteWifiSSID(const String ssid);
+bool        ConfigWriteWifiPassword(const String password);
+
+#endif // INC_RUNTIME_CONFIG_H

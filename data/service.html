@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Loop32 service mode</title>
+        <script src='scripts/jquery-3.6.0.min.js'></script>
+        <script src='scripts/update.js'></script>
+        <script src='scripts/logsocket.js'></script>
+    </head>
+    <body>
+        <main class='wrapper'>
+            <div class='container' style='max-width: 75%'>
+                <div class='row'>
+                    <fieldset class='column column-75 rounded'>
+                        <legend>Debug log</legend>
+                        <textarea style='overflow: scroll; height:80%' id='debugLog'></textarea>
+                    </fieldset>
+                    <fieldset class='column column-25 rounded'>
+                        <legend>Firmware Update</legend>
+                        <form method='POST' action='#' enctype='multipart/form-data' id='updateFirmware'>
+                            <fieldset>
+                                <label for='updateFile'>Firmware</label>
+                                <input class='' type='file' name='update' id='updateFile'>
+                                <input class='button-primary' type='submit' value='Update Firmware'>
+                            </fieldset>
+                        </form>
+                        <form method='POST' action='#' enctype='multipart/form-data' id='updateSpiffs'>
+                            <label for='updateFile'>SPIFFS</label>
+                            <input type='file' name='update' id='updateFile'>
+                            <input type='submit' value='Update Spiffs'>
+                        </form>
+                        <label for='updateProgress'>Update progress:</label>
+                        <progress style='padding-bottom: 2rem' id='updateProgress' max='100' value='0'>0%</progress>
+                    </fieldset>
+                </div>
+            </div>
+        </main>
+    </body>
+</html>
+

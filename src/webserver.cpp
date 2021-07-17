@@ -7,12 +7,10 @@
 //  Includes
 //==============================================================================
 #include <string>
-#include <WiFi.h>
-#include <WiFiClient.h>
-#include <ESPmDNS.h>
+
+#include <SPIFFS.h>
 #include <Update.h>
 #include <ArduinoJson.h>
-#include "SPIFFS.h"
 #include "ESPAsyncWebServer.h"
 
 #include "config.h"
@@ -446,37 +444,7 @@ static void postGlobalValues(AsyncWebServerRequest * request, uint8_t *data, siz
 // Initialize update webserver
 eStatus WebserverInit(void * params) 
 {
-    // IVA: TODO: Move SPIFFS and Wifi intialization outside!
-    if (!SPIFFS.begin())
-    {
-        Log(eLogCrit, CMP_NAME, "WebserverInit: An Error has occurred while mounting SPIFFS");
-        return eFAIL;
-    }
-
-    // Connect to WiFi network
-    Log(eLogInfo, CMP_NAME, "WebserverInit: Connecting to Wifi: %s", WIFI_SSID);
-    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-
-    // Wait for connection
-    while (WiFi.status() != WL_CONNECTED) 
-    {
-        // IVA: TODO: Use FreeRTOS primitives!
-        vTaskDelay(5000 / portTICK_PERIOD_MS);
-        Log(eLogInfo, CMP_NAME, ".");
-    }
-  
-    Log(eLogInfo, CMP_NAME, "WebserverInit: Connected to %s", WIFI_SSID);
-    Log(eLogInfo, CMP_NAME, "IP address: %s", WiFi.localIP().toString().c_str());
-
-    // Advertise through MDNS
-    if (!MDNS.begin(WIFI_DEVICE_NAME)) 
-    {
-        Log(eLogWarn, CMP_NAME, "WebserverInit: Error setting up MDNS responder!");
-    } 
-    else
-    {
-        Log(eLogInfo, CMP_NAME, "mDNS responder started");
-    }
+    Log(eLogInfo, CMP_NAME, "Webserver init called");
     
     // Web root 
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {

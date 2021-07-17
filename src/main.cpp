@@ -45,21 +45,19 @@
 //  Local function definitions
 //==============================================================================
 static void     setupHardware();
-static void     moduleHost(void * param);
-static eStatus  startModules();
 static eStatus  keepaliveLoop();
 
 //==============================================================================
 //  Local data
 //==============================================================================
-const Module Modules[] = {
+const Module modules[] = {
     { "Logger",         LogInit,            LogLoop,                LOG_TASK_PERIOD,    NULL,   8192,   2 },
     { "SystemManager",  SystemManagerInit,  SystemManagerTask,      100,                NULL,   4096,   1 },
     { "Keepalive",      NULL,               keepaliveLoop,          10000,              NULL,   4096,   0 },
     { "SerialReceive",  ControlSerialInit,  ControlSerialReceive,   5,                  NULL,   4096,   2 },
     { "SerialTransmit", ControlSerialInit,  ControlSerialTransmit,  5,                  NULL,   4096,   2 },
     { "SerialRefresh",  NULL,               ControlRefreshTask,     2000,               NULL,   4096,   2 },
-    { "Webserver",      WebserverInit,      NULL,                   0,                  NULL,   4096,   1 }
+    //{ "Webserver",      WebserverInit,      NULL,                   0,                  NULL,   4096,   1 }
 };
 
 //==============================================================================
@@ -85,7 +83,7 @@ void setup()
 {
     setupHardware();
 
-    startModules();
+    StartModules(&modules[0], ARRAY_SIZE(modules));
 
     LogSetMinLevel(eLogDebug);
 

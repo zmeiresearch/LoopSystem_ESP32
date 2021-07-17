@@ -61,26 +61,26 @@ static void moduleHost(void * param)
 //==============================================================================
 //  Exported functions
 //==============================================================================
-eStatus StartModules()
+eStatus StartModules(const Module * const modules, const uint32_t moduleCount)
 {
     eStatus retVal = eOK;
     TaskHandle_t    taskHandle;
 
-    for (int i = 0; i < ARRAY_SIZE(Modules); i++)
+    for (uint32_t i = 0; i < moduleCount; i++)
     {
         xTaskCreate(moduleHost,
-                Modules[i].Name,
-                Modules[i].StackSize,   // Stack size
-                (void*)&Modules[i],
-                Modules[i].Priority,
+                modules[i].Name,
+                modules[i].StackSize,   // Stack size
+                (void*)&modules[i],
+                modules[i].Priority,
                 &taskHandle);
         if (taskHandle == NULL)
         {
-            Log(eLogCrit, CMP_NAME, "startModules: Error creating task for %s", Modules[i].Name);
+            Log(eLogCrit, CMP_NAME, "startModules: Error creating task for %s", modules[i].Name);
             // Logger may not be working at that time!
             Serial.begin(115200);
             Serial.print("startModules: Error creating task for");
-            Serial.println(Modules[i].Name);
+            Serial.println(modules[i].Name);
 
             retVal = eFAIL;
         }
