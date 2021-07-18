@@ -2,6 +2,16 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
+function format_for_display(val)
+{
+    return (val/10).toFixed(1);
+}
+
+function format_from_display(val)
+{
+    return (val*10).toFixed(0);
+}
+
 async function update_mode_values()
 {
     var done = false;
@@ -14,12 +24,12 @@ async function update_mode_values()
 
         $.get( "/modeValues", { 'mode' : mode }, function( data ) {
             //console.log("Received: " + data);
-            $('#mode_speed').val((data["speed"]/10).toFixed(1));
-            $('#mode_turn1').val((data["turn1"]/10).toFixed(1));
-            $('#mode_turn2').val((data["turn2"]/10).toFixed(1));
-            $('#mode_brake_time').val((data["brakeTime"]/10).toFixed(1));
-            $('#mode_acc').val((data["acc"]/10).toFixed(1));
-            $('#mode_dec').val((data["dec"]/10).toFixed(1));
+            $('#mode_speed').val(format_for_display(data["speed"]));
+            $('#mode_turn1').val(format_for_display(data["turn1"]));
+            $('#mode_turn2').val(format_for_display(data["turn2"]));
+            $('#mode_brake_time').val(format_for_display(data["brakeTime"]));
+            $('#mode_acc').val(format_for_display(data["acc"]));
+            $('#mode_dec').val(format_for_display(data["dec"]));
             
             done = true;
         });
@@ -31,12 +41,12 @@ async function save_mode_values()
 {
     var mode = $('#mode_id').text();
     val = {
-        'speed' : $('#mode_speed').val(),
-        'turn1' : $('#mode_turn1').val(),
-        'turn2' : $('#mode_turn2').val(),
-        'brakeTime' : $('#mode_brake_time').val(),
-        'acc' : $('#mode_acc').val(),
-        'dec' : $('#mode_dec').val(),
+        'speed' : format_from_display($('#mode_speed').val()),
+        'turn1' : format_from_display($('#mode_turn1').val()),
+        'turn2' : format_from_display($('#mode_turn2').val()),
+        'brakeTime' : format_from_display($('#mode_brake_time').val()),
+        'acc' : format_from_display($('#mode_acc').val()),
+        'dec' : format_from_display($('#mode_dec').val()),
     };
 
     $.ajax("modeValues", {
