@@ -14,13 +14,12 @@ async function update_mode_values()
 
         $.get( "/modeValues", { 'mode' : mode }, function( data ) {
             //console.log("Received: " + data);
-            $('#mode_speed').val(data["speed"]);
-            $('#mode_turn1').val(data["turn1"]);
-            $('#mode_turn2').val(data["turn2"]);
-            $('#mode_brake_time').val(data["brakeTime"]);
-            $('#mode_acc').val(data["acc"]);
-            $('#mode_dec').val(data["dec"]);
-            
+            $('#mode_speed').val((data["speed"]/10).toFixed(1));
+            $('#mode_turn1').val((data["turn1"]/10).toFixed(1));
+            $('#mode_turn2').val((data["turn2"]/10).toFixed(1));
+            $('#mode_brake_time').val((data["brakeTime"]/10).toFixed(1));
+            $('#mode_acc').val((data["acc"]/10).toFixed(1));
+            $('#mode_dec').val((data["dec"]/10).toFixed(1));
             
             done = true;
         });
