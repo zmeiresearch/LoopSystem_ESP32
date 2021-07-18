@@ -255,14 +255,14 @@ void ParsePacketStatusAscii(PacketStatusAscii const * const statusPacket)
 
     uint8_t mode = (uint8_t)statusPacket->status.mode - 0x30;
 
-    if ((eModeNovice <= mode) && (mode <= eModeMaster))
-    {
+    //if ((eModeNovice <= mode) && (mode <= eModeMaster))
+    //{
         gStatus.mode = mode;
-    }
-    else 
-    {
-        Log(eLogWarn, CMP_NAME, "ParseStatus: invalid mode: 0x%02x", statusPacket->status.mode);
-    }
+    //}
+    //else 
+    //{
+        //Log(eLogWarn, CMP_NAME, "ParseStatus: invalid mode: 0x%02x", statusPacket->status.mode);
+    //}
 
     gStatus.completedLaps = FiveByteBcdToUint32((const char *)&statusPacket->status.completedLaps[0]);
     gStatus.position = TenByteBcdToUint32((const char *)&statusPacket->status.position[0]);
@@ -398,7 +398,7 @@ eStatus ControlSerialReceive()
                 if (STOP_BYTE == tmp) 
                 {
                     receiveBuffer[receiveIndex] = 0; // NULL - terminate the buffer
-                    Log(eLogInfo, CMP_NAME, "ControlSerialLoop: ProcessingPacket");
+                    //Log(eLogInfo, CMP_NAME, "ControlSerialLoop: ProcessingPacket");
                     ProcessPacket(&receiveBuffer[0], receiveIndex);
                     receiveStatus = eReceiveStatusIdle;
                 }
