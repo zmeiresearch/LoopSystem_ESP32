@@ -51,8 +51,8 @@ static eStatus  keepaliveLoop();
 //  Local data
 //==============================================================================
 const Module modules[] = {
-    { "Logger",         LogInit,            LogLoop,                LOG_TASK_PERIOD,    NULL,   8192,   2 },
-    { "SystemManager",  SystemManagerInit,  SystemManagerTask,      100,                NULL,   4096,   1 },
+    { "Logger",         LogInit,            LogLoop,                LOG_TASK_PERIOD,    NULL,   4096,   2 },
+    { "SystemManager",  SystemManagerInit,  SystemManagerTask,      100,                NULL,   8192,   1 },
     { "Keepalive",      NULL,               keepaliveLoop,          10000,              NULL,   4096,   0 },
     { "SerialReceive",  ControlSerialInit,  ControlSerialReceive,   5,                  NULL,   4096,   2 },
     { "SerialTransmit", ControlSerialInit,  ControlSerialTransmit,  5,                  NULL,   4096,   2 },
