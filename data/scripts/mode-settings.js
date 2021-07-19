@@ -37,6 +37,27 @@ async function update_mode_values()
     }
 }
 
+function update_limits()
+{
+    //console.log("Updating values");
+
+    $.get( "/globalValues", function( data ) {
+        window.limits = data;
+        //console.log("Received: " + data);
+        //$('#global_home'.val(data["home"]);
+        //$('#global_max_end').val(data["maxEnd"]);
+        //$('#global_max_turn1').val(data["maxTurn1"]);
+        //$('#global_min_turn2').val(data["minTurn2"]);
+        //$('#global_maxAcc').val(data["maxAcc"]);
+        //$('#global_maxDec').val(data["maxDec"]);
+        //$('#global_maxSpeed').val(data["maxSpeed"]);
+        //$('#global_homingSpeed').val(data["homingSpeed"]);
+        //$('#global_maxTime').val(data["maxTime"]);
+        //$('#global_maxLaps').val(data["maxLaps"]);
+        //$('#global_servSpeed').val(data["servSpeed"]); 
+    });
+}
+
 async function save_mode_values()
 {
     var mode = $('#mode_id').text();
@@ -58,7 +79,27 @@ async function save_mode_values()
         });
 }
 
+function handle_speed_change(e)
+{
+    speed = $('#mode_speed')
+    val = speed.val();
+    if ( isNaN(val) || 
+        (format_from_display(val) > window.limits.maxSpeed) ||
+        (format_from_display(val) < window.limits.homingSpeed))
+    {
+        speed.css('background', '#FF0000');
+    }
+    else
+    {
+        speed.css('background', '#FFFFFF');
+    }
+}
+
 $(document).ready()
 {
     update_mode_values();
+    update_limits();
+
+    //$('#mode_speed').change(handle_speed_change);
+
 }
