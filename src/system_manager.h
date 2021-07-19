@@ -31,7 +31,6 @@
 eStatus   SystemManagerInit(void * params);
 eStatus   SystemManagerTask();
 
-
 #endif // INC_SYSTEM_MANAGER_H
 
 

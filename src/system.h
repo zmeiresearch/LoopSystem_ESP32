@@ -5,21 +5,21 @@
 //==============================================================================
 //  Multi-include guard
 //==============================================================================
-#ifndef INC_RUNTIME_CONFIG_H
-#define INC_RUNTIME_CONFIG_H
+#ifndef INC_SYSTEM_H
+#define INC_SYSTEM_H
 
 //==============================================================================
 //  Includes
 //==============================================================================
-#include "WString.h"
-
 #include "globals.h"
 
 //==============================================================================
 //  Defines
 //==============================================================================
-#define CONFIG_STRUCT_VERSION   1
-#define CONFIG_NAMESPACE        "loop32"
+#define SystemGetTimeMs()       (xTaskGetTickCount() * portTICK_PERIOD_MS)
+#define SystemSleepMs(x)        (vTaskDelay((x)/portTICK_PERIOD_MS))
+#define SystemElapsedTimeMs(x)  (SystemGetTimeMs() - (x))
+
 
 //==============================================================================
 //  Exported types
@@ -32,16 +32,9 @@
 //==============================================================================
 //  Exported functions
 //==============================================================================
+void      SystemRestart();
 
-void        ConfigInit();
-void        ConfigFinalize();
-uint32_t    ConfigVersion();
-uint32_t    ConfigUpdateCount();
 
-// Data starts here
-String      ConfigWifiSSID();
-String      ConfigWifiPassword();
-bool        ConfigWriteWifiSSID(const String ssid);
-bool        ConfigWriteWifiPassword(const String password);
+#endif // INC_SYSTEM_H
 
-#endif // INC_RUNTIME_CONFIG_H
+

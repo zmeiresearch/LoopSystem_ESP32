@@ -19,6 +19,7 @@
 
 #include "webserver.h"
 #include "runtime_config.h"
+#include "system.h"
 
 //==============================================================================
 //  Defines
@@ -43,6 +44,9 @@ static bool         wifiConnected = false;
 static bool         wifiApStarted = false;
 
 static DNSServer    dnsServer;
+
+static uint32_t     wifiApConnectStartTime = 0;
+static uint32_t     wifiClientConnectStartTime = 0;
 
 
 //==============================================================================
@@ -92,6 +96,7 @@ static eStatus connectWifi(const char * const ssid, const char * const password)
     {
         retVal = eFAIL;
         Log(eLogWarn, CMP_NAME, "SystemManagerTask: Unable to connect to %s", ssid);
+        WiFi.mode(WIFI_OFF);
     }
 
     return retVal;
@@ -148,15 +153,23 @@ eStatus SystemManagerTask()
 
     if (!wifiConnected && !wifiApStarted)
     {
-        if (ConfigIsDefault())
+        Log(eLogInfo, CMP_NAME, "SystemManagerTask: Connecting to configured Wifi: %s", ConfigWifiSSID().c_str());
+        if (eOK == connectWifi(ConfigWifiSSID().c_str(), ConfigWifiPassword().c_str()))
         {
-            // No run-time configuration done, try connecting to default network first
-            Log(eLogInfo, CMP_NAME, "SystemManagerTask: Connecting to default Wifi: %s", WIFI_DEFAULT_SSID);
-            if (eOK == connectWifi(WIFI_DEFAULT_SSID, WIFI_DEFAULT_PASSWORD))
+            wifiConnected = true;
+            WebserverInit();
+            setupmDNS();
+        }
+        else
+        {
+            if ( 0 == wifiClientConnectStartTime)
             {
-                wifiConnected = true;
-                WebserverInit(NULL);
-                setupmDNS();
+                wifiClientConnectStartTime = SystemGetTimeMs();
+            }
+
+            if (SystemElapsedTimeMs(wifiClientConnectStartTime) < WIFI_WAIT_FOR_AP_TIME)
+            {
+                Log(eLogInfo, CMP_NAME, "SystemManagerTask: Unable to connect to wifi, retrying");
             }
             else
             {
@@ -164,26 +177,14 @@ eStatus SystemManagerTask()
                 {
                     Log(eLogInfo, CMP_NAME, "SystemManagerTask: Started configuration AP %s", WIFI_AP_SSID);
                     wifiApStarted = true;
-                    WebserverInit(NULL);
+                    WebserverInit();
+                    wifiApConnectStartTime = SystemGetTimeMs();
                 }
                 else
                 {
                     Log(eLogError, CMP_NAME, "SystemManagerTask: Unable to start configuration AP!");
+                    SystemRestart();
                 }
-            }
-        }
-        else
-        {
-            Log(eLogInfo, CMP_NAME, "SystemManagerTask: Connecting to configured Wifi: %s", ConfigWifiSSID().c_str());
-            if (eOK == connectWifi(ConfigWifiSSID().c_str(), ConfigWifiPassword().c_str()))
-            {
-                wifiConnected = true;
-                WebserverInit(NULL);
-                setupmDNS();
-            }
-            else
-            {
-                Log(eLogInfo, CMP_NAME, "SystemManagerTask: Unable to connect to wifi, retrying");
             }
         }
     }
@@ -191,6 +192,11 @@ eStatus SystemManagerTask()
     if (wifiApStarted)
     {
         dnsServer.processNextRequest();
+        if (SystemElapsedTimeMs(wifiApConnectStartTime) > WIFI_WAIT_FOR_CONFIG_TIME)
+        {
+            Log(eLogError, CMP_NAME, "SystemManagerTask: Configuration time in AP mode exceeded, restarting!");
+            SystemRestart();
+        }
     }
 
     // always loop

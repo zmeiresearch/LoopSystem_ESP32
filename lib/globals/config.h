@@ -30,7 +30,11 @@
 #define     WIFI_DEVICE_NAME        "loopsystem-esp32"
 
 // Time in milliseconds to wait for WiFi to connect in client mode
-#define     WIFI_DEFAULT_CONNECT_TIME   30
+#define     WIFI_DEFAULT_CONNECT_TIME   30 * 1000       // on a single try
+#define     WIFI_WAIT_FOR_AP_TIME       10 * 60 * 1000  // in total
+
+// Time to wait in AP mode for configuration
+#define     WIFI_WAIT_FOR_CONFIG_TIME   5 * 60 * 1000 
 
 // Number of retries to mount SPIFFS. Most of the time if it fails once, it will 
 // fail forever

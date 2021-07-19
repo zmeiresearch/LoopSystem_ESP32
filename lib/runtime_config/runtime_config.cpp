@@ -7,6 +7,8 @@
 //==============================================================================
 #include <Preferences.h>
 
+#include "config.h"
+
 #include "runtime_config.h"
 
 #include "logger.h"
@@ -42,15 +44,9 @@ void         ConfigInit()
     preferences.begin(CONFIG_NAMESPACE, false); 
 }
 
-void         Finalize()
+void         ConfigFinalize()
 {
     preferences.end();
-}
-
-bool         ConfigIsDefault()
-{
-    if (ConfigUpdateCount > 0) return false;
-    return true;
 }
 
 uint32_t     ConfigVersion()
@@ -66,12 +62,12 @@ uint32_t     ConfigUpdateCount()
 // Data starts here
 String       ConfigWifiSSID()
 {
-    return preferences.getString("WifiSSID", "kyp");
+    return preferences.getString("WifiSSID", WIFI_DEFAULT_SSID);
 }
 
 String       ConfigWifiPassword()
 {
-    return preferences.getString("WifiPassword", "kyp");
+    return preferences.getString("WifiPassword", WIFI_DEFAULT_PASSWORD);
 }
 
 void incrementUpdateCount()

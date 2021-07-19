@@ -18,6 +18,7 @@
 #include "logger.h"
 #include "values.h"
 #include "control_serial.h"
+#include "system.h"
 
 //==============================================================================
 //  Defines
@@ -436,13 +437,12 @@ static void postGlobalValues(AsyncWebServerRequest * request, uint8_t *data, siz
 
 
 
-
 //==============================================================================
 //  Exported functions
 //==============================================================================
 
 // Initialize update webserver
-eStatus WebserverInit(void * params) 
+eStatus WebserverInit()
 {
     Log(eLogInfo, CMP_NAME, "Webserver init called");
     
@@ -497,7 +497,7 @@ eStatus WebserverInit(void * params)
             AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", "OK");
             response->addHeader("Connection", "close");
             request->send(response);
-            ESP.restart();
+            SystemRestart();
         } else {
             AsyncWebServerResponse *response = request->beginResponse(500, "text/plain", "ERROR");
             response->addHeader("Connection", "close");
@@ -510,7 +510,7 @@ eStatus WebserverInit(void * params)
             AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", "OK");
             response->addHeader("Connection", "close");
             request->send(response);
-            ESP.restart();
+            SystemRestart();
         } else {
             AsyncWebServerResponse *response = request->beginResponse(500, "text/plain", "ERROR");
             response->addHeader("Connection", "close");
