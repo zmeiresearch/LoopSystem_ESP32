@@ -20,6 +20,8 @@
 #include "control_serial.h"
 #include "system.h"
 
+#include "runtime_config.h"
+
 //==============================================================================
 //  Defines
 //==============================================================================
@@ -435,6 +437,49 @@ static void postGlobalValues(AsyncWebServerRequest * request, uint8_t *data, siz
     SendPacketGlobalValuesAscii();
 }
 
+static eStatus getConfig(AsyncWebServerRequest *request)
+{
+    AsyncResponseStream *response = request->beginResponseStream("application/json");
+    DynamicJsonDocument json(1024);
+    json["wifi"]["ssid"] = String(ConfigWifiSSID());
+    json["wifi"]["password"] = String(ConfigWifiPassword());
+    serializeJson(json, *response);
+    request->send(response);
+}
+
+static eStatus postConfig(AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total)
+{
+    eStatus retVal = eOK;
+
+    Log(eLogInfo, CMP_NAME, "postConfig: Processing %d bytes: %s", len, data);
+
+    //DynamicJsonDocument doc(total);
+    DynamicJsonDocument json(1024);
+    auto resultError = deserializeJson(json, (const char *) data, len);
+
+    if (resultError)
+    {
+        Log(eLogWarn, CMP_NAME, "postConfig: Deserialization error: %s", resultError.c_str());
+    }
+    else
+    {
+        const char* ssid = json["wifi"]["ssid"];
+        const char* password = json["wifi"]["password"];
+        if ((ssid) && (password))
+        {
+            Log(eLogWarn, CMP_NAME, "postConfig: Setting wifi parameters: %s, %s", ssid, password);
+            ConfigWriteWifiSSID(json["wifi"]["ssid"].as<String>());
+            ConfigWriteWifiPassword(json["wifi"]["password"].as<String>());
+            SystemRestart();
+        }
+        else
+        {
+            Log(eLogWarn, CMP_NAME, "postConfig: incomplete wifi configuration!");
+        } 
+    }
+
+    return retVal;
+}
 
 
 //==============================================================================
@@ -469,6 +514,11 @@ eStatus WebserverInit()
         getGlobalValues(request);
     });
 
+    server.on("/config", HTTP_GET, [](AsyncWebServerRequest *request){
+        //Log(eLogDebug, CMP_NAME, "get config received");
+        getConfig(request);
+    });
+
     server.on("/modeValues", HTTP_POST,
     [](AsyncWebServerRequest * request){
         Log(eLogDebug, CMP_NAME, "post modeValues received");
@@ -488,6 +538,17 @@ eStatus WebserverInit()
         [](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total) {
             Log(eLogDebug, CMP_NAME, "post globalValues body handling");
             postGlobalValues(request, data, len, index, total);
+            AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", "OK");
+        });
+
+    server.on("/config", HTTP_POST,
+    [](AsyncWebServerRequest * request){
+            Log(eLogDebug, CMP_NAME, "post config received");
+        },
+        NULL,
+        [](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total) {
+            Log(eLogDebug, CMP_NAME, "post config body handling");
+            postConfig(request, data, len, index, total);
             AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", "OK");
         });
 

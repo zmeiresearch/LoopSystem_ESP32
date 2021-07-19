@@ -79,20 +79,24 @@ void incrementUpdateCount()
 
 bool        ConfigWriteWifiSSID(const String ssid)
 {
-    if (0 != preferences.putString("WifiSSID", ssid))
+    Log(eLogInfo, CMP_NAME, "ConfigWriteWifiSSID: %s", ssid.c_str());
+    if (0 != preferences.putString("WifiSSID", ssid.c_str()))
     {
         incrementUpdateCount();
         return true;
     }
+    Log(eLogError, CMP_NAME "ConfigWriteWifiSSID: error setting SSID!");
     return false;
 }
 
 bool        ConfigWriteWifiPassword(const String password)
 {
-    if (0 != preferences.putString("WifiPassword", password))
+    Log(eLogInfo, CMP_NAME, "ConfigWriteWifiPassword: %s", password.c_str());
+    if (0 != preferences.putString("WifiPassword", password.c_str()))
     {
         incrementUpdateCount();
         return true;
     }
+    Log(eLogError, CMP_NAME "ConfigWriteWifiPassword: error setting Password!");
     return false;
 }

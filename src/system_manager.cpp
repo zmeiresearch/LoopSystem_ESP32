@@ -113,8 +113,9 @@ static eStatus startAP(const char * const ssid, const char * const password)
 
     WiFi.disconnect(true);
     WiFi.mode(WIFI_AP);
-	WiFi.softAPConfig(apIp, apIp, apNetmask);
 	WiFi.softAP(ssid, password, WIFI_AP_CHANNEL);
+    SystemSleepMs(1000);
+    WiFi.softAPConfig(apIp, apIp, apNetmask);
 
 	// Ensure we don't poison the client DNS cache
 	dnsServer.setTTL(0);
@@ -130,6 +131,8 @@ static eStatus startAP(const char * const ssid, const char * const password)
 eStatus SystemManagerInit(void * params)
 {
     Log(eLogInfo, CMP_NAME, "SystemManagerInit");
+
+    ConfigInit();
 
     return eOK;
 }
@@ -154,6 +157,12 @@ eStatus SystemManagerTask()
     if (!wifiConnected && !wifiApStarted)
     {
         Log(eLogInfo, CMP_NAME, "SystemManagerTask: Connecting to configured Wifi: %s", ConfigWifiSSID().c_str());
+
+        if ( 0 == wifiClientConnectStartTime)
+        {
+            wifiClientConnectStartTime = SystemGetTimeMs();
+        }
+
         if (eOK == connectWifi(ConfigWifiSSID().c_str(), ConfigWifiPassword().c_str()))
         {
             wifiConnected = true;
@@ -162,11 +171,6 @@ eStatus SystemManagerTask()
         }
         else
         {
-            if ( 0 == wifiClientConnectStartTime)
-            {
-                wifiClientConnectStartTime = SystemGetTimeMs();
-            }
-
             if (SystemElapsedTimeMs(wifiClientConnectStartTime) < WIFI_WAIT_FOR_AP_TIME)
             {
                 Log(eLogInfo, CMP_NAME, "SystemManagerTask: Unable to connect to wifi, retrying");
