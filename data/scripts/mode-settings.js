@@ -67,7 +67,7 @@ async function get_mode_values(checkWrite)
                                 
                 done = true;
             },
-            error: function(response) {
+            /*error: function(response) {
                 console.log("setting default values");
                 var data = [];
                 data["speed"] = 123;
@@ -78,7 +78,7 @@ async function get_mode_values(checkWrite)
                 data["dec"] = 14;
                 set_mode_fields(data);
                 done = true;
-            }
+            }*/
         });
 
         await sleep(1000);
@@ -118,7 +118,7 @@ async function get_limits()
                 window.limits = data;
                 done = true;
             },
-            error: function(response) {
+            /*error: function(response) {
                 console.log("setting default limits");
                 var data = [];
                 data["home"] = 1000;
@@ -134,7 +134,7 @@ async function get_limits()
                 data["servSpeed"] = 50;
                 window.limits = data;
                 done = true;    
-            }
+            }*/
         });
 
         await sleep(1000);
