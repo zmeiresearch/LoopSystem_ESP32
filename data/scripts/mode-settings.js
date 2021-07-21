@@ -100,10 +100,10 @@ async function set_mode_values()
     $.ajax("modeValues", {
         data : JSON.stringify({"mode" : mode, "values": val}),
         contentType : 'application/json',
-        type : 'POST'
-        }).always(function(done) {
+        type : 'POST',
+        always : function(done) {
             setTimeout(get_mode_values(true), 600);
-        });
+        }});
 }
 
 async function get_limits()
