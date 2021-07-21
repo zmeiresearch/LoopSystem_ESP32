@@ -323,105 +323,88 @@ static void postGlobalValues(AsyncWebServerRequest * request, uint8_t *data, siz
     }
     else
     {
-        const char* home = json["values"]["home"];
-        if (home) {
-            gGlobalValues.home = json["values"]["home"].as<uint32_t>();
+        if (json.containsKey("home")) {
+            gGlobalValues.home = json["home"].as<uint32_t>();
         }
         else
         {
             Log(eLogWarn, CMP_NAME, "postGlobalValues: no home!");
         }
 
-        const char* maxEnd = json["values"]["maxEnd"];
-        if (maxEnd) {
-            gGlobalValues.maxEnd = json["values"]["maxEnd"].as<uint32_t>();
+        if (json.containsKey("maxEnd")) {
+            gGlobalValues.maxEnd = json["maxEnd"].as<uint32_t>();
         }
         else
         {
             Log(eLogWarn, CMP_NAME, "postGlobalValues: no maxEnd!");
         }
 
-        const char* maxTurn1 = json["values"]["maxTurn1"];
-        if (maxTurn1) {
-            gGlobalValues.maxTurn1 = json["values"]["maxTurn1"].as<uint32_t>();
+        if (json.containsKey("maxTurn1")) {
+            gGlobalValues.maxTurn1 = json["maxTurn1"].as<uint32_t>();
         }
         else
         {
             Log(eLogWarn, CMP_NAME, "postGlobalValues: no maxTurn1!");
         }
 
-
-        const char* minTurn2 = json["values"]["minTurn2"];
-        if (minTurn2) {
-            gGlobalValues.minTurn2 = json["values"]["minTurn2"].as<uint32_t>();
+        if (json.containsKey("minTurn2")) {
+            gGlobalValues.minTurn2 = json["minTurn2"].as<uint32_t>();
         }
         else
         {
             Log(eLogWarn, CMP_NAME, "postGlobalValues: no minTurn2!");
         }
 
-
-        const char* maxAcc = json["values"]["maxAcc"];
-        if (maxAcc) {
-            gGlobalValues.maxAcc = json["values"]["maxAcc"].as<uint32_t>();
+        if (json.containsKey("maxAcc")) {
+            gGlobalValues.maxAcc = json["maxAcc"].as<uint32_t>();
         }
         else
         {
             Log(eLogWarn, CMP_NAME, "postGlobalValues: no maxAcc!");
         }
 
-
-        const char* maxDec = json["values"]["maxDec"];
-        if (maxDec) {
-            gGlobalValues.maxDec = json["values"]["maxDec"].as<uint32_t>();
+        if (json.containsKey("maxDec")) {
+            gGlobalValues.maxDec = json["maxDec"].as<uint32_t>();
         }
         else
         {
             Log(eLogWarn, CMP_NAME, "postGlobalValues: no maxDec!");
         }
 
-
-        const char* maxSpeed = json["values"]["maxSpeed"];
-        if (maxSpeed) {
-            gGlobalValues.maxSpeed = json["values"]["maxSpeed"].as<uint32_t>();
+        if (json.containsKey("maxSpeed")) {
+            gGlobalValues.maxSpeed = json["maxSpeed"].as<uint32_t>();
         }
         else
         {
             Log(eLogWarn, CMP_NAME, "postGlobalValues: no maxSpeed!");
         }
 
-
-        const char* homingSpeed = json["values"]["homingSpeed"];
-        if (homingSpeed) {
-            gGlobalValues.homingSpeed = json["values"]["homingSpeed"].as<uint32_t>();
+        if (json.containsKey("homingSpeed")) {
+            gGlobalValues.homingSpeed = json["homingSpeed"].as<uint32_t>();
         }
         else
         {
             Log(eLogWarn, CMP_NAME, "postGlobalValues: no homingSpeed!");
         }
 
-
-        const char* maxTime = json["values"]["maxTime"];
-        if (maxTime) {
-            gGlobalValues.maxTime = json["values"]["maxTime"].as<uint32_t>();
+        if (json.containsKey("maxTime")) {
+            gGlobalValues.maxTime = json["maxTime"].as<uint32_t>();
         }
         else
         {
             Log(eLogWarn, CMP_NAME, "postGlobalValues: no maxTime!");
         }
 
-        const char* maxLaps = json["values"]["maxLaps"];
-        if (maxLaps) {
-            gGlobalValues.maxLaps = json["values"]["maxLaps"].as<uint32_t>();
+        if (json.containsKey("maxLaps")) {
+            gGlobalValues.maxLaps = json["maxLaps"].as<uint32_t>();
         }
         else
         {
             Log(eLogWarn, CMP_NAME, "postGlobalValues: no maxLaps!");
         }
 
-        const char* servSpeed = json["values"]["servSpeed"];
-        if (servSpeed) {
-            gGlobalValues.servSpeed = json["values"]["servSpeed"].as<uint32_t>();
+        if (json.containsKey("servSpeed")) {
+            gGlobalValues.servSpeed = json["servSpeed"].as<uint32_t>();
         }
         else
         {
