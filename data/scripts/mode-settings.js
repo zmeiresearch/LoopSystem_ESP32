@@ -134,7 +134,7 @@ async function get_limits()
                 data["maxLaps"] = 100;
                 data["servSpeed"] = 50;
                 window.limits = data;
-                done = true;    
+                done = true;
             }*/
         });
 

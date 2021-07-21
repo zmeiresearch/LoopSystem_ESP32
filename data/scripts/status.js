@@ -1,3 +1,8 @@
+function format_for_display(val)
+{
+    return (val/10).toFixed(1);
+}
+
 function updateStatus()
 {
     //console.log("Updating values");
@@ -6,7 +11,7 @@ function updateStatus()
         //console.log("Received: " + data);
         $('#status_mode').text(data["mode"]);
         $('#status_completed_laps').text(data["completedLaps"]);
-        $('#status_position').text(data["position"]);
+        $('#status_position').text(format_for_display(data["position"]));
         $('#status_system_status').text(data["systemStatus"]);
     });
 
