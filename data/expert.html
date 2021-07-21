@@ -22,7 +22,9 @@
       </div>
 
       <div class="colelem value_heading">
-        <p>SPEED ( CURRENT SETTINGS )</p>
+        SPEED ( CURRENT: 
+        <div class="value_current" id="mode_speed_current">??</div>
+         km/h )
       </div>
       <div class="colelem value_row">
         <div class="grpelem value_name width_half">
@@ -30,13 +32,15 @@
         </div>
         <div class="grpelem value_input width_half offset_half">
           <p>
-            <input class="grpelem width_half" type="number" id="mode_speed">
+            <input class="grpelem width_half" type="number" step="0.1" id="mode_speed" onChange="validate_all()">
           </p>
         </div>
       </div>
 
       <div class="colelem value_heading">
-        <p>END TURNING POINT ( CURRENT SETTINGS )</p>
+        END TURNING POINT ( CURRENT:
+        <div class="value_current" id="mode_turn1_current">??</div>
+        m )
       </div>
       <div class="colelem value_row">
         <div class="grpelem value_name width_half">
@@ -44,13 +48,15 @@
         </div>
         <div class="grpelem value_input width_half offset_half">
           <p>
-            <input class="grpelem width_half" type="number" id="mode_turn1">
+            <input class="grpelem width_half" type="number" step="0.1" id="mode_turn1" onChange="validate_all()">
           </p>
         </div>
       </div>
 
       <div class="colelem value_heading">
-        <p>NEAR TURNING POINT ( CURRENT SETTINGS )</p>
+        NEAR TURNING POINT ( CURRENT:
+        <div class="value_current" id="mode_turn2_current">??</div>
+        m )
       </div>
       <div class="colelem value_row">
         <div class="grpelem value_name width_half">
@@ -58,13 +64,15 @@
         </div>
         <div class="grpelem value_input width_half offset_half">
           <p>
-            <input class="grpelem width_half" type="number" id="mode_turn2">
+            <input class="grpelem width_half" type="number" step="0.1"  id="mode_turn2" onChange="validate_all()">
           </p>
         </div>
       </div>
 
       <div class="colelem value_heading">
-        <p>BRAKE TIME S ( CURRENT SETTINGS )</p>
+        BRAKE TIME ( CURRENT: 
+        <div class="value_current" id="mode_brake_time_current">??</div>
+        s )
       </div>
       <div class="colelem value_row">
         <div class="grpelem value_name width_half">
@@ -72,13 +80,15 @@
         </div>
         <div class="grpelem value_input width_half offset_half">
           <p>
-            <input class="grpelem width_half" type="number" id="mode_brake_time">
+            <input class="grpelem width_half" type="number" step="0.1" id="mode_brake_time" onChange="validate_all()">
           </p>
         </div>
       </div>
 
       <div class="colelem value_heading">
-        <p>ACCELERATION M/S ( CURRENT SETTINGS )</p>
+        ACCELERATION ( CURRENT:
+        <div class="value_current" id="mode_acc_current">??</div>
+        m/s<sup>2</sup> )
       </div>
       <div class="colelem value_row">
         <div class="grpelem value_name width_half">
@@ -86,13 +96,15 @@
         </div>
         <div class="grpelem value_input width_half offset_half">
           <p>
-            <input class="grpelem width_half" type="number" id="mode_acc">
+            <input class="grpelem width_half" type="number" step="0.1" id="mode_acc" onChange="validate_all()">
           </p>
         </div>
       </div>
 
       <div class="colelem value_heading">
-        <p>DECELERATION M/S ( CURRENT SETTINGS )</p>
+        DECELERATION ( CURRENT:
+        <div class="value_current" id="mode_dec_current">??</div>
+        m/s<sup>2</sup> )
       </div>
       <div class="colelem value_row">
         <div class="grpelem value_name width_half">
@@ -100,13 +112,13 @@
         </div>
         <div class="grpelem value_input width_half offset_half">
           <p>
-            <input class="grpelem width_half" type="number" id="mode_dec">
+            <input class="grpelem width_half" type="number" step="0.1 "id="mode_dec" onChange="validate_all()">
           </p>
         </div>
       </div>
 
       <div class="colelem" style="padding-top: 14px;">
-        <a href="javascript:save_mode_values()" class="save_button width_full" >SET</a>
+        <a href="javascript:set_mode_values()" class="save_button width_full" id="set_button" >SET</a>
       </div>
 
       <a class="nonblock nontext clip_frame colelem" id="u1231" href="program-selector.html"><img
