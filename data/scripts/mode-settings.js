@@ -30,6 +30,8 @@ function set_mode_fields(data){
     
     $('#mode_dec').val(format_for_display(data["dec"]));
     $('#mode_dec_current').text(format_for_display(data["dec"]));
+
+    window.values_updated = true;
 }
 
 function check_write_success(newData) {
@@ -60,7 +62,7 @@ async function get_mode_values(checkWrite)
                 } else {
                     set_mode_fields(data);
                 }
-                
+                                
                 done = true;
             },
             error: function(response) {
@@ -150,21 +152,23 @@ function setElementValueInvalid(e) {
 }
 
 function validate_all(){
-    e = document.getElementById("set_button");
-    if (!validate_speed() ||
-        !validate_turn1() ||
-        !validate_turn2() ||
-        !validate_brake_time() ||
-        !validate_acceleration() ||
-        !validate_deceleration())
-    {
-        e.classList.remove("save_button_enabled");
-        e.classList.add("save_button_disabled");
-    }
-    else
-    {
-        e.classList.remove("save_button_disabled");
-        e.classList.add("save_button_enabled");
+    if (window.values_updated) {
+        e = document.getElementById("set_button");
+        if (!validate_speed() ||
+            !validate_turn1() ||
+            !validate_turn2() ||
+            !validate_brake_time() ||
+            !validate_acceleration() ||
+            !validate_deceleration())
+        {
+            e.classList.remove("save_button_enabled");
+            e.classList.add("save_button_disabled");
+        }
+        else
+        {
+            e.classList.remove("save_button_disabled");
+            e.classList.add("save_button_enabled");
+        }
     }
 }
 
