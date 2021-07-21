@@ -105,6 +105,18 @@ body {
   padding-top: 14px;
 }
 
+.value_current {
+  display: inline;
+}
+
+.value_invalid {
+  background-color: #FF0000;
+}
+
+.value_valid {
+  background-color: #FFFFFF;
+}
+
 a.save_button {
   display:inline-block;
   padding:0.7em 1.7em;

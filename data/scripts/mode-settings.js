@@ -9,56 +9,62 @@ function format_for_display(val)
 
 function format_from_display(val)
 {
-    return (val*10).toFixed(0);
+    return parseInt((val*10).toFixed(0));
 }
 
-async function update_mode_values()
+function set_mode_fields(data){
+    $('#mode_speed').val(format_for_display(data["speed"]));
+    $('#mode_speed_current').text(format_for_display(data["speed"]));
+
+    $('#mode_turn1').val(format_for_display(data["turn1"]));
+    $('#mode_turn1_current').text(format_for_display(data["turn1"]));
+    
+    $('#mode_turn2').val(format_for_display(data["turn2"]));
+    $('#mode_turn2_current').text(format_for_display(data["turn2"]));
+    
+    $('#mode_brake_time').val(format_for_display(data["brakeTime"]));
+    $('#mode_brake_time_current').text(format_for_display(data["brakeTime"]));
+    
+    $('#mode_acc').val(format_for_display(data["acc"]));
+    $('#mode_acc_current').text(format_for_display(data["acc"]));
+    
+    $('#mode_dec').val(format_for_display(data["dec"]));
+    $('#mode_dec_current').text(format_for_display(data["dec"]));
+}
+
+async function get_mode_values()
 {
     var done = false;
-
     while (!done)
     {
-        //console.log("Updating values");
-        
         var mode = $('#mode_id').text();
-
-        $.get( "/modeValues", { 'mode' : mode }, function( data ) {
-            //console.log("Received: " + data);
-            $('#mode_speed').val(format_for_display(data["speed"]));
-            $('#mode_turn1').val(format_for_display(data["turn1"]));
-            $('#mode_turn2').val(format_for_display(data["turn2"]));
-            $('#mode_brake_time').val(format_for_display(data["brakeTime"]));
-            $('#mode_acc').val(format_for_display(data["acc"]));
-            $('#mode_dec').val(format_for_display(data["dec"]));
-            
-            done = true;
+        $.ajax({
+            type: "GET",
+            data: {'mode' : mode },
+            url: "/modeValues",
+            success: function(data) {
+                set_mode_fields(data);
+                done = true;
+            },
+            error: function(response) {
+                console.log("setting default values");
+                var data = [];
+                data["speed"] = 123;
+                data["turn1"] = 434753;
+                data["turn2"] = 17682;
+                data["brakeTime"] = 13;
+                data["acc"] = 18;
+                data["dec"] = 14;
+                set_mode_fields(data);
+                done = true;
+            }
         });
+
         await sleep(200);
     }
 }
 
-function update_limits()
-{
-    //console.log("Updating values");
-
-    $.get( "/globalValues", function( data ) {
-        window.limits = data;
-        //console.log("Received: " + data);
-        //$('#global_home'.val(data["home"]);
-        //$('#global_max_end').val(data["maxEnd"]);
-        //$('#global_max_turn1').val(data["maxTurn1"]);
-        //$('#global_min_turn2').val(data["minTurn2"]);
-        //$('#global_maxAcc').val(data["maxAcc"]);
-        //$('#global_maxDec').val(data["maxDec"]);
-        //$('#global_maxSpeed').val(data["maxSpeed"]);
-        //$('#global_homingSpeed').val(data["homingSpeed"]);
-        //$('#global_maxTime').val(data["maxTime"]);
-        //$('#global_maxLaps').val(data["maxLaps"]);
-        //$('#global_servSpeed').val(data["servSpeed"]); 
-    });
-}
-
-async function save_mode_values()
+async function set_mode_values()
 {
     var mode = $('#mode_id').text();
     val = {
@@ -79,26 +85,152 @@ async function save_mode_values()
         });
 }
 
-function handle_speed_change(e)
+async function get_limits()
 {
-    speed = $('#mode_speed')
-    val = speed.val();
+    var done = false;
+    while (!done)
+    {
+        $.ajax({
+            type: "GET",
+            url: "/globalValues",
+            success: function(data) {
+                window.limits = data;
+                done = true;
+            },
+            error: function(response) {
+                console.log("setting default limits");
+                var data = [];
+                data["home"] = 1000;
+                data["maxEnd"] = 800000;
+                data["maxTurn1"] = 730000;
+                data["minTurn2"] = 10000;
+                data["maxAcc"] = 32;
+                data["maxDec"] = 35;
+                data["maxSpeed"] = 300;
+                data["homingSpeed"] = 100;
+                data["maxTime"] = 3600;
+                data["maxLaps"] = 100;
+                data["servSpeed"] = 50;
+                window.limits = data;
+                done = true;    
+            }
+        });
+
+        await sleep(200);
+    }
+
+    validate_all();
+}
+
+function setElementValueValid(e) {
+    e.classList.remove("value_invalid");
+    e.classList.add("value_valid");
+}
+
+function setElementValueInvalid(e) {
+    e.classList.remove("value_valid");
+    e.classList.add("value_invalid");
+}
+
+function validate_all(){
+    validate_speed();
+    validate_turn1();
+    validate_turn2();
+    validate_brake_time();
+    validate_acceleration();
+    validate_deceleration();
+}
+
+function validate_speed() {
+    var e = document.getElementById("mode_speed");
+    val = e.value
     if ( isNaN(val) || 
         (format_from_display(val) > window.limits.maxSpeed) ||
         (format_from_display(val) < window.limits.homingSpeed))
     {
-        speed.css('background', '#FF0000');
+        setElementValueInvalid(e);
     }
     else
     {
-        speed.css('background', '#FFFFFF');
+        setElementValueValid(e);
+    }
+}
+
+function validate_turn1() {
+    var e = document.getElementById("mode_turn1");
+    val = e.value
+    if ( isNaN(val) || 
+        (format_from_display(val) > window.limits.maxTurn1) ||
+        (format_from_display(val) < window.limits.minTurn2) ||
+        (format_from_display(val) < format_from_display($('#mode_turn2').val())))
+    {
+        setElementValueInvalid(e);
+    }
+    else
+    {
+        setElementValueValid(e);
+    }
+}
+
+function validate_turn2() {
+    var e = document.getElementById("mode_turn2");
+    val = e.value
+    if ( isNaN(val) || 
+        (format_from_display(val) > window.limits.maxTurn1) ||
+        (format_from_display(val) < window.limits.minTurn2) ||
+        (format_from_display(val) > format_from_display($('#mode_turn1').val()))) 
+    {
+        setElementValueInvalid(e);
+    } else {
+        setElementValueValid(e);
+    }
+}
+
+function validate_brake_time() {
+    /*val = this.value
+    if ( isNaN(val) || 
+        (format_from_display(val) > window.limits.maxTurn1) ||
+        (format_from_display(val) < window.limits.minTurn2) ||
+        (format_from_display(val) < format_from_display($('#mode_turn2').val())))
+    {
+        setElementValueInvalid(this);
+    }
+    else
+    {
+        setElementValueValid(this);
+    }*/
+}
+
+function validate_acceleration() {
+    var e = document.getElementById("mode_acc");
+    val = e.value
+    if ( isNaN(val) || 
+        (format_from_display(val) <= 0) ||
+        (format_from_display(val) > window.limits.maxAcc))
+    {
+        setElementValueInvalid(e);
+    } else {
+        setElementValueValid(e);
+    }
+}
+
+function validate_deceleration() {
+    var e = document.getElementById("mode_dec");
+    val = e.value
+    if ( isNaN(val) || 
+        (format_from_display(val) <= 0) ||
+        (format_from_display(val) > window.limits.maxDec))
+    {
+        setElementValueInvalid(e);
+    } else {
+        setElementValueValid(e);
     }
 }
 
 $(document).ready()
 {
-    update_mode_values();
-    update_limits();
+    get_mode_values();
+    get_limits();
 
     //$('#mode_speed').change(handle_speed_change);
 
