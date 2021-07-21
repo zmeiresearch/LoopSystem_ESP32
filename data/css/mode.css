@@ -130,7 +130,7 @@ a.save_button {
   font-weight:bold;
   font-size: 24px;
   color:#000000;
-  background-color:#29ABE2;
+  /*background-color:#29ABE2;*/
   box-shadow:inset 0 -0.6em 1em -0.35em rgba(0,0,0,0.17),inset 0 0.6em 2em -0.3em rgba(255,255,255,0.15),inset 0 0 0em 0.05em rgba(255,255,255,0.12);
   text-align:center;
   position:relative;
@@ -139,6 +139,18 @@ a.save_button {
 
 a.save_button:active{
   box-shadow:inset 0 0.6em 2em -0.3em rgba(0,0,0,0.15),inset 0 0 0em 0.05em rgba(255,255,255,0.12);
+}
+
+.save_button_enabled{
+  pointer-events: all;
+  cursor: pointer;
+  background-color:#29ABE2;
+}
+
+.save_button_disabled{
+  pointer-events: none;
+  cursor: default;
+  background-color:#393b3b;
 }
 
 .mode_name {

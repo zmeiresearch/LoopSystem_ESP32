@@ -150,12 +150,22 @@ function setElementValueInvalid(e) {
 }
 
 function validate_all(){
-    validate_speed();
-    validate_turn1();
-    validate_turn2();
-    validate_brake_time();
-    validate_acceleration();
-    validate_deceleration();
+    e = document.getElementById("set_button");
+    if (!validate_speed() ||
+        !validate_turn1() ||
+        !validate_turn2() ||
+        !validate_brake_time() ||
+        !validate_acceleration() ||
+        !validate_deceleration())
+    {
+        e.classList.remove("save_button_enabled");
+        e.classList.add("save_button_disabled");
+    }
+    else
+    {
+        e.classList.remove("save_button_disabled");
+        e.classList.add("save_button_enabled");
+    }
 }
 
 function validate_speed() {
@@ -166,11 +176,14 @@ function validate_speed() {
         (format_from_display(val) < window.limits.homingSpeed))
     {
         setElementValueInvalid(e);
+        return false;
     }
     else
     {
         setElementValueValid(e);
     }
+
+    return true;
 }
 
 function validate_turn1() {
@@ -182,11 +195,14 @@ function validate_turn1() {
         (format_from_display(val) < format_from_display($('#mode_turn2').val())))
     {
         setElementValueInvalid(e);
+        return false;
     }
     else
     {
         setElementValueValid(e);
     }
+
+    return true;
 }
 
 function validate_turn2() {
@@ -198,9 +214,12 @@ function validate_turn2() {
         (format_from_display(val) > format_from_display($('#mode_turn1').val()))) 
     {
         setElementValueInvalid(e);
+        return false;
     } else {
         setElementValueValid(e);
     }
+
+    return true;
 }
 
 function validate_brake_time() {
@@ -211,11 +230,14 @@ function validate_brake_time() {
         (format_from_display(val) < format_from_display($('#mode_turn2').val())))
     {
         setElementValueInvalid(this);
+        return false;
     }
     else
     {
         setElementValueValid(this);
     }*/
+
+    return true;
 }
 
 function validate_acceleration() {
@@ -226,9 +248,12 @@ function validate_acceleration() {
         (format_from_display(val) > window.limits.maxAcc))
     {
         setElementValueInvalid(e);
+        return false;
     } else {
         setElementValueValid(e);
     }
+
+    return true;
 }
 
 function validate_deceleration() {
@@ -239,9 +264,12 @@ function validate_deceleration() {
         (format_from_display(val) > window.limits.maxDec))
     {
         setElementValueInvalid(e);
+        return false;
     } else {
         setElementValueValid(e);
     }
+
+    return true;
 }
 
 $(document).ready()
