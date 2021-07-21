@@ -32,7 +32,19 @@ function set_mode_fields(data){
     $('#mode_dec_current').text(format_for_display(data["dec"]));
 }
 
-async function get_mode_values()
+function check_write_success(newData) {
+    if ((data['speed']      != format_from_display($('#mode_speed').val()))     ||
+        (data['turn1']      != format_from_display($('#mode_turn1').val()))     ||
+        (data['turn2']      != format_from_display($('#mode_turn2').val()))     ||
+        (data['brakeTime']  != format_from_display($('#mode_brake_time').val()))||
+        (data['acc']        != format_from_display($('#mode_acc').val()))       ||
+        (data['dec']        != format_from_display($('#mode_dec').val())) )
+        {
+            alert("Error writing values! Please try again!");
+        }
+}
+
+async function get_mode_values(checkWrite)
 {
     var done = false;
     while (!done)
@@ -43,7 +55,12 @@ async function get_mode_values()
             data: {'mode' : mode },
             url: "/modeValues",
             success: function(data) {
-                set_mode_fields(data);
+                if (checkWrite) {
+                    check_write_success(data);
+                } else {
+                    set_mode_fields(data);
+                }
+                
                 done = true;
             },
             error: function(response) {
@@ -81,7 +98,7 @@ async function set_mode_values()
         contentType : 'application/json',
         type : 'POST'
         }).always(function(done) {
-            setTimeout(update_mode_values, 600);
+            setTimeout(get_mode_values(true), 600);
         });
 }
 
@@ -229,7 +246,7 @@ function validate_deceleration() {
 
 $(document).ready()
 {
-    get_mode_values();
+    get_mode_values(false);
     get_limits();
 
     //$('#mode_speed').change(handle_speed_change);
