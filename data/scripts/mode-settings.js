@@ -70,9 +70,9 @@ async function get_mode_values(checkWrite)
             /*error: function(response) {
                 console.log("setting default values");
                 var data = [];
-                data["speed"] = 123;
+                data["speed"] = 3000;
                 data["turn1"] = 434753;
-                data["turn2"] = 17682;
+                data["turn2"] = 200000;
                 data["brakeTime"] = 13;
                 data["acc"] = 18;
                 data["dec"] = 14;
@@ -89,6 +89,7 @@ async function set_mode_values()
 {
     var mode = $('#mode_id').text();
     val = {
+        "mode" : mode,
         'speed' : format_from_display($('#mode_speed').val()),
         'turn1' : format_from_display($('#mode_turn1').val()),
         'turn2' : format_from_display($('#mode_turn2').val()),
@@ -98,7 +99,7 @@ async function set_mode_values()
     };
 
     $.ajax("modeValues", {
-        data : JSON.stringify({"mode" : mode, "values": val}),
+        data : JSON.stringify(val),
         contentType : 'application/json',
         type : 'POST',
         always : function(done) {

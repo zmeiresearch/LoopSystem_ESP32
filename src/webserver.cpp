@@ -196,6 +196,8 @@ static void postModeValues(AsyncWebServerRequest * request, uint8_t *data, size_
     DynamicJsonDocument json(1024);
     auto resultError = deserializeJson(json, (const char *) data, len);
 
+    //Log(eLogWarn, CMP_NAME, "postModeValues: json[values]:%s", json["values"]);
+
     if (resultError)
     {
         Log(eLogWarn, CMP_NAME, "postModeValues: Deserialization error: %s", resultError.c_str());
@@ -212,55 +214,48 @@ static void postModeValues(AsyncWebServerRequest * request, uint8_t *data, size_
 
             if (eModeCount != mode)
             {
-                const char* speed = json["values"]["speed"];
-                if (speed) {
-                    gModeValues[mode].speed = json["values"]["speed"].as<uint32_t>();
+                if (json.containsKey("speed")) {
+                    gModeValues[mode].speed = json["speed"].as<uint32_t>();
                 }
                 else
                 {
                     Log(eLogWarn, CMP_NAME, "postModeValues: no speed!");
                 }
 
-
-                const char* turn1 = json["values"]["turn1"];
-                if (turn1) {
-                    gModeValues[mode].turn1 = json["values"]["turn1"].as<uint32_t>();
+                if (json.containsKey("turn1")) {
+                    gModeValues[mode].turn1 = json["turn1"].as<uint32_t>();
                 }
                 else
                 {
                     Log(eLogWarn, CMP_NAME, "postModeValues: no turn1!");
                 }
 
-                const char* turn2 = json["values"]["turn2"];
-                if (turn2) {
-                    gModeValues[mode].turn2 = json["values"]["turn2"].as<uint32_t>();
+                if (json.containsKey("turn2")) {
+                    gModeValues[mode].turn2 = json["turn2"].as<uint32_t>();
                 }
                 else
                 {
                     Log(eLogWarn, CMP_NAME, "postModeValues: no turn2!");
                 }
 
-                const char* brakeTime = json["values"]["brakeTime"];
-                if (brakeTime) {
-                    gModeValues[mode].brakeTime = json["values"]["brakeTime"].as<uint32_t>();
+                if (json.containsKey("brakeTime")) {
+                    gModeValues[mode].brakeTime = json["brakeTime"].as<uint32_t>();
                 }
                 else
                 {
                     Log(eLogWarn, CMP_NAME, "postModeValues: no brakeTime!");
                 }
 
-                const char* acc = json["values"]["acc"];
-                if (acc) {
-                    gModeValues[mode].acc = json["values"]["acc"].as<uint32_t>();
+                if (json.containsKey("acc")) {
+                    gModeValues[mode].acc = json["acc"].as<uint32_t>();
                 }
                 else
                 {
                     Log(eLogWarn, CMP_NAME, "postModeValues: no acc!");
                 }
 
-                const char* dec = json["values"]["dec"];
-                if (dec) {
-                    gModeValues[mode].dec = json["values"]["dec"].as<uint32_t>();
+                if (json.containsKey("dec")) {
+                    gModeValues[mode].dec = json["dec"].as<uint32_t>();
                 }
                 else
                 {
