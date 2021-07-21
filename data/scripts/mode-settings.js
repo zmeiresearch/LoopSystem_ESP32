@@ -157,6 +157,15 @@ function setElementValueInvalid(e) {
 
 function validate_all(){
     e = document.getElementById("set_button");
+
+    // force update of all fields
+    validate_speed();
+    validate_turn1();
+    validate_turn2();
+    validate_brake_time();
+    validate_acceleration();
+    validate_deceleration();
+
     if (!validate_speed() ||
         !validate_turn1() ||
         !validate_turn2() ||
