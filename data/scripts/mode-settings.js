@@ -37,12 +37,12 @@ function set_mode_fields(data){
 }
 
 function check_write_success(newData) {
-    if ((data['speed']      != format_from_display($('#mode_speed').val()))     ||
-        (data['turn1']      != format_from_display($('#mode_turn1').val()))     ||
-        (data['turn2']      != format_from_display($('#mode_turn2').val()))     ||
-        (data['brakeTime']  != format_from_display($('#mode_brake_time').val()))||
-        (data['acc']        != format_from_display($('#mode_acc').val()))       ||
-        (data['dec']        != format_from_display($('#mode_dec').val())) )
+    if ((newData['speed']       != format_from_display($('#mode_speed').val()))     ||
+        (newData['turn1']       != format_from_display($('#mode_turn1').val()))     ||
+        (newData['turn2']       != format_from_display($('#mode_turn2').val()))     ||
+        (newData['brakeTime']   != format_from_display($('#mode_brake_time').val()))||
+        (newData['acc']         != format_from_display($('#mode_acc').val()))       ||
+        (newData['dec']         != format_from_display($('#mode_dec').val())) )
         {
             alert("Error writing values! Please try again!");
         }
@@ -81,7 +81,7 @@ async function get_mode_values(checkWrite)
             }
         });
 
-        await sleep(200);
+        await sleep(1000);
     }
 }
 
@@ -137,7 +137,7 @@ async function get_limits()
             }
         });
 
-        await sleep(200);
+        await sleep(1000);
     }
 
     window.limits_set = true;
