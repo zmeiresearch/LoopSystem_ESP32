@@ -156,8 +156,19 @@ function setElementValueInvalid(e) {
     e.classList.add("value_invalid");
 }
 
-function validate_all(){
+function setSaveButtonEnabled() {
     e = document.getElementById("set_button");
+    e.classList.remove("save_button_disabled");
+    e.classList.add("save_button_enabled");
+}
+
+function setSaveButtonDisabled() {
+    e = document.getElementById("set_button");
+    e.classList.remove("save_button_enabled");
+    e.classList.add("save_button_disabled");
+}
+
+function validate_all(){
 
     // force update of all fields
     validate_speed();
@@ -174,13 +185,11 @@ function validate_all(){
         !validate_acceleration() ||
         !validate_deceleration())
     {
-        e.classList.remove("save_button_enabled");
-        e.classList.add("save_button_disabled");
+        setSaveButtonDisabled(); 
     }
     else
     {
-        e.classList.remove("save_button_disabled");
-        e.classList.add("save_button_enabled");
+        setSaveButtonEnabled(); 
     }
 }
 
@@ -290,6 +299,7 @@ function validate_deceleration() {
 
 $(document).ready()
 {
+    setSaveButtonDisabled();
     get_mode_values(false);
     get_limits();
 
