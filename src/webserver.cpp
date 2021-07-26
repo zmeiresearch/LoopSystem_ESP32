@@ -190,7 +190,14 @@ static void getModeValues(AsyncWebServerRequest *request)
 
 static void postModeValues(AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total)
 {
-    Log(eLogInfo, CMP_NAME, "postModeValues: Processing %d bytes: %s", len, data);
+
+    char * tmp = (char *)malloc(len+1);
+    memcpy(tmp, data, len);
+    tmp[len] = 0;
+
+    Log(eLogInfo, CMP_NAME, "postModeValues: Processing %d bytes: %s", len, tmp);
+    free(tmp);
+
 
     //DynamicJsonDocument doc(total);
     DynamicJsonDocument json(1024);
@@ -311,7 +318,13 @@ static void getStatus(AsyncWebServerRequest *request)
 static void postGlobalValues(AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total)
 {
 
-    Log(eLogInfo, CMP_NAME, "postGlobalValues: Processing %d bytes: %s", len, data);
+    char * tmp = (char *)malloc(len+1);
+    memcpy(tmp, data, len);
+    tmp[len] = 0;
+
+    Log(eLogInfo, CMP_NAME, "postGlobalValues: Processing %d bytes: %s", len, tmp);
+
+    free(tmp);
 
     //DynamicJsonDocument doc(total);
     DynamicJsonDocument json(1024);
@@ -428,8 +441,15 @@ static eStatus getConfig(AsyncWebServerRequest *request)
 static eStatus postConfig(AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total)
 {
     eStatus retVal = eOK;
+    
+    char *  tmp = (char *)malloc(len+1);
+    memcpy(tmp, data, len);
+    tmp[len] = 0;
 
-    Log(eLogInfo, CMP_NAME, "postConfig: Processing %d bytes: %s", len, data);
+    Log(eLogInfo, CMP_NAME, "postConfig: Processing %d bytes: %s", len, tmp);
+
+    free(tmp);
+
 
     //DynamicJsonDocument doc(total);
     DynamicJsonDocument json(1024);
