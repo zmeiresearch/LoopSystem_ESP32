@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html class="nojs html css_verticalspacer" lang="en-US">
+
+<head>
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Novice</title>
+  <script type="text/javascript" src="scripts/jquery-3.6.0.min.js"></script>
+  <script type="text/javascript" src="scripts/mode-settings.js"></script>
+  <link rel="stylesheet" type="text/css" href="css/site_global.css" />
+  <link rel="stylesheet" type="text/css" href="css/mode.css" id="pagesheet" />
+</head>
+
+<body id="limits">
+  <p id="mode_id" style="display: none">limits</p>
+
+  <div class="breakpoint active" id="bp_infinity" data-min-width="961">
+    <div id="page">
+      <div class="colelem mode_name width_full">
+        <p>GLOBAL LIMITS</p>
+      </div>
+
+      <div class="colelem value_heading">
+        HOME POSITION ( CURRENT: 
+        <div class="value_current" id="limit_home_current">??</div>
+         m )
+      </div>
+      <div class="colelem value_row">
+        <div class="grpelem value_name width_half">
+          <p>HOME</p>
+        </div>
+        <div class="grpelem value_input width_half offset_half">
+          <p>
+            <input class="grpelem width_half" type="number" step="0.1" id="limit_home" onChange="validate_all()">
+          </p>
+        </div>
+      </div>
+
+      <div class="colelem value_heading">
+        MAX END ( CURRENT:
+        <div class="value_current" id="limit_max_end_current">??</div>
+        m )
+      </div>
+      <div class="colelem value_row">
+        <div class="grpelem value_name width_half">
+          <p>END</p>
+        </div>
+        <div class="grpelem value_input width_half offset_half">
+          <p>
+            <input class="grpelem width_half" type="number" step="0.1" id="limit_max_end" onChange="validate_all()">
+          </p>
+        </div>
+      </div>
+
+      <div class="colelem value_heading">
+        MAX TURN 1 ( CURRENT:
+        <div class="value_current" id="limit_max_turn1_current">??</div>
+        m )
+      </div>
+      <div class="colelem value_row">
+        <div class="grpelem value_name width_half">
+          <p>TURN 1</p>
+        </div>
+        <div class="grpelem value_input width_half offset_half">
+          <p>
+            <input class="grpelem width_half" type="number" step="0.1"  id="limit_max_turn1" onChange="validate_all()">
+          </p>
+        </div>
+      </div>
+
+      <div class="colelem value_heading">
+        MIN TURN 2 ( CURRENT: 
+        <div class="value_current" id="limit_min_turn2_current">??</div>
+        m )
+      </div>
+      <div class="colelem value_row">
+        <div class="grpelem value_name width_half">
+          <p>TURN 2</p>
+        </div>
+        <div class="grpelem value_input width_half offset_half">
+          <p>
+            <input class="grpelem width_half" type="number" step="0.1" id="limit_min_turn2" onChange="validate_all()">
+          </p>
+        </div>
+      </div>
+
+      <div class="colelem value_heading">
+        MAX ACCELERATION ( CURRENT:
+        <div class="value_current" id="limit_max_acc_current">??</div>
+        m/s<sup>2</sup> )
+      </div>
+      <div class="colelem value_row">
+        <div class="grpelem value_name width_half">
+          <p>MAX ACC</p>
+        </div>
+        <div class="grpelem value_input width_half offset_half">
+          <p>
+            <input class="grpelem width_half" type="number" step="0.1" id="limit_max_acc" onChange="validate_all()">
+          </p>
+        </div>
+      </div>
+
+      <div class="colelem value_heading">
+        MAX DECELERATION ( CURRENT:
+        <div class="value_current" id="limit_max_dec_current">??</div>
+        m/s<sup>2</sup> )
+      </div>
+      <div class="colelem value_row">
+        <div class="grpelem value_name width_half">
+          <p>MAX DEC</p>
+        </div>
+        <div class="grpelem value_input width_half offset_half">
+          <p>
+            <input class="grpelem width_half" type="number" step="0.1 "id="limit_max_dec" onChange="validate_all()">
+          </p>
+        </div>
+      </div>
+
+      <div class="colelem value_heading">
+        MAX SPEED ( CURRENT:
+        <div class="value_current" id="limit_max_speed_current">??</div>
+        km/h )
+      </div>
+      <div class="colelem value_row">
+        <div class="grpelem value_name width_half">
+          <p>MAX SPEED</p>
+        </div>
+        <div class="grpelem value_input width_half offset_half">
+          <p>
+            <input class="grpelem width_half" type="number" step="0.1 "id="limit_max_speed" onChange="validate_all()">
+          </p>
+        </div>
+      </div>
+
+      <div class="colelem value_heading">
+        HOMING SPEED ( CURRENT:
+        <div class="value_current" id="limit_homing_speed_current">??</div>
+        km/h )
+      </div>
+      <div class="colelem value_row">
+        <div class="grpelem value_name width_half">
+          <p>HOME SPEED</p>
+        </div>
+        <div class="grpelem value_input width_half offset_half">
+          <p>
+            <input class="grpelem width_half" type="number" step="0.1 "id="limit_homing_speed" onChange="validate_all()">
+          </p>
+        </div>
+      </div>
+
+      <div class="colelem value_heading">
+        MAX TIME ( CURRENT:
+        <div class="value_current" id="limit_max_time_current">??</div>
+        )
+      </div>
+      <div class="colelem value_row">
+        <div class="grpelem value_name width_half">
+          <p>MAX TIME</p>
+        </div>
+        <div class="grpelem value_input width_half offset_half">
+          <p>
+            <input class="grpelem width_half" type="number" id="limit_max_time" onChange="validate_all()">
+          </p>
+        </div>
+      </div>
+
+      <div class="colelem value_heading">
+        MAX LAPS ( CURRENT:
+        <div class="value_current" id="limit_max_laps_current">??</div>
+        )
+      </div>
+      <div class="colelem value_row">
+        <div class="grpelem value_name width_half">
+          <p>MAX LAPS</p>
+        </div>
+        <div class="grpelem value_input width_half offset_half">
+          <p>
+            <input class="grpelem width_half" type="number" id="limit_max_laps" onChange="validate_all()">
+          </p>
+        </div>
+      </div>
+
+
+
+    <div class="colelem value_heading">
+        SERVICE MODE SPEED LIMIT ( CURRENT:
+        <div class="value_current" id="limit_serv_speed_current">??</div>
+        km/h )
+      </div>
+      <div class="colelem value_row">
+        <div class="grpelem value_name width_half">
+          <p>SERVICE SPEED</p>
+        </div>
+        <div class="grpelem value_input width_half offset_half">
+          <p>
+            <input class="grpelem width_half" type="number" step="0.1 "id="limit_serv_speed" onChange="validate_all()">
+          </p>
+        </div>
+      </div>
+
+
+
+      <div class="colelem" style="padding-top: 14px;">
+        <a href="javascript:set_mode_values()" class="save_button width_full" id="set_button" >SET</a>
+      </div>
+
+      <a class="nonblock nontext clip_frame colelem" id="u1231" href="program-selector.html"><img
+        class="svg" id="u1227" width="75" height="75" alt="back" src="images/left-arrow.svg" /></a>
+
+      <div class="verticalspacer">
+      </div>
+    </div>
+  </div>
+  <!-- Other scripts -->
+</body>
+
+</html>

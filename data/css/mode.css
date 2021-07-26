@@ -33,6 +33,11 @@ body#master {
   position: relative;
 }
 
+body#limits {
+  background-color: #666666;
+  position: relative;
+}
+
 body {
   position: relative;
 }

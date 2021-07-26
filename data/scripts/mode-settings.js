@@ -189,7 +189,7 @@ function validate_speed() {
     val = e.value
     if ( isNaN(val) || 
         (format_from_display(val) > window.limits.maxSpeed) ||
-        (format_from_display(val) < window.limits.homingSpeed))
+        (format_from_display(val) < 0))
     {
         setElementValueInvalid(e);
         return false;
@@ -206,7 +206,7 @@ function validate_turn1() {
     var e = document.getElementById("mode_turn1");
     val = e.value
     if ( isNaN(val) || 
-        (format_from_display(val) > window.limits.maxTurn1) ||
+        (format_from_display(val) >= window.limits.maxTurn1) ||
         (format_from_display(val) < window.limits.minTurn2) ||
         (format_from_display(val) < format_from_display($('#mode_turn2').val())))
     {
@@ -261,7 +261,7 @@ function validate_acceleration() {
     val = e.value
     if ( isNaN(val) || 
         (format_from_display(val) <= 0) ||
-        (format_from_display(val) > window.limits.maxAcc))
+        (format_from_display(val) >= window.limits.maxAcc))
     {
         setElementValueInvalid(e);
         return false;
@@ -277,7 +277,7 @@ function validate_deceleration() {
     val = e.value
     if ( isNaN(val) || 
         (format_from_display(val) <= 0) ||
-        (format_from_display(val) > window.limits.maxDec))
+        (format_from_display(val) >= window.limits.maxDec))
     {
         setElementValueInvalid(e);
         return false;
