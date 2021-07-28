@@ -16,10 +16,18 @@
 //==============================================================================
 //  Defines
 //==============================================================================
+#if !defined(BUILD_REV)
+#define BUILD_REV               "Unknown"
+#endif  // BUILD_REV
+
+//==============================================================================
+//  Function-like macros
+//==============================================================================
+#define SystemGetBuildId()      (BUILD_REV)
+
 #define SystemGetTimeMs()       (xTaskGetTickCount() * portTICK_PERIOD_MS)
 #define SystemSleepMs(x)        (vTaskDelay((x)/portTICK_PERIOD_MS))
 #define SystemElapsedTimeMs(x)  (SystemGetTimeMs() - (x))
-
 
 //==============================================================================
 //  Exported types
@@ -32,9 +40,7 @@
 //==============================================================================
 //  Exported functions
 //==============================================================================
-void      SystemRestart();
-
-
+void    SystemRestart();
+void    SystemGetMemoryInfo()
 #endif // INC_SYSTEM_H
-
 

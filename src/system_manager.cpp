@@ -130,7 +130,7 @@ static eStatus startAP(const char * const ssid, const char * const password)
 //==============================================================================
 eStatus SystemManagerInit(void * params)
 {
-    Log(eLogInfo, CMP_NAME, "SystemManagerInit");
+    Log(eLogInfo, CMP_NAME, "SystemManagerInit: Build ID:%s", SystemGetBuildId());
 
     ConfigInit();
 
