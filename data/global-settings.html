@@ -1,245 +1,218 @@
 <!DOCTYPE html>
 <html class="nojs html css_verticalspacer" lang="en-US">
- <head>
 
-  <meta http-equiv="Content-type" content="text/html;charset=UTF-8"/>
-  <meta name="generator" content="2018.1.1.386"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-   
-  <title>Global Settings</title>
-  <!-- CSS -->
+<head>
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Novice</title>
   <script type="text/javascript" src="scripts/jquery-3.6.0.min.js"></script>
   <script type="text/javascript" src="scripts/global-settings.js"></script>
-  <link rel="stylesheet" type="text/css" href="css/site_global.css?crc=444006867"/>
-  <link rel="stylesheet" type="text/css" href="css/global-settings.css?crc=3833088082" id="pagesheet"/>
- </head>
- <body>
+  <link rel="stylesheet" type="text/css" href="css/site_global.css" />
+  <link rel="stylesheet" type="text/css" href="css/mode.css" id="pagesheet" />
+</head>
 
-  <div class="breakpoint active" id="bp_infinity" data-min-width="961"><!-- responsive breakpoint node -->
-   <div class="clearfix" id="page"><!-- column -->
-    <div class="position_content" id="page_position_content">
-     <div class="browser_width colelem shared_content" id="u1781-4-bw" data-content-guid="u1781-4-bw_content">
-      <div class="clearfix" id="u1781-4"><!-- content -->
-       <p id="u1781-2">GLOBAL LIMITS</p>
+<body id="limits">
+  <p id="mode_id" style="display: none">limits</p>
+
+  <div class="breakpoint active" id="bp_infinity" data-min-width="961">
+    <div id="page">
+      <div class="colelem mode_name width_full">
+        <p>GLOBAL LIMITS</p>
       </div>
-     </div>
-     <a class="nonblock nontext clip_frame colelem shared_content" id="u2198" href="program-selector.html" data-content-guid="u2198_content"><!-- svg --><img class="svg temp_no_img_src" id="u2199"  width="38" height="38" alt="back" src="images/left-arrow.svg"/></a>
-     <div class="clearfix colelem shared_content" id="u2144" data-content-guid="u2144_content"><!-- column -->
-      <div class="clearfix colelem" id="u1795-4"><!-- content -->
-       <p>HOME POSITION ( 5.0 M )</p>
+
+      <div class="colelem value_heading">
+        HOME POSITION ( CURRENT: 
+        <div class="value_current" id="limit_home_current">??</div>
+         m )
       </div>
-      <div class="clearfix colelem" id="pu1787-4"><!-- group -->
-       <div class="clearfix grpelem" id="u1787-4"><!-- content -->
-        <p id="u1787-2">HOME</p>
-       </div>
-       <div class="clearfix grpelem" id="u1788-4"><!-- content -->
-        <p id="u1788-2">
-         <input class ="clearfix grpelem" type="number" id="global_home">
-        </p>
-       </div>
-      </div>
-     </div>
-     <div class="clearfix colelem shared_content" id="u2150" data-content-guid="u2150_content"><!-- column -->
-      <div class="clearfix colelem" id="u1796-4"><!-- content -->
-       <p>MAX END ( 120.0 M )</p>
-      </div>
-      <div class="clearfix colelem" id="pu1789-4"><!-- group -->
-       <div class="clearfix grpelem" id="u1789-4"><!-- content -->
-        <p id="u1789-2">END</p>
-       </div>
-       <div class="clearfix grpelem" id="u1790-4"><!-- content -->
-        <p id="u1790-2">
-          <input class ="clearfix grpelem" type="number" id="global_max_end">
-        </p>
-       </div>
-      </div>
-     </div>
-     <div class="browser_width colelem shared_content" id="u3133-bw" data-content-guid="u3133-bw_content">
-      <div id="u3133"><!-- column -->
-       <div class="clearfix" id="u3133_align_to_page">
-        <div class="clearfix colelem shared_content" id="u2156" data-content-guid="u2156_content"><!-- column -->
-         <div class="clearfix colelem" id="u1797-4"><!-- content -->
-          <p>MAX TURN 1 ( 20 M )</p>
-         </div>
-         <div class="clearfix colelem" id="pu1791-4"><!-- group -->
-          <div class="clearfix grpelem" id="u1791-4"><!-- content -->
-           <p id="u1791-2">TURN 1</p>
-          </div>
-          <div class="clearfix grpelem" id="u1792-4"><!-- content -->
-           <p id="u1792-2">
-             <input class ="clearfix grpelem" type="number" id="global_max_turn1">
-           </p>
-          </div>
-         </div>
+      <div class="colelem value_row">
+        <div class="grpelem value_name width_half">
+          <p>HOME</p>
         </div>
-        <div class="clearfix colelem shared_content" id="u2162" data-content-guid="u2162_content"><!-- column -->
-         <div class="clearfix colelem" id="u1798-4"><!-- content -->
-          <p>MIN TURN 2 ( 110 M )</p>
-         </div>
-         <div class="clearfix colelem" id="pu1793-4"><!-- group -->
-          <div class="clearfix grpelem" id="u1793-4"><!-- content -->
-           <p id="u1793-2">TURN 2</p>
-          </div>
-          <div class="clearfix grpelem" id="u1794-4"><!-- content -->
-           <p id="u1794-2">
-             <input class ="clearfix grpelem" type="number" id="global_min_turn2">
-           </p>
-          </div>
-         </div>
+        <div class="grpelem value_input width_half offset_half">
+          <p>
+            <input class="grpelem width_half" type="number" step="0.1" id="limit_home" onChange="validate_all()">
+          </p>
         </div>
-       </div>
       </div>
-     </div>
-     <div class="browser_width colelem shared_content" id="u3157-4-bw" data-content-guid="u3157-4-bw_content">
-      <div class="clearfix" id="u3157-4"><!-- content -->
-       <p id="u3157-2">GLOBAL SETTINGS</p>
+
+      <div class="colelem value_heading">
+        MAX END ( CURRENT:
+        <div class="value_current" id="limit_max_end_current">??</div>
+        m )
       </div>
-     </div>
-     <div class="browser_width colelem shared_content" id="u3115-bw" data-content-guid="u3115-bw_content">
-      <div id="u3115"><!-- column -->
-       <div class="clearfix" id="u3115_align_to_page">
-        <div class="clearfix colelem" id="u2168"><!-- column -->
-         <div class="clearfix colelem" id="u2021-4"><!-- content -->
-          <p>MAX ACCELERATION ( CURRENT SETTINGS )</p>
-         </div>
-         <div class="clearfix colelem" id="u2126"><!-- group -->
-          <div class="clearfix grpelem" id="u2009-4"><!-- content -->
-           <p id="u2009-2">MAX ACC</p>
-          </div>
-          <div class="clearfix grpelem" id="u2030-4"><!-- content -->
-           <p id="u2030-2">
-             <input class ="clearfix grpelem" type="number" id="global_maxAcc">
-           </p>
-          </div>
-         </div>
+      <div class="colelem value_row">
+        <div class="grpelem value_name width_half">
+          <p>END</p>
         </div>
-        <div class="clearfix colelem" id="u2174"><!-- column -->
-         <div class="clearfix colelem" id="u2039-4"><!-- content -->
-          <p>MAX DECELERATION&nbsp; ( CURRENT SETTINGS )</p>
-         </div>
-         <div class="clearfix colelem" id="u2120"><!-- group -->
-          <div class="clearfix grpelem" id="u2048-4"><!-- content -->
-           <p id="u2048-2">MAX DEC</p>
-          </div>
-          <div class="clearfix grpelem" id="u2057-4"><!-- content -->
-           <p id="u2057-2">
-             <input class ="clearfix grpelem" type="number" id="global_maxDec">
-           </p>
-          </div>
-         </div>
+        <div class="grpelem value_input width_half offset_half">
+          <p>
+            <input class="grpelem width_half" type="number" step="0.1" id="limit_max_end" onChange="validate_all()">
+          </p>
         </div>
-       </div>
       </div>
-     </div>
-     <div class="clearfix colelem shared_content" id="u2186" data-content-guid="u2186_content"><!-- column -->
-      <div class="clearfix colelem" id="u2066-4"><!-- content -->
-       <p>MAX SPEED</p>
+
+      <div class="colelem value_heading">
+        MAX TURN 1 ( CURRENT:
+        <div class="value_current" id="limit_max_turn1_current">??</div>
+        m )
       </div>
-      <div class="clearfix colelem" id="u2132"><!-- group -->
-       <div class="clearfix grpelem" id="u2075-4"><!-- content -->
-        <p id="u2075-2">MAX SPEED</p>
-       </div>
-       <div class="clearfix grpelem" id="u2084-4"><!-- content -->
-        <p id="u2084-2">
-          <input class ="clearfix grpelem" type="number" id="global_maxSpeed">
-        </p>
-       </div>
-      </div>
-     </div>
-     <div class="clearfix colelem shared_content" id="u2192" data-content-guid="u2192_content"><!-- column -->
-      <div class="clearfix colelem" id="u2093-4"><!-- content -->
-       <p>HOMING SPEED</p>
-      </div>
-      <div class="clearfix colelem" id="u2138"><!-- group -->
-       <div class="clearfix grpelem" id="u2102-4"><!-- content -->
-        <p id="u2102-2">HOMING SPEED</p>
-       </div>
-       <div class="clearfix grpelem" id="u2111-4"><!-- content -->
-        <p id="u2111-2">
-          <input class ="clearfix grpelem" type="number" id="global_homingSpeed">
-        </p>
-       </div>
-      </div>
-     </div>
-     <div class="browser_width colelem shared_content" id="u2288-4-bw" data-content-guid="u2288-4-bw_content">
-      <div class="clearfix" id="u2288-4"><!-- content -->
-       <p id="u2288-2">AUTOMATIC MODE SETTINGS</p>
-      </div>
-     </div>
-     <div class="browser_width colelem shared_content" id="u2666-bw" data-content-guid="u2666-bw_content">
-      <div id="u2666"><!-- column -->
-       <div class="clearfix" id="u2666_align_to_page">
-        <div class="clearfix colelem shared_content" id="u2348" data-content-guid="u2348_content"><!-- column -->
-         <div class="clearfix colelem" id="u2349-5"><!-- content -->
-          <p>MAX TIME <span id="u2349-2">( 10 min. )</span></p>
-         </div>
-         <div class="clearfix colelem" id="u2350"><!-- group -->
-          <div class="clearfix grpelem" id="u2352-4"><!-- content -->
-           <p id="u2352-2">MAX TIME</p>
-          </div>
-          <div class="clearfix grpelem" id="u2351-4"><!-- content -->
-           <p id="u2351-2"></p>
-             <input class ="clearfix grpelem" type="number" id="global_maxTime">
-          </div>
-         </div>
+      <div class="colelem value_row">
+        <div class="grpelem value_name width_half">
+          <p>TURN 1</p>
         </div>
-         <div class="clearfix colelem shared_content" id="u2444" data-content-guid="u2444_content"><!-- column -->
-         <div class="clearfix colelem" id="u2448-5"><!-- content -->
-          <p>MAX LAPS <span id="u2448-2">(CURRENT SETTINGS )</span></p>
-         </div>
-         <div class="clearfix colelem" id="u2445"><!-- group -->
-          <div class="clearfix grpelem" id="u2446-4"><!-- content -->
-           <p id="u2446-2">MAX LAPS</p>
-          </div>
-          <div class="clearfix grpelem" id="u2447-4"><!-- content -->
-           <p id="u2447-2"></p>
-            <input class ="clearfix grpelem" type="number" id="global_maxLaps">
-          </div>
-         </div>
+        <div class="grpelem value_input width_half offset_half">
+          <p>
+            <input class="grpelem width_half" type="number" step="0.1"  id="limit_max_turn1" onChange="validate_all()">
+          </p>
         </div>
-        
-        <div class="clearfix colelem shared_content" id="u2609" data-content-guid="u2609_content"><!-- column -->
-         <div class="clearfix colelem" id="u2613-4"><!-- content -->
-          <p>SERVICE MODE SPEED LIMIT</p>
-         </div>
-         <div class="clearfix colelem" id="u2610"><!-- group -->
-          <div class="clearfix grpelem" id="u2612-4"><!-- content -->
-           <p id="u2612-2">SERVICE MODE</p>
-          </div>
-          <div class="clearfix grpelem" id="u2611-4"><!-- content -->
-           <p id="u2611-2"></p>
-            <input class ="clearfix grpelem" type="number" id="global_servSpeed">
-          </div>
-         </div>
-        </div>
-        <div class="rounded-corners clearfix colelem shared_content" id="u2657-4" data-content-guid="u2657-4_content"><!-- content -->
-          <p id="u2657-2" onclick="save_global_settings()">SET</p>
-         </div>
-        <div class="rounded-corners clearfix colelem shared_content" id="u2540-7" data-content-guid="u2540-7_content"><!-- content -->
-          <p id="u2540">&nbsp;</p>
-          <p id="u2540-3">SERVICE</p>
-          <p id="u2540-5">MODE</p>
-         </div>
-        
-        <div class="rounded-corners clearfix colelem shared_content" id="u2684-4" data-content-guid="u2684-4_content"><!-- content -->
-         <p id="u2684-2">SYSTEM LOGS</p>
-        </div>
-        <a class="nonblock nontext rounded-corners clearfix colelem shared_content" id="u2708-4" href="maintenance.html" data-content-guid="u2708-4_content"><!-- content --><p id="u2708-2">MAINTENANCE</p></a>
-        <div class="clearfix colelem" id="u2764"><!-- group -->
-         <div class="rounded-corners clearfix grpelem shared_content" id="u2732-4" data-content-guid="u2732-4_content"><!-- content -->
-          <p id="u2732-2">MASTER RESET</p>
-         </div>
-         <div class="clip_frame grpelem" id="u2748"><!-- svg -->
-          <img class="svg temp_no_img_src" id="u2744" data-orig-src="images/lock.svg?crc=4086306118" width="32" height="32" alt="" data-mu-svgfallback="images/lock_poster_.png?crc=444311082" src="images/blank.gif?crc=4208392903"/>
-         </div>
-        </div>
-       </div>
       </div>
-     </div>
-     <div class="verticalspacer" data-offset-top="2387" data-content-above-spacer="2387" data-content-below-spacer="37"></div>
+
+      <div class="colelem value_heading">
+        MIN TURN 2 ( CURRENT: 
+        <div class="value_current" id="limit_min_turn2_current">??</div>
+        m )
+      </div>
+      <div class="colelem value_row">
+        <div class="grpelem value_name width_half">
+          <p>TURN 2</p>
+        </div>
+        <div class="grpelem value_input width_half offset_half">
+          <p>
+            <input class="grpelem width_half" type="number" step="0.1" id="limit_min_turn2" onChange="validate_all()">
+          </p>
+        </div>
+      </div>
+
+      <div class="colelem value_heading">
+        MAX ACCELERATION ( CURRENT:
+        <div class="value_current" id="limit_max_acc_current">??</div>
+        m/s<sup>2</sup> )
+      </div>
+      <div class="colelem value_row">
+        <div class="grpelem value_name width_half">
+          <p>MAX ACC</p>
+        </div>
+        <div class="grpelem value_input width_half offset_half">
+          <p>
+            <input class="grpelem width_half" type="number" step="0.1" id="limit_max_acc" onChange="validate_all()">
+          </p>
+        </div>
+      </div>
+
+      <div class="colelem value_heading">
+        MAX DECELERATION ( CURRENT:
+        <div class="value_current" id="limit_max_dec_current">??</div>
+        m/s<sup>2</sup> )
+      </div>
+      <div class="colelem value_row">
+        <div class="grpelem value_name width_half">
+          <p>MAX DEC</p>
+        </div>
+        <div class="grpelem value_input width_half offset_half">
+          <p>
+            <input class="grpelem width_half" type="number" step="0.1 "id="limit_max_dec" onChange="validate_all()">
+          </p>
+        </div>
+      </div>
+
+      <div class="colelem value_heading">
+        MAX SPEED ( CURRENT:
+        <div class="value_current" id="limit_max_speed_current">??</div>
+        km/h )
+      </div>
+      <div class="colelem value_row">
+        <div class="grpelem value_name width_half">
+          <p>MAX SPEED</p>
+        </div>
+        <div class="grpelem value_input width_half offset_half">
+          <p>
+            <input class="grpelem width_half" type="number" step="0.1 "id="limit_max_speed" onChange="validate_all()">
+          </p>
+        </div>
+      </div>
+
+      <div class="colelem value_heading">
+        HOMING SPEED ( CURRENT:
+        <div class="value_current" id="limit_homing_speed_current">??</div>
+        km/h )
+      </div>
+      <div class="colelem value_row">
+        <div class="grpelem value_name width_half">
+          <p>HOME SPEED</p>
+        </div>
+        <div class="grpelem value_input width_half offset_half">
+          <p>
+            <input class="grpelem width_half" type="number" step="0.1 "id="limit_homing_speed" onChange="validate_all()">
+          </p>
+        </div>
+      </div>
+
+      <div class="colelem value_heading">
+        MAX TIME ( CURRENT:
+        <div class="value_current" id="limit_max_time_current">??</div>
+        )
+      </div>
+      <div class="colelem value_row">
+        <div class="grpelem value_name width_half">
+          <p>MAX TIME</p>
+        </div>
+        <div class="grpelem value_input width_half offset_half">
+          <p>
+            <input class="grpelem width_half" type="number" id="limit_max_time" onChange="validate_all()">
+          </p>
+        </div>
+      </div>
+
+      <div class="colelem value_heading">
+        MAX LAPS ( CURRENT:
+        <div class="value_current" id="limit_max_laps_current">??</div>
+        )
+      </div>
+      <div class="colelem value_row">
+        <div class="grpelem value_name width_half">
+          <p>MAX LAPS</p>
+        </div>
+        <div class="grpelem value_input width_half offset_half">
+          <p>
+            <input class="grpelem width_half" type="number" id="limit_max_laps" onChange="validate_all()">
+          </p>
+        </div>
+      </div>
+
+
+
+    <div class="colelem value_heading">
+        SERVICE MODE SPEED LIMIT ( CURRENT:
+        <div class="value_current" id="limit_serv_speed_current">??</div>
+        km/h )
+      </div>
+      <div class="colelem value_row">
+        <div class="grpelem value_name width_half">
+          <p>SERVICE SPEED</p>
+        </div>
+        <div class="grpelem value_input width_half offset_half">
+          <p>
+            <input class="grpelem width_half" type="number" step="0.1 "id="limit_serv_speed" onChange="validate_all()">
+          </p>
+        </div>
+      </div>
+
+
+
+      <div class="colelem" style="padding-top: 14px;">
+        <a href="javascript:set_mode_values()" class="save_button width_full" id="set_button" >SET</a>
+      </div>
+
+      <a class="nonblock nontext clip_frame colelem" id="u1231" href="program-selector.html"><img
+        class="svg" id="u1227" width="75" height="75" alt="back" src="images/left-arrow.svg" /></a>
+
+      <div class="verticalspacer">
+      </div>
     </div>
-   </div>
   </div>
   <!-- Other scripts -->
-  </body>
+</body>
+
 </html>
