@@ -41,6 +41,7 @@
 //  Exported functions
 //==============================================================================
 void    SystemRestart();
-void    SystemGetMemoryInfo()
+void    SystemGetMemoryInfo();
+
 #endif // INC_SYSTEM_H
 
