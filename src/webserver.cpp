@@ -123,6 +123,18 @@ static void spiffsUpload(AsyncWebServerRequest *request, String filename, size_t
     }
 }
 
+// Dump request data to log - requires special handling as the data is not null-terminated
+static void dumpRequestData(const char * const requestName, const uint8_t * const data, const size_t len)
+{
+    char *  tmp = (char *)malloc(len+1);
+    memcpy(tmp, data, len);
+    tmp[len] = 0;
+
+    Log(eLogInfo, CMP_NAME, "%s: Processing %d bytes: %s", requestName, len, tmp);
+
+    free(tmp);
+}
+
 static Modes modeFromString(String modeStr)
 {
     Modes mode = eModeCount;
@@ -190,20 +202,10 @@ static void getModeValues(AsyncWebServerRequest *request)
 
 static void postModeValues(AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total)
 {
+    dumpRequestData("postModeValues", data, len);
 
-    char * tmp = (char *)malloc(len+1);
-    memcpy(tmp, data, len);
-    tmp[len] = 0;
-
-    Log(eLogInfo, CMP_NAME, "postModeValues: Processing %d bytes: %s", len, tmp);
-    free(tmp);
-
-
-    //DynamicJsonDocument doc(total);
     DynamicJsonDocument json(1024);
     auto resultError = deserializeJson(json, (const char *) data, len);
-
-    //Log(eLogWarn, CMP_NAME, "postModeValues: json[values]:%s", json["values"]);
 
     if (resultError)
     {
@@ -318,13 +320,7 @@ static void getStatus(AsyncWebServerRequest *request)
 static void postGlobalValues(AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total)
 {
 
-    char * tmp = (char *)malloc(len+1);
-    memcpy(tmp, data, len);
-    tmp[len] = 0;
-
-    Log(eLogInfo, CMP_NAME, "postGlobalValues: Processing %d bytes: %s", len, tmp);
-
-    free(tmp);
+    dumpRequestData("postGlobalValues", data, len);
 
     //DynamicJsonDocument doc(total);
     DynamicJsonDocument json(1024);
@@ -428,7 +424,7 @@ static void postGlobalValues(AsyncWebServerRequest * request, uint8_t *data, siz
     SendPacketGlobalValuesAscii();
 }
 
-static eStatus getConfig(AsyncWebServerRequest *request)
+static void getConfig(AsyncWebServerRequest *request)
 {
     AsyncResponseStream *response = request->beginResponseStream("application/json");
     DynamicJsonDocument json(1024);
@@ -438,18 +434,9 @@ static eStatus getConfig(AsyncWebServerRequest *request)
     request->send(response);
 }
 
-static eStatus postConfig(AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total)
+static void postConfig(AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total)
 {
-    eStatus retVal = eOK;
-    
-    char *  tmp = (char *)malloc(len+1);
-    memcpy(tmp, data, len);
-    tmp[len] = 0;
-
-    Log(eLogInfo, CMP_NAME, "postConfig: Processing %d bytes: %s", len, tmp);
-
-    free(tmp);
-
+    dumpRequestData("postConfig", data, len);
 
     //DynamicJsonDocument doc(total);
     DynamicJsonDocument json(1024);
@@ -475,10 +462,7 @@ static eStatus postConfig(AsyncWebServerRequest * request, uint8_t *data, size_t
             Log(eLogWarn, CMP_NAME, "postConfig: incomplete wifi configuration!");
         } 
     }
-
-    return retVal;
 }
-
 
 //==============================================================================
 //  Exported functions
@@ -526,6 +510,7 @@ eStatus WebserverInit()
             Log(eLogDebug, CMP_NAME, "post modeValues body handling");
             postModeValues(request, data, len, index, total);
             AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", "OK");
+            request->send(response);
         });
 
     server.on("/globalValues", HTTP_POST,
@@ -537,6 +522,7 @@ eStatus WebserverInit()
             Log(eLogDebug, CMP_NAME, "post globalValues body handling");
             postGlobalValues(request, data, len, index, total);
             AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", "OK");
+            request->send(response);
         });
 
     server.on("/config", HTTP_POST,
@@ -548,6 +534,7 @@ eStatus WebserverInit()
             Log(eLogDebug, CMP_NAME, "post config body handling");
             postConfig(request, data, len, index, total);
             AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", "OK");
+            request->send(response);
         });
 
     // Firmware update handler
@@ -578,7 +565,6 @@ eStatus WebserverInit()
 
     // serve static files directly
     server.serveStatic("/", SPIFFS, "/");
-
 
     // Everything else - 404
     server.onNotFound(notFoundResponse);
