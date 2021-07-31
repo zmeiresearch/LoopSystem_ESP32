@@ -45,17 +45,17 @@ async function get_limits(useDefaultsOnFail, callback) {
                 if (useDefaultsOnFail) {
                     console.log("setting default limits");
                     var data = [];
-                    data["home"] = 1000;
-                    data["maxEnd"] = 800000;
-                    data["maxTurn1"] = 730000;
-                    data["minTurn2"] = 10000;
+                    data["home"] = 123;
+                    data["maxEnd"] = 1670;
+                    data["maxTurn1"] = 1520;
+                    data["minTurn2"] = 235;
                     data["maxAcc"] = 32;
                     data["maxDec"] = 35;
                     data["maxSpeed"] = 300;
                     data["homingSpeed"] = 100;
                     data["maxTime"] = 3600;
                     data["maxLaps"] = 100;
-                    data["servSpeed"] = 50;
+                    data["servSpeed"] = 54;
                     window.limits = data;
                     done = true;
                 }
@@ -84,13 +84,13 @@ async function get_mode_values(useDefaultsOnFail, callback) {
                 if (useDefaultsOnFail) {
                     console.log("setting default values");
                     var data = [];
-                    data["speed"] = 3000;
-                    data["turn1"] = 434753;
-                    data["turn2"] = 200000;
+                    data["speed"] = 134;
+                    data["turn1"] = 1532;
+                    data["turn2"] = 287;
                     data["brakeTime"] = 13;
                     data["acc"] = 18;
                     data["dec"] = 14;
-                    set_mode_fields(data);
+                    window.values = data;
                     done = true;
                 }
             }
