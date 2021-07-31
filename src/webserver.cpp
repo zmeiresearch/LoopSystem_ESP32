@@ -137,6 +137,10 @@ static Modes modeFromString(String modeStr)
     return mode;
 }
 
+
+//==============================================================================
+//  Get/Post mode values
+//==============================================================================
 static void getModeValues(AsyncWebServerRequest *request)
 {
     const int paramCount = request->params();
@@ -178,9 +182,10 @@ static void getModeValues(AsyncWebServerRequest *request)
     }
 }
 
-
 static void postModeValues(AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total)
 {
+    AsyncWebServerResponse *response;
+
     dumpRequestData("postModeValues", data, len);
 
     DynamicJsonDocument json(1024);
@@ -189,10 +194,12 @@ static void postModeValues(AsyncWebServerRequest * request, uint8_t *data, size_
     if (resultError)
     {
         Log(eLogWarn, CMP_NAME, "postModeValues: Deserialization error: %s", resultError.c_str());
+        response = request->beginResponse(400, "text/plain", "Fail");
     }
     else
     {
         const char * modeStr = json["mode"];
+        response = request->beginResponse(200, "text/plain", "OK");
 
         if (modeStr)
         {
@@ -259,8 +266,13 @@ static void postModeValues(AsyncWebServerRequest * request, uint8_t *data, size_
             }
         }
     }
+
+    request->send(response);
 }
 
+//==============================================================================
+//  Get/Post global values
+//==============================================================================
 static void getGlobalValues(AsyncWebServerRequest *request)
 {
     SendPacketRequestGlobalValues();
@@ -284,20 +296,9 @@ static void getGlobalValues(AsyncWebServerRequest *request)
     request->send(response);
 }
 
-static void getStatus(AsyncWebServerRequest *request)
-{
-    AsyncResponseStream *response = request->beginResponseStream("application/json");
-    DynamicJsonDocument json(1024);
-    json["mode"] = String(gStatus.mode);
-    json["completedLaps"] = String(gStatus.completedLaps);
-    json["position"] = String(gStatus.position);
-    json["systemStatus"] = String(gStatus.systemStatus - 0x30);
-    serializeJson(json, *response);
-    request->send(response);
-}
-
 static void postGlobalValues(AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total)
 {
+    AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", "OK");
 
     dumpRequestData("postGlobalValues", data, len);
 
@@ -401,8 +402,13 @@ static void postGlobalValues(AsyncWebServerRequest * request, uint8_t *data, siz
     }       
 
     SendPacketGlobalValuesAscii();
+
+    request->send(response);
 }
 
+//==============================================================================
+//  Get/Post device configuration
+//==============================================================================
 static void getConfig(AsyncWebServerRequest *request)
 {
     AsyncResponseStream *response = request->beginResponseStream("application/json");
@@ -415,6 +421,8 @@ static void getConfig(AsyncWebServerRequest *request)
 
 static void postConfig(AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total)
 {
+    AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", "OK");
+
     dumpRequestData("postConfig", data, len);
 
     DynamicJsonDocument json(1024);
@@ -433,6 +441,11 @@ static void postConfig(AsyncWebServerRequest * request, uint8_t *data, size_t le
             Log(eLogWarn, CMP_NAME, "postConfig: Setting wifi parameters: %s, %s", ssid, password);
             ConfigWriteWifiSSID(json["wifi"]["ssid"].as<String>());
             ConfigWriteWifiPassword(json["wifi"]["password"].as<String>());
+
+            // Indicate to client we'll not keep the connection
+            response->addHeader("Connection", "close");
+            request->send(response);
+
             SystemRestart();
         }
         else
@@ -440,6 +453,22 @@ static void postConfig(AsyncWebServerRequest * request, uint8_t *data, size_t le
             Log(eLogWarn, CMP_NAME, "postConfig: incomplete wifi configuration!");
         } 
     }
+    request->send(response);
+}
+
+//==============================================================================
+//  Get device status
+//==============================================================================
+static void getStatus(AsyncWebServerRequest *request)
+{
+    AsyncResponseStream *response = request->beginResponseStream("application/json");
+    DynamicJsonDocument json(1024);
+    json["mode"] = String(gStatus.mode);
+    json["completedLaps"] = String(gStatus.completedLaps);
+    json["position"] = String(gStatus.position);
+    json["systemStatus"] = String(gStatus.systemStatus - 0x30);
+    serializeJson(json, *response);
+    request->send(response);
 }
 
 //==============================================================================
@@ -474,34 +503,19 @@ eStatus WebserverInit()
         getConfig(request);
     });
 
-    server.on("/modeValues", HTTP_POST,
-    [](AsyncWebServerRequest * request){
-        },
-        NULL,
+    server.on("/modeValues", HTTP_POST, NULL, NULL,
         [](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total) {
             postModeValues(request, data, len, index, total);
-            AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", "OK");
-            request->send(response);
         });
 
-    server.on("/globalValues", HTTP_POST,
-    [](AsyncWebServerRequest * request){
-        },
-        NULL,
+    server.on("/globalValues", HTTP_POST, NULL, NULL,
         [](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total) {
             postGlobalValues(request, data, len, index, total);
-            AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", "OK");
-            request->send(response);
         });
 
-    server.on("/config", HTTP_POST,
-    [](AsyncWebServerRequest * request){
-        },
-        NULL,
+    server.on("/config", HTTP_POST, NULL, NULL,
         [](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total) {
             postConfig(request, data, len, index, total);
-            AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", "OK");
-            request->send(response);
         });
 
     // Firmware update handler
