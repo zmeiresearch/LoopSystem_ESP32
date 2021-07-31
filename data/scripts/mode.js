@@ -1,4 +1,4 @@
-function set_mode_fields(data) {
+function set_mode_fields(data = window.values) {
     $('#mode_speed').val(format_for_display(data["speed"]));
     $('#mode_speed_current').text(format_for_display(data["speed"]));
 
@@ -17,9 +17,7 @@ function set_mode_fields(data) {
     $('#mode_dec').val(format_for_display(data["dec"]));
     $('#mode_dec_current').text(format_for_display(data["dec"]));
 
-    window.values_set = true;
-
-    if (window.limits_set) validate_all();
+    validate_all();
 }
 
 function check_mode_write_success(newData) {
@@ -172,6 +170,6 @@ function validate_deceleration() {
 $(document).ready()
 {
     setSaveButtonDisabled();
-    get_mode_values(false, validate_all);
+    get_mode_values(false, set_mode_fields);
     get_limits(false, validate_all);
 }

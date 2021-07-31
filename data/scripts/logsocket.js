@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     logSocket.onmessage = function(event) {
-        console.log("logSocket: Got: " + event.data);
+        //console.log("logSocket: Got: " + event.data);
         document.getElementById('debugLog').value += event.data;
     };
 
