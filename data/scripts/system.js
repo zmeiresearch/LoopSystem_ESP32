@@ -4,7 +4,8 @@ function get_config()
         console.log("Received: " + data);
         $('#wifiSsid').val(data["wifi"]["ssid"]);
         $('#wifiPassword').val(data["wifi"]["password"]);
-        
+        $('#buildId').text(data["system"]["buildId"]);
+        $('#buildTime').text(data["system"]["buildTime"]);        
     });
 }
 

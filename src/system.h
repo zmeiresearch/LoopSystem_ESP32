@@ -24,6 +24,7 @@
 //  Function-like macros
 //==============================================================================
 #define SystemGetBuildId()      (BUILD_REV)
+#define SystemGetBuildTime()    (__TIME__ "," __DATE__ )
 
 #define SystemGetTimeMs()       (xTaskGetTickCount() * portTICK_PERIOD_MS)
 #define SystemSleepMs(x)        (vTaskDelay((x)/portTICK_PERIOD_MS))

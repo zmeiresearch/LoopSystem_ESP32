@@ -415,6 +415,8 @@ static void getConfig(AsyncWebServerRequest *request)
     DynamicJsonDocument json(1024);
     json["wifi"]["ssid"] = String(ConfigWifiSSID());
     json["wifi"]["password"] = String(ConfigWifiPassword());
+    json["system"]["buildId"] = String(SystemGetBuildId());
+    json["system"]["buildTime"] = String(SystemGetBuildTime());
     serializeJson(json, *response);
     request->send(response);
 }
