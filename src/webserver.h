@@ -29,7 +29,7 @@
 //  Exported functions
 //==============================================================================
 eStatus WebserverInit();
-
+eStatus WebserverTask();
 
 #endif // INC_WEBSERVER_H
 

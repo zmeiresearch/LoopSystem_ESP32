@@ -34,14 +34,18 @@
 //==============================================================================
 //  Local data
 //==============================================================================
-static AsyncWebServer server(80);
+static AsyncWebServer   server(80);
+static AsyncWebSocket   socket("/ws");
 
 //==============================================================================
 //  Local function definitions
 //==============================================================================
 static void notFoundResponse(AsyncWebServerRequest *request);
-static void firmwareUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);
-static void spiffsUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);
+
+static void doUpdate(int updatingWhat, AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);
+static void updateRequestFn(AsyncWebServerRequest *request);
+static void firmwareUploadFn(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);
+static void spiffsUploadFn(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);
 
 
 //==============================================================================
@@ -54,6 +58,9 @@ static void notFoundResponse(AsyncWebServerRequest *request)
     request->send(404, "text/plain", "Not found");
 }
 
+//==============================================================================
+//  OTA Update
+//==============================================================================
 // The actual update function
 static void doUpdate(int updatingWhat, AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final)
 {
@@ -69,7 +76,7 @@ static void doUpdate(int updatingWhat, AsyncWebServerRequest *request, String fi
         }
     }
 
-    /* flashing firmware to ESP*/
+    // flashing firmware to ESP
     if (len)
     {
         Update.write(data, len);
@@ -90,17 +97,35 @@ static void doUpdate(int updatingWhat, AsyncWebServerRequest *request, String fi
     }
 }
 
+static void updateRequestFn(AsyncWebServerRequest *request)
+{
+    if (!Update.hasError()) {
+            AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", "OK");
+            response->addHeader("Connection", "close");
+            request->send(response);
+            SystemRestart();
+        } else {
+            AsyncWebServerResponse *response = request->beginResponse(500, "text/plain", "ERROR");
+            response->addHeader("Connection", "close");
+            request->send(response);
+        }
+}
+
 // Firmware upload
-static void firmwareUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final)
+static void firmwareUploadFn(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final)
 {
     doUpdate(U_FLASH, request, filename, index, data, len, final);
 }
 
 // SPIFFS upload
-static void spiffsUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final)
+static void spiffsUploadFn(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final)
 {
     doUpdate(U_SPIFFS, request, filename, index, data, len, final);
 }
+
+//==============================================================================
+//  Helper functions
+//==============================================================================
 
 // Dump request data to log - requires special handling as the data is not null-terminated
 static void dumpRequestData(const char * const requestName, const uint8_t * const data, const size_t len)
@@ -135,6 +160,20 @@ static Modes modeFromString(String modeStr)
     }
 
     return mode;
+}
+
+template<typename T>eStatus setVariableFromJson(DynamicJsonDocument &json, T * const variable, const char * const variableName)
+{
+    eStatus retVal = eFAIL;
+     if (json.containsKey(variableName)) {
+        *variable = json[variableName].as<T>();
+        retVal = eOK;
+    }
+    else
+    {
+        Log(eLogWarn, CMP_NAME, "setVariableFromJson: no %s", variableName);
+    }
+    return retVal;
 }
 
 
@@ -209,55 +248,13 @@ static void postModeValues(AsyncWebServerRequest * request, uint8_t *data, size_
 
             if (eModeCount != mode)
             {
-                if (json.containsKey("speed")) {
-                    gModeValues[mode].speed = json["speed"].as<uint32_t>();
-                }
-                else
-                {
-                    Log(eLogWarn, CMP_NAME, "postModeValues: no speed!");
-                }
 
-                if (json.containsKey("turn1")) {
-                    gModeValues[mode].turn1 = json["turn1"].as<uint32_t>();
-                }
-                else
-                {
-                    Log(eLogWarn, CMP_NAME, "postModeValues: no turn1!");
-                }
-
-                if (json.containsKey("turn2")) {
-                    gModeValues[mode].turn2 = json["turn2"].as<uint32_t>();
-                }
-                else
-                {
-                    Log(eLogWarn, CMP_NAME, "postModeValues: no turn2!");
-                }
-
-                if (json.containsKey("brakeTime")) {
-                    gModeValues[mode].brakeTime = json["brakeTime"].as<uint32_t>();
-                }
-                else
-                {
-                    Log(eLogWarn, CMP_NAME, "postModeValues: no brakeTime!");
-                }
-
-                if (json.containsKey("acc")) {
-                    gModeValues[mode].acc = json["acc"].as<uint32_t>();
-                }
-                else
-                {
-                    Log(eLogWarn, CMP_NAME, "postModeValues: no acc!");
-                }
-
-                if (json.containsKey("dec")) {
-                    gModeValues[mode].dec = json["dec"].as<uint32_t>();
-                }
-                else
-                {
-                    Log(eLogWarn, CMP_NAME, "postModeValues: no dec!");
-                }
-
-                
+                setVariableFromJson(json, &gModeValues[mode].speed, "speed");
+                setVariableFromJson(json, &gModeValues[mode].turn1, "turn1");
+                setVariableFromJson(json, &gModeValues[mode].turn2, "turn2");
+                setVariableFromJson(json, &gModeValues[mode].brakeTime, "brakeTime");
+                setVariableFromJson(json, &gModeValues[mode].acc, "acc");
+                setVariableFromJson(json, &gModeValues[mode].dec, "dec");
 
                 Log(eLogInfo, CMP_NAME, "postModeValues: updated mode %s", modeStr);
                 DumpModeValues(&gModeValues[mode]);
@@ -312,93 +309,17 @@ static void postGlobalValues(AsyncWebServerRequest * request, uint8_t *data, siz
     }
     else
     {
-        if (json.containsKey("home")) {
-            gGlobalValues.home = json["home"].as<uint32_t>();
-        }
-        else
-        {
-            Log(eLogWarn, CMP_NAME, "postGlobalValues: no home!");
-        }
-
-        if (json.containsKey("maxEnd")) {
-            gGlobalValues.maxEnd = json["maxEnd"].as<uint32_t>();
-        }
-        else
-        {
-            Log(eLogWarn, CMP_NAME, "postGlobalValues: no maxEnd!");
-        }
-
-        if (json.containsKey("maxTurn1")) {
-            gGlobalValues.maxTurn1 = json["maxTurn1"].as<uint32_t>();
-        }
-        else
-        {
-            Log(eLogWarn, CMP_NAME, "postGlobalValues: no maxTurn1!");
-        }
-
-        if (json.containsKey("minTurn2")) {
-            gGlobalValues.minTurn2 = json["minTurn2"].as<uint32_t>();
-        }
-        else
-        {
-            Log(eLogWarn, CMP_NAME, "postGlobalValues: no minTurn2!");
-        }
-
-        if (json.containsKey("maxAcc")) {
-            gGlobalValues.maxAcc = json["maxAcc"].as<uint32_t>();
-        }
-        else
-        {
-            Log(eLogWarn, CMP_NAME, "postGlobalValues: no maxAcc!");
-        }
-
-        if (json.containsKey("maxDec")) {
-            gGlobalValues.maxDec = json["maxDec"].as<uint32_t>();
-        }
-        else
-        {
-            Log(eLogWarn, CMP_NAME, "postGlobalValues: no maxDec!");
-        }
-
-        if (json.containsKey("maxSpeed")) {
-            gGlobalValues.maxSpeed = json["maxSpeed"].as<uint32_t>();
-        }
-        else
-        {
-            Log(eLogWarn, CMP_NAME, "postGlobalValues: no maxSpeed!");
-        }
-
-        if (json.containsKey("homingSpeed")) {
-            gGlobalValues.homingSpeed = json["homingSpeed"].as<uint32_t>();
-        }
-        else
-        {
-            Log(eLogWarn, CMP_NAME, "postGlobalValues: no homingSpeed!");
-        }
-
-        if (json.containsKey("maxTime")) {
-            gGlobalValues.maxTime = json["maxTime"].as<uint32_t>();
-        }
-        else
-        {
-            Log(eLogWarn, CMP_NAME, "postGlobalValues: no maxTime!");
-        }
-
-        if (json.containsKey("maxLaps")) {
-            gGlobalValues.maxLaps = json["maxLaps"].as<uint32_t>();
-        }
-        else
-        {
-            Log(eLogWarn, CMP_NAME, "postGlobalValues: no maxLaps!");
-        }
-
-        if (json.containsKey("servSpeed")) {
-            gGlobalValues.servSpeed = json["servSpeed"].as<uint32_t>();
-        }
-        else
-        {
-            Log(eLogWarn, CMP_NAME, "postGlobalValues: no servSpeed!");
-        }
+        setVariableFromJson(json, &gGlobalValues.home, "home");
+        setVariableFromJson(json, &gGlobalValues.maxEnd, "maxEnd");
+        setVariableFromJson(json, &gGlobalValues.maxTurn1, "maxTurn1");
+        setVariableFromJson(json, &gGlobalValues.minTurn2, "minTurn2");
+        setVariableFromJson(json, &gGlobalValues.maxAcc, "maxAcc");
+        setVariableFromJson(json, &gGlobalValues.maxDec, "maxDec");
+        setVariableFromJson(json, &gGlobalValues.maxSpeed, "maxSpeed");
+        setVariableFromJson(json, &gGlobalValues.homingSpeed, "homingSpeed");
+        setVariableFromJson(json, &gGlobalValues.maxTime, "maxTime");
+        setVariableFromJson(json, &gGlobalValues.maxLaps, "maxLaps");
+        setVariableFromJson(json, &gGlobalValues.servSpeed, "servSpeed");
     }       
 
     SendPacketGlobalValuesAscii();
@@ -489,62 +410,20 @@ eStatus WebserverInit()
         request->send(response);
     });
 
-    server.on("/status", HTTP_GET, [](AsyncWebServerRequest *request){
-        getStatus(request);
-    });
+    server.on("/status", HTTP_GET, getStatus);
 
-    server.on("/modeValues", HTTP_GET, [](AsyncWebServerRequest *request){
-        getModeValues(request);
-    });
+    server.on("/modeValues", HTTP_GET, getModeValues);    
+    server.on("/modeValues", HTTP_POST, [](AsyncWebServerRequest * request){}, NULL, postModeValues);
 
-    server.on("/globalValues", HTTP_GET, [](AsyncWebServerRequest *request){
-        getGlobalValues(request);
-    });
+    server.on("/globalValues", HTTP_GET, getGlobalValues);
+    server.on("/globalValues", HTTP_POST, [](AsyncWebServerRequest * request){}, NULL, postGlobalValues);
 
-    server.on("/config", HTTP_GET, [](AsyncWebServerRequest *request){
-        getConfig(request);
-    });
+    server.on("/config", HTTP_GET, getConfig);
+    server.on("/config", HTTP_POST, [](AsyncWebServerRequest * request){}, NULL, postConfig);
 
-    server.on("/modeValues", HTTP_POST, NULL, NULL,
-        [](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total) {
-            postModeValues(request, data, len, index, total);
-        });
-
-    server.on("/globalValues", HTTP_POST, NULL, NULL,
-        [](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total) {
-            postGlobalValues(request, data, len, index, total);
-        });
-
-    server.on("/config", HTTP_POST, NULL, NULL,
-        [](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total) {
-            postConfig(request, data, len, index, total);
-        });
-
-    // Firmware update handler
-    server.on("/updateFirmware", HTTP_POST, [](AsyncWebServerRequest *request) {
-        if (!Update.hasError()) {
-            AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", "OK");
-            response->addHeader("Connection", "close");
-            request->send(response);
-            SystemRestart();
-        } else {
-            AsyncWebServerResponse *response = request->beginResponse(500, "text/plain", "ERROR");
-            response->addHeader("Connection", "close");
-            request->send(response);
-        } }, firmwareUpload);
-
-    // SPIFFS update handler
-    server.on("/updateSpiffs", HTTP_POST, [](AsyncWebServerRequest *request) {
-        if (!Update.hasError()) {
-            AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", "OK");
-            response->addHeader("Connection", "close");
-            request->send(response);
-            SystemRestart();
-        } else {
-            AsyncWebServerResponse *response = request->beginResponse(500, "text/plain", "ERROR");
-            response->addHeader("Connection", "close");
-            request->send(response);
-        } }, spiffsUpload);
+    // OTA Update Handlers
+    server.on("/updateFirmware", HTTP_POST, updateRequestFn, firmwareUploadFn);
+    server.on("/updateSpiffs", HTTP_POST, updateRequestFn, spiffsUploadFn);
 
     // serve static files directly
     server.serveStatic("/", SPIFFS, "/");
@@ -554,5 +433,12 @@ eStatus WebserverInit()
    
     server.begin();
 
+    return eOK;
+}
+
+// Cleans-up websockets to avoid exhaustion
+eStatus WebserverTask()
+{
+    //socket.cleanupClients();
     return eOK;
 }
