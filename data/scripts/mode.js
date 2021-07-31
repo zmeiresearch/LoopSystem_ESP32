@@ -33,6 +33,7 @@ function check_mode_write_success(newData) {
 
 
 async function set_mode_values() {
+    setSaveButtonDisabled();
     var mode = $('#mode_id').text();
     val = {
         "mode": mode,
@@ -48,8 +49,8 @@ async function set_mode_values() {
         data: JSON.stringify(val),
         contentType: 'application/json',
         type: 'POST',
-        always: function (done) {
-            setTimeout(get_mode_values(true), 600);
+        always: function () {
+            setTimeout(get_mode_values(false), 600);
         }
     });
 }
