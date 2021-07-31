@@ -54,17 +54,16 @@ static void notFoundResponse(AsyncWebServerRequest *request)
     request->send(404, "text/plain", "Not found");
 }
 
-// IVA: TODO: Merge firmwareUpload and spiffsUpload - the two differ only in U_FLASH/U_SPIFFS
-// Firmware upload
-static void firmwareUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final)
+// The actual update function
+static void doUpdate(int updatingWhat, AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final)
 {
     // handle upload and update
     if (!index)
     {
-        Log(eLogInfo, CMP_NAME, "firmwareUpload: Update %s", filename.c_str());
-        if (!Update.begin(UPDATE_SIZE_UNKNOWN, U_FLASH))
+        Log(eLogInfo, CMP_NAME, "doUpdate: Update %s", filename.c_str());
+        if (!Update.begin(UPDATE_SIZE_UNKNOWN, updatingWhat/*U_FLASH/U_SPIFFS*/))
         { 
-            Log(eLogCrit, CMP_NAME, "firmwareUpload: Error updating!");
+            Log(eLogCrit, CMP_NAME, "doUpdate: Error updating!");
             //start with max available size
             Update.printError(Serial);
         }
@@ -81,46 +80,26 @@ static void firmwareUpload(AsyncWebServerRequest *request, String filename, size
         if (Update.end(true))
         { 
             //true to set the size to the current progress
-            Log(eLogInfo, CMP_NAME, "firmwareUpload: Update Success: %ub written\nRebooting...", index+len);
+            Log(eLogInfo, CMP_NAME, "doUpdate: Update Success: %ub written, rebooting...", index+len);
         }
         else
         {
-            Log(eLogCrit, CMP_NAME, "formwareUpload: Error updating!");
+            Log(eLogCrit, CMP_NAME, "doUpdate: Error updating!");
             Update.printError(Serial);
         }
     }
 }
 
+// Firmware upload
+static void firmwareUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final)
+{
+    doUpdate(U_FLASH, request, filename, index, data, len, final);
+}
+
 // SPIFFS upload
 static void spiffsUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final)
 {
-    if (!index)
-    {
-        Log(eLogInfo, CMP_NAME, "spiffsUpload: Update %s", filename.c_str());
-        if (!Update.begin(UPDATE_SIZE_UNKNOWN, U_SPIFFS))
-        { 
-            Log(eLogCrit, CMP_NAME, "spiffsUpload: Error updating!");
-            Update.printError(Serial);
-        }
-    }
-
-    if (len)
-    {
-        Update.write(data, len);
-    }
-
-    if (final)
-    {
-        if (Update.end(true))
-        {    
-            Log(eLogInfo, CMP_NAME, "spiffsUpload: Update Success: %ub written\nRebooting...", index+len);
-        }
-        else
-        {
-            Log(eLogCrit, CMP_NAME, "spiffsUpload: Error updating!");
-            Update.printError(Serial);
-        }
-    }
+    doUpdate(U_SPIFFS, request, filename, index, data, len, final);
 }
 
 // Dump request data to log - requires special handling as the data is not null-terminated
@@ -438,7 +417,6 @@ static void postConfig(AsyncWebServerRequest * request, uint8_t *data, size_t le
 {
     dumpRequestData("postConfig", data, len);
 
-    //DynamicJsonDocument doc(total);
     DynamicJsonDocument json(1024);
     auto resultError = deserializeJson(json, (const char *) data, len);
 
