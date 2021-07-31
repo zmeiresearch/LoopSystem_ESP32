@@ -478,36 +478,29 @@ eStatus WebserverInit()
         AsyncWebServerResponse *response = request->beginResponse(SPIFFS, "/index.html", "text/html");
         response->addHeader("Connection", "close");
         request->send(response);
-
     });
 
     server.on("/status", HTTP_GET, [](AsyncWebServerRequest *request){
-        //Log(eLogDebug, CMP_NAME, "get modeValues received");
         getStatus(request);
     });
 
     server.on("/modeValues", HTTP_GET, [](AsyncWebServerRequest *request){
-        //Log(eLogDebug, CMP_NAME, "get modeValues received");
         getModeValues(request);
     });
 
     server.on("/globalValues", HTTP_GET, [](AsyncWebServerRequest *request){
-        //Log(eLogDebug, CMP_NAME, "get globalValues received");
         getGlobalValues(request);
     });
 
     server.on("/config", HTTP_GET, [](AsyncWebServerRequest *request){
-        //Log(eLogDebug, CMP_NAME, "get config received");
         getConfig(request);
     });
 
     server.on("/modeValues", HTTP_POST,
     [](AsyncWebServerRequest * request){
-        Log(eLogDebug, CMP_NAME, "post modeValues received");
         },
         NULL,
         [](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total) {
-            Log(eLogDebug, CMP_NAME, "post modeValues body handling");
             postModeValues(request, data, len, index, total);
             AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", "OK");
             request->send(response);
@@ -515,11 +508,9 @@ eStatus WebserverInit()
 
     server.on("/globalValues", HTTP_POST,
     [](AsyncWebServerRequest * request){
-            Log(eLogDebug, CMP_NAME, "post globalValues received");
         },
         NULL,
         [](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total) {
-            Log(eLogDebug, CMP_NAME, "post globalValues body handling");
             postGlobalValues(request, data, len, index, total);
             AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", "OK");
             request->send(response);
@@ -527,11 +518,9 @@ eStatus WebserverInit()
 
     server.on("/config", HTTP_POST,
     [](AsyncWebServerRequest * request){
-            Log(eLogDebug, CMP_NAME, "post config received");
         },
         NULL,
         [](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total) {
-            Log(eLogDebug, CMP_NAME, "post config body handling");
             postConfig(request, data, len, index, total);
             AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", "OK");
             request->send(response);
@@ -573,4 +562,3 @@ eStatus WebserverInit()
 
     return eOK;
 }
-
