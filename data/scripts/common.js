@@ -31,6 +31,53 @@ function setSaveButtonDisabled(e) {
     e.classList.add("save_button_disabled");
 }
 
+function connectSocket() {
+    socket = new WebSocket("ws://" + location.hostname + "/ws");
+    socket.onopen = function(event) {
+        console.log("dataSocket: opened " + event);
+        //socket.send(JSON.stringify({'action':'getConfig'}));
+    };
+
+    socket.onmessage = function(event) {
+        console.log("dataSocket: Got: " + event.data);
+
+        let response = JSON.parse(event.data);
+        if (window.socketEventHandlers) {
+            if (response["type"] in window.socketEventHandlers) {
+                socketEventHandlers[response["type"]](response["data"]);
+            }
+        }
+    };
+
+    window.dataSocket = socket;
+}
+
+async function websocketSend(data) {
+    var done = false;
+    while (!done) {
+        if (window.dataSocket && window.dataSocket.readyState === WebSocket.OPEN) {
+            window.dataSocket.send(data);
+            done = true;
+        }
+        await sleep(100);
+    }
+}
+
+async function requestConfig() {
+    websocketSend(JSON.stringify({ action: "getConfig"}));
+}
+
+async function requestModeValues(mode) {
+    websocketSend(JSON.stringify({ action: "getModeValues", data: { mode: mode}}));
+}
+
+async function requestGlobalValues() {
+    websocketSend(JSON.stringify({ action: "getGlobalValues"}));
+}
+
+document.addEventListener('DOMContentLoaded', connectSocket, false);
+
+/*
 async function get_limits(useDefaultsOnFail, callback) {
     var done = false;
     while (!done) {
@@ -100,4 +147,4 @@ async function get_mode_values(useDefaultsOnFail, callback) {
     }
 
     if (callback) callback();
-}
+}*/

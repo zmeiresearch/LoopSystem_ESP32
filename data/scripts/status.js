@@ -1,24 +1,16 @@
-function format_for_display(val)
+function updateStatus(data)
 {
-    return (val/10).toFixed(1);
+    console.log("Updating status values");
+
+    $('#status_mode').text(data["mode"]);
+    $('#status_completed_laps').text(data["completedLaps"]);
+    $('#status_position').text(format_for_display(data["position"]));
+    $('#status_system_status').text(data["systemStatus"]);
 }
 
-function updateStatus()
-{
-    //console.log("Updating values");
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("status.js: Registering status handler");
+    if (!window.socketEventHandlers) window.socketEventHandlers = {};
+    window.socketEventHandlers["Status"] = updateStatus;
 
-    $.get( "/status", function( data ) {
-        //console.log("Received: " + data);
-        $('#status_mode').text(data["mode"]);
-        $('#status_completed_laps').text(data["completedLaps"]);
-        $('#status_position').text(format_for_display(data["position"]));
-        $('#status_system_status').text(data["systemStatus"]);
-    });
-
-}
-
-function setPeriodicUpdate() {
-    setInterval(updateStatus, 1000);
-}
-
-$(document).ready(setPeriodicUpdate);
+}, false);

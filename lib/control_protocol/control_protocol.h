@@ -46,7 +46,18 @@ typedef enum _PacketType {
     ePacketCount = 0x36
 } PacketType;
 
+typedef enum _Modes
+{
+    eModeSerivce,
+    eModeNovice,
+    eModeAdvanced,
+    eModeExpert,
+    eModeMaster,
+    eModeCount
+} Modes;
+
 typedef struct _ModeValues {
+    Modes               mode;
     uint32_t            speed;
     int32_t             turn1;
     int32_t             turn2;

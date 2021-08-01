@@ -74,6 +74,7 @@ uint16_t CalculateChecksum(const unsigned char * packet, const int packetLength)
 
 void DumpModeValues(const ModeValues * const values)
 {
+    Log(eLogInfo, CMP_NAME, "Mode:%d",          values->mode);
     Log(eLogInfo, CMP_NAME, "Speed:%d",         values->speed);
     Log(eLogInfo, CMP_NAME, "Turn 1:%d",        values->turn1);
     Log(eLogInfo, CMP_NAME, "Turn 2:%d",        values->turn2);

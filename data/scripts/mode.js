@@ -1,4 +1,4 @@
-function set_mode_fields(data = window.values) {
+function set_mode_fields(data) {
     $('#mode_speed').val(format_for_display(data["speed"]));
     $('#mode_speed_current').text(format_for_display(data["speed"]));
 
@@ -168,9 +168,20 @@ function validate_deceleration() {
     return true;
 }
 
-$(document).ready()
-{
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("system.js: Registering status handler");
+    if (!window.socketEventHandlers) window.socketEventHandlers = {};
+    window.socketEventHandlers["ModeValues"] = set_mode_fields;
+
     setSaveButtonDisabled();
-    get_mode_values(false, set_mode_fields);
-    get_limits(false, validate_all);
-}
+
+    requestModeValues($('#mode_id').text());
+
+}, false);
+
+//$(document).ready()
+//{
+    
+    //get_mode_values(false, set_mode_fields);
+    //get_limits(false, validate_all);
+//}

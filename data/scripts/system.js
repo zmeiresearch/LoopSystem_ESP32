@@ -1,12 +1,11 @@
-function get_config()
+function updateConfig(data)
 {
-    $.get( "/config", function( data ) {
-        console.log("Received: " + data);
-        $('#wifiSsid').val(data["wifi"]["ssid"]);
-        $('#wifiPassword').val(data["wifi"]["password"]);
-        $('#buildId').text(data["system"]["buildId"]);
-        $('#buildTime').text(data["system"]["buildTime"]);        
-    });
+    console.log("Updating config values");
+    
+    $('#wifiSsid').val(data["wifi"]["ssid"]);
+    $('#wifiPassword').val(data["wifi"]["password"]);
+    $('#buildId').text(data["system"]["buildId"]);
+    $('#buildTime').text(data["system"]["buildTime"]);        
 }
 
 async function set_config()
@@ -25,7 +24,9 @@ async function set_config()
         });
 }
 
-$(document).ready()
-{
-    get_config();
-}
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("system.js: Registering status handler");
+    if (!window.socketEventHandlers) window.socketEventHandlers = {};
+    window.socketEventHandlers["Config"] = updateConfig;
+    requestConfig();
+}, false);

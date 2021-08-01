@@ -12,6 +12,7 @@
 //  Includes
 //==============================================================================
 #include "globals.h"
+#include "control_protocol.h"
 
 //==============================================================================
 //  Defines
@@ -30,6 +31,10 @@
 //==============================================================================
 eStatus WebserverInit();
 eStatus WebserverTask();
+
+eStatus PushStatus(const CurrentStatus & status);
+eStatus PushGlobalValues(const GlobalValues & values);
+eStatus PushModeValues(const ModeValues & values);
 
 #endif // INC_WEBSERVER_H
 

@@ -25,24 +25,11 @@
 //==============================================================================
 //  Exported types
 //==============================================================================
-typedef enum _Modes
-{
-    eModeSerivce,
-    eModeNovice,
-    eModeAdvanced,
-    eModeExpert,
-    eModeMaster,
-    eModeCount
-} Modes;
+
 
 //==============================================================================
 //  Exported data
 //==============================================================================
-
-extern GlobalValues   gGlobalValues;
-extern ModeValues     gModeValues[eModeCount];
-extern CurrentStatus  gStatus;
-
 
 //==============================================================================
 //  Exported functions

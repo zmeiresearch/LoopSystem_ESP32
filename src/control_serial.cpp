@@ -15,7 +15,7 @@
 #include "config.h"
 #include "control_serial.h"
 
-#include "values.h"
+#include "webserver.h"
 
 //==============================================================================
 //  Defines
@@ -101,23 +101,26 @@ size_t getValuesCount(PacketType packetType)
 
 void ParsePacketGlobalValueAscii(PacketGlobalValuesAscii const * const packet)
 {
+    GlobalValues values;
     Log(eLogInfo, CMP_NAME, "ParsePacketGlobalValueAscii");
-    gGlobalValues.home = TenByteBcdToUint32((const char *)&packet->values.home[0]);
-    gGlobalValues.maxEnd = TenByteBcdToUint32((const char *)&packet->values.maxEnd[0]);
-    gGlobalValues.maxTurn1 = TenByteBcdToUint32((const char *)&packet->values.maxTurn1[0]);
-    gGlobalValues.minTurn2 = TenByteBcdToUint32((const char *)&packet->values.minTurn2[0]);
-    gGlobalValues.maxAcc = FiveByteBcdToUint32((const char *)&packet->values.maxAcc[0]);
-    gGlobalValues.maxDec = FiveByteBcdToUint32((const char *)&packet->values.maxDec[0]);
-    gGlobalValues.maxSpeed = FiveByteBcdToUint32((const char *)&packet->values.maxSpeed[0]);
-    gGlobalValues.homingSpeed = FiveByteBcdToUint32((const char *)&packet->values.homingSpeed[0]);
-    gGlobalValues.maxTime = FiveByteBcdToUint32((const char *)&packet->values.maxTime[0]);
-    gGlobalValues.maxLaps = FiveByteBcdToUint32((const char *)&packet->values.maxLaps[0]);
-    gGlobalValues.servSpeed = FiveByteBcdToUint32((const char *)&packet->values.servSpeed[0]);
+    values.home = TenByteBcdToUint32((const char *)&packet->values.home[0]);
+    values.maxEnd = TenByteBcdToUint32((const char *)&packet->values.maxEnd[0]);
+    values.maxTurn1 = TenByteBcdToUint32((const char *)&packet->values.maxTurn1[0]);
+    values.minTurn2 = TenByteBcdToUint32((const char *)&packet->values.minTurn2[0]);
+    values.maxAcc = FiveByteBcdToUint32((const char *)&packet->values.maxAcc[0]);
+    values.maxDec = FiveByteBcdToUint32((const char *)&packet->values.maxDec[0]);
+    values.maxSpeed = FiveByteBcdToUint32((const char *)&packet->values.maxSpeed[0]);
+    values.homingSpeed = FiveByteBcdToUint32((const char *)&packet->values.homingSpeed[0]);
+    values.maxTime = FiveByteBcdToUint32((const char *)&packet->values.maxTime[0]);
+    values.maxLaps = FiveByteBcdToUint32((const char *)&packet->values.maxLaps[0]);
+    values.servSpeed = FiveByteBcdToUint32((const char *)&packet->values.servSpeed[0]);
 
-    DumpGlobalValues(&gGlobalValues);
+    DumpGlobalValues(&values);
+
+    PushGlobalValues(values);
 }
 
-void SendPacketGlobalValuesAscii(void)
+void SendPacketGlobalValuesAscii(const GlobalValues * const values)
 {
     PacketGlobalValuesAscii packet;
 
@@ -125,17 +128,17 @@ void SendPacketGlobalValuesAscii(void)
     packet.packetType = ePacketGlobalValues;
 
     // All lines print out a null terminator, but it gets overwritten by the next one
-    snprintf((char *)&packet.values.home[0], 11, "%010u", gGlobalValues.home);
-    snprintf((char *)&packet.values.maxEnd[0], 11, "%010u", gGlobalValues.maxEnd);
-    snprintf((char *)&packet.values.maxTurn1[0], 11, "%010u", gGlobalValues.maxTurn1);
-    snprintf((char *)&packet.values.minTurn2[0], 11, "%010u", gGlobalValues.minTurn2);
-    snprintf((char *)&packet.values.maxAcc[0], 6, "%05u", gGlobalValues.maxAcc);
-    snprintf((char *)&packet.values.maxDec[0], 6, "%05u", gGlobalValues.maxDec);
-    snprintf((char *)&packet.values.maxSpeed[0], 6, "%05u", gGlobalValues.maxSpeed);
-    snprintf((char *)&packet.values.homingSpeed[0], 6, "%05u", gGlobalValues.homingSpeed);
-    snprintf((char *)&packet.values.maxTime[0], 6, "%05u", gGlobalValues.maxTime);
-    snprintf((char *)&packet.values.maxLaps[0], 6, "%05u", gGlobalValues.maxLaps);
-    snprintf((char *)&packet.values.servSpeed[0], 6, "%05u", gGlobalValues.servSpeed);
+    snprintf((char *)&packet.values.home[0], 11, "%010u", values->home);
+    snprintf((char *)&packet.values.maxEnd[0], 11, "%010u", values->maxEnd);
+    snprintf((char *)&packet.values.maxTurn1[0], 11, "%010u", values->maxTurn1);
+    snprintf((char *)&packet.values.minTurn2[0], 11, "%010u", values->minTurn2);
+    snprintf((char *)&packet.values.maxAcc[0], 6, "%05u", values->maxAcc);
+    snprintf((char *)&packet.values.maxDec[0], 6, "%05u", values->maxDec);
+    snprintf((char *)&packet.values.maxSpeed[0], 6, "%05u", values->maxSpeed);
+    snprintf((char *)&packet.values.homingSpeed[0], 6, "%05u", values->homingSpeed);
+    snprintf((char *)&packet.values.maxTime[0], 6, "%05u", values->maxTime);
+    snprintf((char *)&packet.values.maxLaps[0], 6, "%05u", values->maxLaps);
+    snprintf((char *)&packet.values.servSpeed[0], 6, "%05u", values->servSpeed);
 
     uint16_t checksum = CalculateChecksum((const unsigned char *)&packet, sizeof(PacketGlobalValuesAscii));
 
@@ -148,7 +151,7 @@ void SendPacketGlobalValuesAscii(void)
     }
 }
 
-void SendPacketModeValuesAscii(Modes mode)
+void SendPacketModeValuesAscii(const ModeValues * const modeValues)
 {
     PacketModeValuesAscii packet;
 
@@ -156,13 +159,13 @@ void SendPacketModeValuesAscii(Modes mode)
     packet.packetType = ePacketModeValues;
 
     // All lines print out a null terminator, but it gets overwritten by the next one
-    snprintf((char *)&packet.values.mode, 2, "%01u", mode);
-    snprintf((char *)&packet.values.speed[0], 6, "%05u", gModeValues[mode].speed);
-    snprintf((char *)&packet.values.turn1[0], 11, "%010u", gModeValues[mode].turn1);
-    snprintf((char *)&packet.values.turn2[0], 11, "%010u", gModeValues[mode].turn2);
-    snprintf((char *)&packet.values.brakeTime[0], 6, "%05u", gModeValues[mode].brakeTime);
-    snprintf((char *)&packet.values.acc[0], 6, "%05u", gModeValues[mode].acc);
-    snprintf((char *)&packet.values.dec[0], 6, "%05u", gModeValues[mode].dec);
+    snprintf((char *)&packet.values.mode, 2, "%01u", modeValues->mode);
+    snprintf((char *)&packet.values.speed[0], 6, "%05u", modeValues->speed);
+    snprintf((char *)&packet.values.turn1[0], 11, "%010u", modeValues->turn1);
+    snprintf((char *)&packet.values.turn2[0], 11, "%010u", modeValues->turn2);
+    snprintf((char *)&packet.values.brakeTime[0], 6, "%05u", modeValues->brakeTime);
+    snprintf((char *)&packet.values.acc[0], 6, "%05u", modeValues->acc);
+    snprintf((char *)&packet.values.dec[0], 6, "%05u", modeValues->dec);
 
     uint16_t checksum = CalculateChecksum((const unsigned char *)&packet, sizeof(PacketModeValuesAscii));
 
@@ -175,16 +178,9 @@ void SendPacketModeValuesAscii(Modes mode)
     {
         vTaskDelay(100/portTICK_PERIOD_MS);
     }
-
-    //vTaskDelay(500/portTICK_PERIOD_MS);
-
-    //while (eOK !=  queueForTransmit(REQUEST_MODE_NOVICE, 3))
-    //{
-    //    vTaskDelay(100/portTICK_PERIOD_MS);
-    //}
 }
 
-void        SendPacketRequestModeValues(Modes mode)
+void SendPacketRequestModeValues(Modes mode)
 {
     switch (mode)
     {
@@ -232,16 +228,19 @@ void SendPacketRequestGlobalValues()
 void ParsePacketModeValuesAscii(PacketModeValuesAscii const * const modePacket)
 {
     uint8_t mode = (uint8_t)modePacket->values.mode - 0x30;
+    ModeValues values;
 
     if ((eModeNovice <= mode) && (mode <= eModeMaster))
     {
-        gModeValues[mode].speed = FiveByteBcdToUint32((const char *)&modePacket->values.speed[0]);
-        gModeValues[mode].turn1 = TenByteBcdToUint32((const char *)&modePacket->values.turn1[0]);
-        gModeValues[mode].turn2 = TenByteBcdToUint32((const char *)&modePacket->values.turn2[0]);
-        gModeValues[mode].brakeTime = FiveByteBcdToUint32((const char *)&modePacket->values.brakeTime[0]);
-        gModeValues[mode].acc = FiveByteBcdToUint32((const char *)&modePacket->values.acc[0]);
-        gModeValues[mode].dec = FiveByteBcdToUint32((const char *)&modePacket->values.dec[0]);
+        values.mode = (Modes)mode;
+        values.speed = FiveByteBcdToUint32((const char *)&modePacket->values.speed[0]);
+        values.turn1 = TenByteBcdToUint32((const char *)&modePacket->values.turn1[0]);
+        values.turn2 = TenByteBcdToUint32((const char *)&modePacket->values.turn2[0]);
+        values.brakeTime = FiveByteBcdToUint32((const char *)&modePacket->values.brakeTime[0]);
+        values.acc = FiveByteBcdToUint32((const char *)&modePacket->values.acc[0]);
+        values.dec = FiveByteBcdToUint32((const char *)&modePacket->values.dec[0]);
         Log(eLogDebug, CMP_NAME, "ParsePacketModeValuesAscii: Updated mode 0x%02x", mode);
+        PushModeValues(values);
     }
     else 
     {
@@ -252,21 +251,15 @@ void ParsePacketModeValuesAscii(PacketModeValuesAscii const * const modePacket)
 void ParsePacketStatusAscii(PacketStatusAscii const * const statusPacket)
 {
     //Log(eLogDebug, CMP_NAME, "ParseStatus");
+    CurrentStatus status;
 
     uint8_t mode = (uint8_t)statusPacket->status.mode - 0x30;
 
-    //if ((eModeNovice <= mode) && (mode <= eModeMaster))
-    //{
-        gStatus.mode = mode;
-    //}
-    //else 
-    //{
-        //Log(eLogWarn, CMP_NAME, "ParseStatus: invalid mode: 0x%02x", statusPacket->status.mode);
-    //}
-
-    gStatus.completedLaps = FiveByteBcdToUint32((const char *)&statusPacket->status.completedLaps[0]);
-    gStatus.position = TenByteBcdToUint32((const char *)&statusPacket->status.position[0]);
-    gStatus.systemStatus = statusPacket->status.systemStatus;
+    status.mode = (Modes)mode;
+    status.completedLaps = FiveByteBcdToUint32((const char *)&statusPacket->status.completedLaps[0]);
+    status.position = TenByteBcdToUint32((const char *)&statusPacket->status.position[0]);
+    status.systemStatus = statusPacket->status.systemStatus;
+    PushStatus(status);
 }
 
 

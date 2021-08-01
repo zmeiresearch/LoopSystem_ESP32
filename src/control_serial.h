@@ -37,8 +37,8 @@ eStatus     ControlSerialInit(void * param);
 eStatus     ControlSerialReceive();
 eStatus     ControlSerialTransmit();
 eStatus     ControlRefreshTask();
-void        SendPacketGlobalValuesAscii(void);
-void        SendPacketModeValuesAscii(Modes mode);
+void        SendPacketGlobalValuesAscii(const GlobalValues * const values);
+void        SendPacketModeValuesAscii(const ModeValues * const modeValues);
 void        SendPacketRequestModeValues(Modes mode);
 void        SendPacketRequestGlobalValues();
 
