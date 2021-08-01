@@ -34,6 +34,7 @@
 //==============================================================================
 //  Local data
 //==============================================================================
+static bool             initialized = false;
 static AsyncWebServer   server(80);
 static AsyncWebSocket   socket("/ws");
 
@@ -193,7 +194,7 @@ static eStatus requestModeValues(const JsonObject & json)
         }
         else
         {
-            Log(eLogWarn, CMP_NAME, "requestModeValues: Invalid mode: %s", json["mode"]);
+            Log(eLogWarn, CMP_NAME, "requestModeValues: Invalid mode: %s", json["mode"].as<String>().c_str());
         }
     }
     else
@@ -208,7 +209,7 @@ eStatus PushModeValues(const ModeValues & values)
 {
     Log(eLogInfo, CMP_NAME, "PushModeValues");
 
-    DynamicJsonDocument json(1024);
+    DynamicJsonDocument json(256);
     json["type"] = String("ModeValues");
     json["data"]["mode"] = String(values.mode);
     json["data"]["speed"] = String(values.speed);
@@ -222,17 +223,15 @@ eStatus PushModeValues(const ModeValues & values)
 
 static eStatus receiveModeValues(const JsonObject &json)
 {
-    eStatus retVal = eFAIL;
+    eStatus retVal = eOK;
     Log(eLogInfo, CMP_NAME, "receiveModeValues");
 
-    const char * modeStr = json["data"]["mode"];
-
-    if (modeStr)
+    if (json.containsKey("mode"))
     {
-        Modes mode = modeFromString(String(modeStr));
+        Modes mode = modeFromString(json["mode"]);
         ModeValues values;
 
-        if (eModeCount <= mode)
+        if (eModeCount != mode)
         {
             values.mode = mode;
             retVal = (eStatus)(retVal | setVariableFromJson(json, &values.speed, "speed"));
@@ -244,7 +243,7 @@ static eStatus receiveModeValues(const JsonObject &json)
 
             if (eOK == retVal) 
             {
-                Log(eLogInfo, CMP_NAME, "receiveModeValues: updated mode %s", modeStr);
+                Log(eLogInfo, CMP_NAME, "receiveModeValues: updated mode %s", json["mode"].as<String>().c_str());
             }
             else 
             {
@@ -257,8 +256,12 @@ static eStatus receiveModeValues(const JsonObject &json)
         }
         else 
         {
-            Log(eLogWarn, CMP_NAME, "receiveModeValues: got invalid mode %s", json["data"]["mode"]);
+            Log(eLogWarn, CMP_NAME, "receiveModeValues: got invalid mode %s", json["mode"].as<String>().c_str());
         }
+    }
+    else
+    {
+        Log(eLogWarn, CMP_NAME, "receiveModeValues: no mode!");
     }
 
     return retVal;
@@ -393,13 +396,17 @@ static eStatus webscocketSendJsonAll(const JsonDocument & json)
 static eStatus  websocketHandleMessage(AsyncWebSocketClient * client, void *arg, uint8_t *data, size_t len) 
 {
     eStatus retVal = eFAIL;
+
+    dumpRequestData("websocketHandleMessage", data, len);
+
     AwsFrameInfo *info = (AwsFrameInfo*)arg;
-    
+
     // We expect all incomming data to be in one chunk (small) and Text - JSON
     if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) 
     {
         DynamicJsonDocument json(1024);
         auto resultError = deserializeJson(json, (const char *) data, len);
+
         if (resultError) 
         {
             Log(eLogWarn, CMP_NAME, "websocketHandleMessage: Deserialization error: %s", resultError.c_str());
@@ -490,6 +497,15 @@ static void websocketOnEvent(AsyncWebSocket * server, AsyncWebSocketClient * cli
 //  Exported functions
 //==============================================================================
 
+eStatus WebserverCloseSockets()
+{
+    if (initialized)
+    {
+        socket.closeAll();
+    }
+    return eOK;
+}
+
 // Initialize update webserver
 eStatus WebserverInit()
 {
@@ -518,12 +534,18 @@ eStatus WebserverInit()
    
     server.begin();
 
+    initialized = true;
+
     return eOK;
 }
 
 // Cleans-up websockets to avoid exhaustion
 eStatus WebserverTask()
 {
-    //socket.cleanupClients();
+    if (initialized)
+    {
+        socket.cleanupClients();
+    }
+    
     return eOK;
 }

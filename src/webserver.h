@@ -32,6 +32,8 @@
 eStatus WebserverInit();
 eStatus WebserverTask();
 
+eStatus WebserverCloseSockets();
+
 eStatus PushStatus(const CurrentStatus & status);
 eStatus PushGlobalValues(const GlobalValues & values);
 eStatus PushModeValues(const ModeValues & values);

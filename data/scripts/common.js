@@ -42,12 +42,22 @@ function connectSocket() {
         console.log("dataSocket: Got: " + event.data);
 
         let response = JSON.parse(event.data);
-        if (window.socketEventHandlers) {
-            if (response["type"] in window.socketEventHandlers) {
-                socketEventHandlers[response["type"]](response["data"]);
+        if (window.socketMessageHandlers) {
+            if (response["type"] in window.socketMessageHandlers) {
+                socketMessageHandlers[response["type"]](response["data"]);
             }
         }
     };
+
+    socket.onclose = function(event) {
+        console.log("dataSocket: Closed!");
+        if (window.socketCloseHandlers) {
+            for (const [key, value] of Object.entries(window.socketCloseHandlers)) {
+                console.log("dataSocket: calling " + value);
+                value();
+            } 
+        }
+    }
 
     window.dataSocket = socket;
 }
@@ -73,6 +83,14 @@ async function requestModeValues(mode) {
 
 async function requestGlobalValues() {
     websocketSend(JSON.stringify({ action: "getGlobalValues"}));
+}
+
+async function sendGlobalValues(data) {
+    websocketSend(JSON.stringify({ action: "setGlobalValues", data}));
+}
+
+async function sendModeValues(data) {
+    websocketSend(JSON.stringify({ action: "setModeValues", data}));
 }
 
 document.addEventListener('DOMContentLoaded', connectSocket, false);

@@ -26,7 +26,7 @@ async function set_config()
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log("system.js: Registering status handler");
-    if (!window.socketEventHandlers) window.socketEventHandlers = {};
-    window.socketEventHandlers["Config"] = updateConfig;
+    if (!window.socketMessageHandlers) window.socketMessageHandlers = {};
+    window.socketMessageHandlers["Config"] = updateConfig;
     requestConfig();
 }, false);

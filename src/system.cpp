@@ -6,12 +6,10 @@
 //  Includes
 //==============================================================================
 #include "system.h"
-
 #include "SPIFFS.h"
-
 #include "config.h"
-
 #include "runtime_config.h"
+#include "webserver.h"
 
 //==============================================================================
 //  Defines
@@ -41,6 +39,7 @@
 //==============================================================================
 void SystemRestart()
 {
+    WebserverCloseSockets();
     ConfigFinalize();
     SPIFFS.end();
     vTaskDelay(500 / portTICK_PERIOD_MS);

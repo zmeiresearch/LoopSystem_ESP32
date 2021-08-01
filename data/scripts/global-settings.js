@@ -1,4 +1,4 @@
-function set_limit_fields(data = window.limits) {
+function receiveGlobalValues(data) {
     $('#limit_home').val(format_for_display(data["home"]));
     $('#limit_home_current').text(format_for_display(data["home"]));
     
@@ -31,10 +31,13 @@ function set_limit_fields(data = window.limits) {
     
     $('#limit_serv_speed').val(format_for_display(data["servSpeed"]));
     $('#limit_serv_speed_current').text(format_for_display(data["servSpeed"]));
+
+    validateAll();
 }
 
-function set_limits()
+function uploadGlobalValues()
 {
+    setSaveButtonDisabled(document.getElementById("set_button"));
     val = {
         'home' : format_from_display($('#limit_home').val()),
         'maxEnd' : format_from_display($('#limit_max_end').val()),
@@ -49,14 +52,21 @@ function set_limits()
         'servSpeed' : format_from_display($('#limit_serv_speed').val())
     };
 
-    $.ajax("globalValues", {
-        data : JSON.stringify(val),
-        contentType : 'application/json',
-        type : 'POST'
-        });
+    sendGlobalValues(val);
+    setSaveButtonEnabled(document.getElementById("set_button"));
 }
 
-$(document).ready()
-{
-    get_limits(true, set_limit_fields);
+function validateAll() {
+    setSaveButtonEnabled(document.getElementById("set_button"));
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("global-settings.js: Registering handler");
+    if (!window.socketMessageHandlers) window.socketMessageHandlers = {};
+    window.socketMessageHandlers["GlobalValues"] = receiveGlobalValues;
+
+    setSaveButtonDisabled(document.getElementById("set_button"));
+
+    requestGlobalValues();
+
+}, false);

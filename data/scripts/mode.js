@@ -1,4 +1,59 @@
-function set_mode_fields(data) {
+
+var values;
+var valuesSet = false;
+var limits;
+var limitsSet = false;
+var isSending = false;
+
+/*
+- Limits received:
+	Is values received:
+		- Yes
+			- Validate
+*/
+function receiveLimits(data) {
+    limits = data;
+    limitsSet = true;
+    if (valuesSet) {
+        validateAll();
+    }
+}
+
+/*
+- Values received:
+	Is first reception:
+		- Yes: 
+			- Update Current Values
+			- Update Input Values
+			Is Limits received:
+				- Yes:
+					- Validate
+		- No:
+			- Update Current Values
+			If Values Stored from POST
+				- Yes:
+					- Are values same:
+						- Notify success:
+						- Notify failure:
+*/
+function receiveModeValues(data) {
+    if (!valuesSet) {
+        values = data;
+        valuesSet = true;
+        setFields(data);
+    } else {
+        if (isSending) {
+            checkWriteSuccess(data);
+        }
+        isSending = false;
+    }
+
+    if (limitsSet) {
+        validateAll();
+    }
+}
+
+function setFields(data) {
     $('#mode_speed').val(format_for_display(data["speed"]));
     $('#mode_speed_current').text(format_for_display(data["speed"]));
 
@@ -16,11 +71,9 @@ function set_mode_fields(data) {
 
     $('#mode_dec').val(format_for_display(data["dec"]));
     $('#mode_dec_current').text(format_for_display(data["dec"]));
-
-    validate_all();
 }
 
-function check_mode_write_success(newData) {
+function checkWriteSuccess(newData) {
     if ((newData['speed'] != format_from_display($('#mode_speed').val())) ||
         (newData['turn1'] != format_from_display($('#mode_turn1').val())) ||
         (newData['turn2'] != format_from_display($('#mode_turn2').val())) ||
@@ -32,8 +85,9 @@ function check_mode_write_success(newData) {
 }
 
 
-async function set_mode_values() {
-    setSaveButtonDisabled();
+function uploadModeValues() {
+    setSaveButtonDisabled(document.getElementById("set_button"));
+    isSending = true;
     var mode = $('#mode_id').text();
     val = {
         "mode": mode,
@@ -45,50 +99,51 @@ async function set_mode_values() {
         'dec': format_from_display($('#mode_dec').val()),
     };
 
-    $.ajax("modeValues", {
-        data: JSON.stringify(val),
-        contentType: 'application/json',
-        type: 'POST',
-        always: function () {
-            setTimeout(get_mode_values(false), 600);
-        }
-    });
+    sendModeValues(val);
+
+    setTimeout(function(){
+        requestModeValues($('#mode_id').text());
+    }, 500);
 }
 
-function validate_all() {
+/*
+- Input Values changed:
+	- Is limits received:
+		- Validate
+*/
+function validateAll() {
+    e = document.getElementById("set_button");
 
     // Only proceed if both limits and values are set
-    if (window.limits && window.values) {
+    if (valuesSet && limitsSet) {
         // force update of all fields
-        validate_speed();
-        validate_turn1();
-        validate_turn2();
-        validate_brake_time();
-        validate_acceleration();
-        validate_deceleration();
+        validateSpeed();
+        validateTurn1();
+        validateTurn2();
+        validateBrakeTime();
+        validateAcceleration();
+        validateDeceleration();
 
-        if (!validate_speed() ||
-            !validate_turn1() ||
-            !validate_turn2() ||
-            !validate_brake_time() ||
-            !validate_acceleration() ||
-            !validate_deceleration()) {
-            e = document.getElementById("set_button");
+        if (!validateSpeed() ||
+            !validateTurn1() ||
+            !validateTurn2() ||
+            !validateBrakeTime() ||
+            !validateAcceleration() ||
+            !validateDeceleration()) {
             setSaveButtonDisabled(e);
         }
         else {
-            e = document.getElementById("set_button");
             setSaveButtonEnabled(e);
         }
     }
 }
 
-function validate_speed() {
+function validateSpeed() {
     var e = document.getElementById("mode_speed");
     val = e.value
     if (isNaN(val) ||
-        (format_from_display(val) > window.limits.maxSpeed) ||
-        (format_from_display(val) < 0)) {
+        (format_from_display(val) > limits.maxSpeed) ||
+        (format_from_display(val) <= 0)) {
         setElementValueInvalid(e);
         return false;
     }
@@ -99,12 +154,12 @@ function validate_speed() {
     return true;
 }
 
-function validate_turn1() {
+function validateTurn1() {
     var e = document.getElementById("mode_turn1");
     val = e.value
     if (isNaN(val) ||
-        (format_from_display(val) >= window.limits.maxTurn1) ||
-        (format_from_display(val) < window.limits.minTurn2) ||
+        (format_from_display(val) >= limits.maxTurn1) ||
+        (format_from_display(val) < limits.minTurn2) ||
         (format_from_display(val) < format_from_display($('#mode_turn2').val()))) {
         setElementValueInvalid(e);
         return false;
@@ -116,12 +171,12 @@ function validate_turn1() {
     return true;
 }
 
-function validate_turn2() {
+function validateTurn2() {
     var e = document.getElementById("mode_turn2");
     val = e.value
     if (isNaN(val) ||
-        (format_from_display(val) > window.limits.maxTurn1) ||
-        (format_from_display(val) < window.limits.minTurn2) ||
+        (format_from_display(val) > limits.maxTurn1) ||
+        (format_from_display(val) < limits.minTurn2) ||
         (format_from_display(val) > format_from_display($('#mode_turn1').val()))) {
         setElementValueInvalid(e);
         return false;
@@ -132,18 +187,18 @@ function validate_turn2() {
     return true;
 }
 
-function validate_brake_time() {
+function validateBrakeTime() {
     // No limits on brake time
 
     return true;
 }
 
-function validate_acceleration() {
+function validateAcceleration() {
     var e = document.getElementById("mode_acc");
     val = e.value
     if (isNaN(val) ||
         (format_from_display(val) <= 0) ||
-        (format_from_display(val) >= window.limits.maxAcc)) {
+        (format_from_display(val) > limits.maxAcc)) {
         setElementValueInvalid(e);
         return false;
     } else {
@@ -153,12 +208,12 @@ function validate_acceleration() {
     return true;
 }
 
-function validate_deceleration() {
+function validateDeceleration() {
     var e = document.getElementById("mode_dec");
     val = e.value
     if (isNaN(val) ||
         (format_from_display(val) <= 0) ||
-        (format_from_display(val) >= window.limits.maxDec)) {
+        (format_from_display(val) > limits.maxDec)) {
         setElementValueInvalid(e);
         return false;
     } else {
@@ -168,20 +223,26 @@ function validate_deceleration() {
     return true;
 }
 
+/*
+- Page Loaded:
+	- Disable Button
+	- Disable Fields
+	- Request Values
+	- Request Limits
+*/
 document.addEventListener('DOMContentLoaded', function() {
-    console.log("system.js: Registering status handler");
-    if (!window.socketEventHandlers) window.socketEventHandlers = {};
-    window.socketEventHandlers["ModeValues"] = set_mode_fields;
+    console.log("mode.js: Registering handlers");
+    if (!window.socketMessageHandlers) window.socketMessageHandlers = {};
+    window.socketMessageHandlers["ModeValues"] = receiveModeValues;
+    window.socketMessageHandlers["GlobalValues"] = receiveLimits;
 
-    setSaveButtonDisabled();
+    //if (!window.socketCloseHandlers) window.socketCloseHandlers = {};
+    //window.socketCloseHandlers["mode"] = socketClosed;
+
+    setSaveButtonDisabled(document.getElementById("set_button"));
 
     requestModeValues($('#mode_id').text());
+    requestGlobalValues();
 
 }, false);
 
-//$(document).ready()
-//{
-    
-    //get_mode_values(false, set_mode_fields);
-    //get_limits(false, validate_all);
-//}

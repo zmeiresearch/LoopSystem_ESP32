@@ -33,7 +33,7 @@
         </div>
         <div class="grpelem value_input width_half offset_half">
           <p>
-            <input class="grpelem width_half" type="number" placeholder="--" step="0.1" id="limit_home" onChange="validate_all()">
+            <input class="grpelem width_half" type="number" placeholder="--" step="0.1" id="limit_home" onInput="validateAll()">
           </p>
         </div>
       </div>
@@ -49,7 +49,7 @@
         </div>
         <div class="grpelem value_input width_half offset_half">
           <p>
-            <input class="grpelem width_half" type="number" placeholder="--" step="0.1" id="limit_max_end" onChange="validate_all()">
+            <input class="grpelem width_half" type="number" placeholder="--" step="0.1" id="limit_max_end" onInput="validateAll()">
           </p>
         </div>
       </div>
@@ -65,7 +65,7 @@
         </div>
         <div class="grpelem value_input width_half offset_half">
           <p>
-            <input class="grpelem width_half" type="number" placeholder="--" step="0.1" id="limit_max_turn1" onChange="validate_all()">
+            <input class="grpelem width_half" type="number" placeholder="--" step="0.1" id="limit_max_turn1" onInput="validateAll()">
           </p>
         </div>
       </div>
@@ -81,7 +81,7 @@
         </div>
         <div class="grpelem value_input width_half offset_half">
           <p>
-            <input class="grpelem width_half" type="number" placeholder="--" step="0.1" id="limit_min_turn2" onChange="validate_all()">
+            <input class="grpelem width_half" type="number" placeholder="--" step="0.1" id="limit_min_turn2" onInput="validateAll()">
           </p>
         </div>
       </div>
@@ -97,7 +97,7 @@
         </div>
         <div class="grpelem value_input width_half offset_half">
           <p>
-            <input class="grpelem width_half" type="number" placeholder="--" step="0.1" id="limit_max_acc" onChange="validate_all()">
+            <input class="grpelem width_half" type="number" placeholder="--" step="0.1" id="limit_max_acc" onInput="validateAll()">
           </p>
         </div>
       </div>
@@ -113,7 +113,7 @@
         </div>
         <div class="grpelem value_input width_half offset_half">
           <p>
-            <input class="grpelem width_half" type="number" placeholder="--" step="0.1 " id="limit_max_dec" onChange="validate_all()">
+            <input class="grpelem width_half" type="number" placeholder="--" step="0.1" id="limit_max_dec" onInput="validateAll()">
           </p>
         </div>
       </div>
@@ -129,7 +129,7 @@
         </div>
         <div class="grpelem value_input width_half offset_half">
           <p>
-            <input class="grpelem width_half" type="number" placeholder="--" step="0.1 " id="limit_max_speed" onChange="validate_all()">
+            <input class="grpelem width_half" type="number" placeholder="--" step="0.1" id="limit_max_speed" onInput="validateAll()">
           </p>
         </div>
       </div>
@@ -145,8 +145,7 @@
         </div>
         <div class="grpelem value_input width_half offset_half">
           <p>
-            <input class="grpelem width_half" type="number" placeholder="--" step="0.1 " id="limit_homing_speed"
-              onChange="validate_all()">
+            <input class="grpelem width_half" type="number" placeholder="--" step="0.1" id="limit_homing_speed" onInput="validateAll()">
           </p>
         </div>
       </div>
@@ -162,7 +161,7 @@
         </div>
         <div class="grpelem value_input width_half offset_half">
           <p>
-            <input class="grpelem width_half" type="number" placeholder="--" id="limit_max_time" onChange="validate_all()">
+            <input class="grpelem width_half" type="number" placeholder="--" id="limit_max_time" onInput="validateAll()">
           </p>
         </div>
       </div>
@@ -178,12 +177,10 @@
         </div>
         <div class="grpelem value_input width_half offset_half">
           <p>
-            <input class="grpelem width_half" type="number" placeholder="--" id="limit_max_laps" onChange="validate_all()">
+            <input class="grpelem width_half" type="number" placeholder="--" id="limit_max_laps" onInput="validateAll()">
           </p>
         </div>
       </div>
-
-
 
       <div class="colelem value_heading">
         SERVICE MODE SPEED LIMIT ( CURRENT:
@@ -196,15 +193,13 @@
         </div>
         <div class="grpelem value_input width_half offset_half">
           <p>
-            <input class="grpelem width_half" type="number" placeholder="--" step="0.1 " id="limit_serv_speed" onChange="validate_all()">
+            <input class="grpelem width_half" type="number" placeholder="--" step="0.1" id="limit_serv_speed" onInput="validateAll()">
           </p>
         </div>
       </div>
 
-
-
       <div class="colelem" style="padding-top: 14px;">
-        <a href="javascript:set_mode_values()" class="save_button width_full" id="set_button">SET</a>
+        <a href="javascript:uploadGlobalValues()" class="save_button width_full" id="set_button">SET</a>
       </div>
 
       <a class="nonblock nontext clip_frame colelem" id="u1231" href="program-selector.html"><img class="svg" id="u1227"

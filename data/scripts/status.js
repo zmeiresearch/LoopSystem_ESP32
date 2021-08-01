@@ -1,7 +1,5 @@
 function updateStatus(data)
 {
-    console.log("Updating status values");
-
     $('#status_mode').text(data["mode"]);
     $('#status_completed_laps').text(data["completedLaps"]);
     $('#status_position').text(format_for_display(data["position"]));
@@ -10,7 +8,7 @@ function updateStatus(data)
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log("status.js: Registering status handler");
-    if (!window.socketEventHandlers) window.socketEventHandlers = {};
-    window.socketEventHandlers["Status"] = updateStatus;
+    if (!window.socketMessageHandlers) window.socketMessageHandlers = {};
+    window.socketMessageHandlers["Status"] = updateStatus;
 
 }, false);
