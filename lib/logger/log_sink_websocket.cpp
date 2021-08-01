@@ -63,7 +63,6 @@ void onEvent(AsyncWebSocket * server, AsyncWebSocketClient * client,
     {
         //client connected
         Log(eLogDebug, CMP_NAME, "ws[%s][%u] connect\n", server->url(), client->id());
-        client->printf("Hello Client %u :)", client->id());
         client->ping();
     } 
     else if(type == WS_EVT_DISCONNECT)
