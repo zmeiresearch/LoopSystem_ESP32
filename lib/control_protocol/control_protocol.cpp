@@ -74,36 +74,23 @@ uint16_t CalculateChecksum(const unsigned char * packet, const int packetLength)
 
 void DumpModeValues(const ModeValues * const values)
 {
-    Log(eLogInfo, CMP_NAME, "Mode:%d",          values->mode);
-    Log(eLogInfo, CMP_NAME, "Speed:%d",         values->speed);
-    Log(eLogInfo, CMP_NAME, "Turn 1:%d",        values->turn1);
-    Log(eLogInfo, CMP_NAME, "Turn 2:%d",        values->turn2);
-    Log(eLogInfo, CMP_NAME, "brakeTime:%d",     values->brakeTime);
-    Log(eLogInfo, CMP_NAME, "Acc:%d",           values->acc);
-    Log(eLogInfo, CMP_NAME, "Dec:%d",           values->dec);
+    Log(eLogInfo, CMP_NAME, "Mode:%d; Speed:%d; Turn 1:%d; Turn 2:%d; brakeTime:%d; Acc:%d; Dec:%d", 
+        values->mode, values->speed, values->turn1, values->turn2, values->brakeTime, values->acc, values->dec);
 }
 
 void DumpGlobalValues(const GlobalValues * const values)
 {
-    Log(eLogInfo, CMP_NAME, "gHome:%d",         values->home);
-    Log(eLogInfo, CMP_NAME, "gMaxEnd:%d",       values->maxEnd);
-    Log(eLogInfo, CMP_NAME, "gMaxTurn1:%d",     values->maxTurn1);
-    Log(eLogInfo, CMP_NAME, "gMinTurn2:%d",     values->minTurn2);
-    Log(eLogInfo, CMP_NAME, "gMaxAcc:%d",       values->maxAcc);
-    Log(eLogInfo, CMP_NAME, "gMaxDec:%d",       values->maxDec);
-    Log(eLogInfo, CMP_NAME, "gFMax:%d",         values->maxSpeed);
-    Log(eLogInfo, CMP_NAME, "gFMin:%d",         values->homingSpeed);
-    Log(eLogInfo, CMP_NAME, "gMaxTime:%d",      values->maxTime);
-    Log(eLogInfo, CMP_NAME, "gMaxLaps:%d",      values->maxLaps);
-    Log(eLogInfo, CMP_NAME, "gServSpeed:%d",    values->servSpeed);
+    Log(eLogInfo, CMP_NAME, "Home:%d; MaxEnd:%d; MaxTurn1:%d; MinTurn2:%d; MaxAcc:%d; MaxDec:%d",
+        values->home, values->maxEnd, values->maxTurn1, values->minTurn2, values->maxAcc, values->maxDec);
+    
+    Log(eLogInfo, CMP_NAME, "FMax:%d; FMin:%d; MaxTime:%d; MaxLaps:%d; ServSpeed:%d",
+        values->maxSpeed, values->homingSpeed, values->maxTime, values->maxLaps, values->servSpeed);
 }
 
 void DumpStatus( const CurrentStatus * const status)
 {
-    Log(eLogInfo, CMP_NAME, "mode:%d",          status->mode);
-    Log(eLogInfo, CMP_NAME, "completedLaps:%d", status->completedLaps);
-    Log(eLogInfo, CMP_NAME, "position:%d",      status->position);
-    Log(eLogInfo, CMP_NAME, "systemStatus:%d",  status->systemStatus);
+    Log(eLogInfo, CMP_NAME, "mode:%d; completedLaps:%d; position:%d; systemStatus:%d",
+        status->mode, status->completedLaps, status->position, status->systemStatus);
 }
 
 eStatus IsBcd(const char val)

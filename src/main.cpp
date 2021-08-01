@@ -56,7 +56,6 @@ const Module modules[] = {
     { "Keepalive",      NULL,               keepaliveLoop,          10000,              NULL,   4096,   0 },
     { "SerialReceive",  ControlSerialInit,  ControlSerialReceive,   5,                  NULL,   4096,   2 },
     { "SerialTransmit", ControlSerialInit,  ControlSerialTransmit,  5,                  NULL,   4096,   2 },
-    { "SerialRefresh",  NULL,               ControlRefreshTask,     2000,               NULL,   4096,   2 },
     // WebserverInit is called from system_manager instead
     { "Webserver",      NULL,               WebserverTask,          1000,               NULL,   4096,   1 }
 };
@@ -87,7 +86,6 @@ void setup()
     StartModules(&modules[0], ARRAY_SIZE(modules));
 
     LogSetMinLevel(eLogInfo);
-
 }
 
 // All tasks already started during setup()

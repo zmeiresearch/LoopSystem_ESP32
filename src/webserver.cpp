@@ -188,7 +188,7 @@ static eStatus requestModeValues(const JsonObject & json)
         Modes mode = modeFromString(json["mode"]);
         if (mode != eModeCount)
         {
-            SendPacketRequestModeValues(mode);
+            SerialRequestModeValues(mode);
             retVal = eOK;
         }
         else
@@ -252,7 +252,7 @@ static eStatus receiveModeValues(const JsonObject &json)
             }
             DumpModeValues(&values);
 
-            SendPacketModeValuesAscii(&values);
+            SerialSendModeValues(&values);
             retVal = eOK;
         }
         else 
@@ -270,7 +270,7 @@ static eStatus receiveModeValues(const JsonObject &json)
 static eStatus requestGlobalValues()
 {
     Log(eLogInfo, CMP_NAME, "requestGlobalValues");
-    SendPacketRequestGlobalValues();
+    SerialRequestGlobalValues();
     return eOK;
 }
 
@@ -310,7 +310,7 @@ static eStatus receiveGlobalValues(const JsonObject &json)
     retVal = (eStatus)(retVal | setVariableFromJson(json, &values.maxLaps, "maxLaps"));
     retVal = (eStatus)(retVal | setVariableFromJson(json, &values.servSpeed, "servSpeed"));
 
-    SendPacketGlobalValuesAscii(&values);
+    SerialSendGlobalValues(&values);
 
     return retVal;
 }

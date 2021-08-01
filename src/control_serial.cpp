@@ -58,26 +58,50 @@ static unsigned char            receiveBuffer[SERIAL_BUFFER_SIZE];
 static size_t                   receiveIndex;
 static ReceiveStatus            receiveStatus = eReceiveStatusIdle;
 static PacketType               receivedPacketType = ePacketCount;
+
+
+//==============================================================================
+//  Local function declarations
+//==============================================================================
+static eStatus  queueForTransmit(const char * const buffer, size_t size);
+static size_t   getValuesByteCount(PacketType packetType);
+
+
 //==============================================================================
 //  Local functions
 //==============================================================================
-static eStatus queueForTransmit(const char * const buffer, size_t size);
-
-//==============================================================================
-//  Exported functions
-//==============================================================================
-
-// Task interface
-eStatus ControlSerialInit(void * param)
+static eStatus queueForTransmit(const char * const buffer, size_t size)
 {
-    Log(eLogInfo, CMP_NAME, "ControlSerialInit");
+    eStatus retVal = eBUSY;
 
-    serial.begin(CONTROL_SERIAL_BAUD, CONTROL_SERIAL_FORMAT, CONTROL_SERIAL_RX_PIN, CONTROL_SERIAL_TX_PIN); 
+    do
+    {
+        if ((sendStatus == eSendStatusIdle) ||
+            (sendStatus == eSendStatusComplete))
+        {
+            if (size <= SERIAL_BUFFER_SIZE)
+            {
+                memcpy(sendBuffer, buffer, size);
+                sendCount = size;
+                sendStatus = eSendStatusQueued;
+                retVal = eOK;
+            }
+            else
+            {
+                retVal = eOVERFLOW;
+            }
+        }
+        
+        if (eBUSY == retVal)
+        {
+            vTaskDelay(100/portTICK_PERIOD_MS);
+        }
+    } while (eBUSY == retVal);
 
-    return eOK;
+    return retVal;
 }
 
-size_t getValuesCount(PacketType packetType)
+static size_t getValuesByteCount(PacketType packetType)
 {
     size_t expectedValueCount;
     switch (packetType)
@@ -99,10 +123,19 @@ size_t getValuesCount(PacketType packetType)
     return expectedValueCount;
 }
 
-void ParsePacketGlobalValueAscii(PacketGlobalValuesAscii const * const packet)
+//==============================================================================
+//  Global Values handling
+//==============================================================================
+void SerialRequestGlobalValues()
+{
+    Log(eLogInfo, CMP_NAME, "SerialRequestGlobalValues");
+    queueForTransmit(REQUEST_GLOBAL_VALUES, 3);
+}
+
+static void serialReceiveGlobalValueAscii(PacketGlobalValuesAscii const * const packet)
 {
     GlobalValues values;
-    Log(eLogInfo, CMP_NAME, "ParsePacketGlobalValueAscii");
+    Log(eLogInfo, CMP_NAME, "serialReceiveGlobalValueAscii");
     values.home = TenByteBcdToUint32((const char *)&packet->values.home[0]);
     values.maxEnd = TenByteBcdToUint32((const char *)&packet->values.maxEnd[0]);
     values.maxTurn1 = TenByteBcdToUint32((const char *)&packet->values.maxTurn1[0]);
@@ -120,7 +153,7 @@ void ParsePacketGlobalValueAscii(PacketGlobalValuesAscii const * const packet)
     PushGlobalValues(values);
 }
 
-void SendPacketGlobalValuesAscii(const GlobalValues * const values)
+void SerialSendGlobalValues(const GlobalValues * const values)
 {
     PacketGlobalValuesAscii packet;
 
@@ -145,13 +178,62 @@ void SendPacketGlobalValuesAscii(const GlobalValues * const values)
     snprintf((char*)&packet.checksum[0], 5, "%04X", checksum);
     packet.stopByte = STOP_BYTE;
 
-    while (eOK != queueForTransmit((const char *)&packet, sizeof(PacketGlobalValuesAscii)))
+    Log(eLogInfo, CMP_NAME, "SerialSendGlobalValues: %s", &packet);
+
+    queueForTransmit((const char *)&packet, sizeof(PacketGlobalValuesAscii));
+}
+
+//==============================================================================
+//  ModeValues Handling
+//==============================================================================
+void SerialRequestModeValues(Modes mode)
+{
+    Log(eLogInfo, CMP_NAME, "SerialRequestModeValues: %d", mode);
+    switch (mode)
     {
-        vTaskDelay(100/portTICK_PERIOD_MS);
+        case eModeNovice:
+            queueForTransmit(REQUEST_MODE_NOVICE, 3);
+            break;
+        case eModeAdvanced:
+            queueForTransmit(REQUEST_MODE_ADVANCED, 3);
+            break;
+        case eModeExpert:
+            queueForTransmit(REQUEST_MODE_EXPERT, 3);
+            break;
+        case eModeMaster:
+            queueForTransmit(REQUEST_MODE_MASTER, 3);
+            break;        
+        default:
+            Log(eLogWarn, CMP_NAME, "SerialRequestModeValues: invalid mode 0x%02x", mode);
+            break;
     }
 }
 
-void SendPacketModeValuesAscii(const ModeValues * const modeValues)
+static void serialReceiveModeValuesAscii(PacketModeValuesAscii const * const modePacket)
+{
+    uint8_t mode = (uint8_t)modePacket->values.mode - 0x30;
+    ModeValues values;
+
+    if ((eModeNovice <= mode) && (mode <= eModeMaster))
+    {
+        values.mode = (Modes)mode;
+        values.speed = FiveByteBcdToUint32((const char *)&modePacket->values.speed[0]);
+        values.turn1 = TenByteBcdToUint32((const char *)&modePacket->values.turn1[0]);
+        values.turn2 = TenByteBcdToUint32((const char *)&modePacket->values.turn2[0]);
+        values.brakeTime = FiveByteBcdToUint32((const char *)&modePacket->values.brakeTime[0]);
+        values.acc = FiveByteBcdToUint32((const char *)&modePacket->values.acc[0]);
+        values.dec = FiveByteBcdToUint32((const char *)&modePacket->values.dec[0]);
+        Log(eLogInfo, CMP_NAME, "serialReceiveModeValuesAscii: Updated mode 0x%02x", mode);
+        DumpModeValues(&values);
+        PushModeValues(values);
+    }
+    else 
+    {
+        Log(eLogWarn, CMP_NAME, "serialReceiveModeValuesAscii: invalid mode: 0x%02x", mode);
+    }
+}
+
+void SerialSendModeValues(const ModeValues * const modeValues)
 {
     PacketModeValuesAscii packet;
 
@@ -172,85 +254,17 @@ void SendPacketModeValuesAscii(const ModeValues * const modeValues)
     snprintf((char*)&packet.checksum[0], 5, "%04X", checksum);
     packet.stopByte = STOP_BYTE;
 
-    Log(eLogDebug, CMP_NAME, "SendPacketModeValuesAscii: %s", &packet);
+    Log(eLogInfo, CMP_NAME, "SerialSendModeValues: %s", &packet);
 
-    while (eOK != queueForTransmit((const char *)&packet, sizeof(PacketModeValuesAscii)))
-    {
-        vTaskDelay(100/portTICK_PERIOD_MS);
-    }
+    queueForTransmit((const char *)&packet, sizeof(PacketModeValuesAscii));
 }
 
-void SendPacketRequestModeValues(Modes mode)
+//==============================================================================
+//  Status handling
+//==============================================================================
+static void serialReceiveStatusAscii(PacketStatusAscii const * const statusPacket)
 {
-    switch (mode)
-    {
-        case eModeNovice:
-            while (eOK !=  queueForTransmit(REQUEST_MODE_NOVICE, 3))
-            {
-                vTaskDelay(100/portTICK_PERIOD_MS);
-            }
-            break;
-        case eModeAdvanced:
-            while (eOK !=  queueForTransmit(REQUEST_MODE_ADVANCED, 3))
-            {
-                vTaskDelay(100/portTICK_PERIOD_MS);
-            }
-            break;
-        
-        case eModeExpert:
-            while (eOK !=  queueForTransmit(REQUEST_MODE_EXPERT, 3))
-            {
-                vTaskDelay(100/portTICK_PERIOD_MS);
-            }
-            break;
-        
-        case eModeMaster:
-            while (eOK  !=  queueForTransmit(REQUEST_MODE_MASTER, 3))
-            {
-                vTaskDelay(100/portTICK_PERIOD_MS);
-            }
-            break;
-        
-        default:
-            Log(eLogWarn, CMP_NAME, "SendPacketRequestModeValues: invalid mode 0x%02x", mode);
-            break;
-    }
-}
-
-void SendPacketRequestGlobalValues()
-{
-    while (eOK  !=  queueForTransmit(REQUEST_GLOBAL_VALUES, 3))
-    {
-        vTaskDelay(100/portTICK_PERIOD_MS);
-    }
-}
-
-void ParsePacketModeValuesAscii(PacketModeValuesAscii const * const modePacket)
-{
-    uint8_t mode = (uint8_t)modePacket->values.mode - 0x30;
-    ModeValues values;
-
-    if ((eModeNovice <= mode) && (mode <= eModeMaster))
-    {
-        values.mode = (Modes)mode;
-        values.speed = FiveByteBcdToUint32((const char *)&modePacket->values.speed[0]);
-        values.turn1 = TenByteBcdToUint32((const char *)&modePacket->values.turn1[0]);
-        values.turn2 = TenByteBcdToUint32((const char *)&modePacket->values.turn2[0]);
-        values.brakeTime = FiveByteBcdToUint32((const char *)&modePacket->values.brakeTime[0]);
-        values.acc = FiveByteBcdToUint32((const char *)&modePacket->values.acc[0]);
-        values.dec = FiveByteBcdToUint32((const char *)&modePacket->values.dec[0]);
-        Log(eLogDebug, CMP_NAME, "ParsePacketModeValuesAscii: Updated mode 0x%02x", mode);
-        PushModeValues(values);
-    }
-    else 
-    {
-        Log(eLogWarn, CMP_NAME, "ParsePacketModeValuesAscii: invalid mode: 0x%02x", mode);
-    }
-}
-
-void ParsePacketStatusAscii(PacketStatusAscii const * const statusPacket)
-{
-    //Log(eLogDebug, CMP_NAME, "ParseStatus");
+    Log(eLogDebug, CMP_NAME, "serialReceiveParseStatusAscii");
     CurrentStatus status;
 
     uint8_t mode = (uint8_t)statusPacket->status.mode - 0x30;
@@ -259,13 +273,16 @@ void ParsePacketStatusAscii(PacketStatusAscii const * const statusPacket)
     status.completedLaps = FiveByteBcdToUint32((const char *)&statusPacket->status.completedLaps[0]);
     status.position = TenByteBcdToUint32((const char *)&statusPacket->status.position[0]);
     status.systemStatus = statusPacket->status.systemStatus;
+    //DumpStatus(&status);
     PushStatus(status);
 }
 
-
-void ProcessPacket(const unsigned char * const buffer, size_t bufferSize)
+//==============================================================================
+//  Packet reception dispatcher
+//==============================================================================
+static void receivePacket(const unsigned char * const buffer, size_t bufferSize)
 {
-    Log(eLogDebug, CMP_NAME, "ProcessPacket: Processing: size: %d: %s", bufferSize, buffer);
+    Log(eLogDebug, CMP_NAME, "receivePacket: Processing: size: %d: %s", bufferSize, buffer);
     const PacketType packetType = (PacketType)buffer[1];
 
     const uint16_t receivedChecksum = ExtractChecksum(buffer, bufferSize);
@@ -273,29 +290,42 @@ void ProcessPacket(const unsigned char * const buffer, size_t bufferSize)
 
     if (receivedChecksum == calculatedChecksum)
     {
-        //Log(eLogInfo, CMP_NAME, "ProcessPacket: Good packet received, type: %02x", packetType);
+        //Log(eLogInfo, CMP_NAME, "receivePacket: Good packet received, type: %02x", packetType);
 
         switch (packetType)
         {
             case ePacketGlobalValues:
-                ParsePacketGlobalValueAscii((PacketGlobalValuesAscii const * const)buffer);
+                serialReceiveGlobalValueAscii((PacketGlobalValuesAscii const * const)buffer);
+                break;
             case ePacketModeValues:
-                ParsePacketModeValuesAscii((PacketModeValuesAscii const * const )buffer);
+                serialReceiveModeValuesAscii((PacketModeValuesAscii const * const )buffer);
+                break;
             case ePacketStatus:
-                ParsePacketStatusAscii((PacketStatusAscii const * const )buffer);
+                serialReceiveStatusAscii((PacketStatusAscii const * const )buffer);
                 break;
             case ePacketCount:
             default:
-                Log(eLogWarn, CMP_NAME, "ProcessPacket: Unexpected packet type: %02x", packetType);
+                Log(eLogWarn, CMP_NAME, "receivePacket: Unexpected packet type: %02x", packetType);
                 break;
         }
     }
     else
     {
-        Log(eLogWarn, CMP_NAME, "ProcessPacket: bad checksum: received: 0x%04x, calculated: 0x%04x", receivedChecksum, calculatedChecksum);
+        Log(eLogWarn, CMP_NAME, "receivePacket: bad checksum: received: 0x%04x, calculated: 0x%04x", receivedChecksum, calculatedChecksum);
     }
 }
 
+//==============================================================================
+//  Task interface
+//==============================================================================
+eStatus ControlSerialInit(void * param)
+{
+    Log(eLogInfo, CMP_NAME, "ControlSerialInit");
+
+    serial.begin(CONTROL_SERIAL_BAUD, CONTROL_SERIAL_FORMAT, CONTROL_SERIAL_RX_PIN, CONTROL_SERIAL_TX_PIN); 
+
+    return eOK;
+}
 eStatus ControlSerialReceive()
 {
     size_t expectedValueCount;
@@ -340,7 +370,7 @@ eStatus ControlSerialReceive()
             
             case eReceiveStatusTypeReceived:
                 // Packet type received, wait for all values to arrive
-                expectedValueCount = getValuesCount(receivedPacketType);
+                expectedValueCount = getValuesByteCount(receivedPacketType);
                 if (eOK == IsBcdOrMinus(tmp))
                 {
                     receiveBuffer[receiveIndex++] = tmp;
@@ -364,7 +394,7 @@ eStatus ControlSerialReceive()
 
             case eReceiveStatusValuesReceived:
                 // All values received, wait for checksum
-                expectedValueCount = getValuesCount(receivedPacketType);
+                expectedValueCount = getValuesByteCount(receivedPacketType);
                 if (eOK == IsHex(tmp))
                 {
                     receiveBuffer[receiveIndex++] = tmp;
@@ -392,7 +422,7 @@ eStatus ControlSerialReceive()
                 {
                     receiveBuffer[receiveIndex] = 0; // NULL - terminate the buffer
                     //Log(eLogInfo, CMP_NAME, "ControlSerialLoop: ProcessingPacket");
-                    ProcessPacket(&receiveBuffer[0], receiveIndex);
+                    receivePacket(&receiveBuffer[0], receiveIndex);
                     receiveStatus = eReceiveStatusIdle;
                 }
                 else
@@ -415,75 +445,7 @@ eStatus ControlSerialReceive()
     return eOK; // Always return OK to continue looping
 }
 
-static eStatus queueForTransmit(const char * const buffer, size_t size)
-{
-    eStatus retVal = eOK;
-    if ((sendStatus == eSendStatusIdle) ||
-        (sendStatus == eSendStatusComplete))
-    {
-        if (size <= SERIAL_BUFFER_SIZE)
-        {
-            memcpy(sendBuffer, buffer, size);
-            sendCount = size;
-            sendStatus = eSendStatusQueued;
-        }
-        else
-        {
-            retVal = eOVERFLOW;
-        }
-    }
-    else 
-    {
-        retVal = eBUSY;
-    }
-    return retVal;
-}
-
-static int toSend = 0;
-eStatus     ControlRefreshTask()
-{
-    switch (toSend)
-    {
-        case 0:
-            //if (eOK == queueForTransmit(REQUEST_GLOBAL_VALUES, 3))
-            {
-                toSend = 1;
-            }
-            break;
-        case 1:
-            //if (eOK == queueForTransmit(REQUEST_MODE_NOVICE, 3))
-            {
-                toSend = 2;
-            }
-            break;
-        case 2:
-            //if (eOK == queueForTransmit(REQUEST_MODE_EXPERT, 3))
-            {
-                toSend = 3;
-            }
-            break;
-        case 3:
-            //if (eOK == queueForTransmit(REQUEST_MODE_ADVANCED, 3))
-            {
-                toSend = 4;
-            }
-            break;
-        case 4:
-            //if (eOK == queueForTransmit(REQUEST_MODE_MASTER, 3))
-            {
-                toSend = 5;
-            }
-            break;
-        default:
-            toSend = 0;
-            break;
-    }
-
-    return eOK; // Always return OK to continue looping
-
-}
-
-eStatus     ControlSerialTransmit()
+eStatus ControlSerialTransmit()
 {
     if (eSendStatusQueued == sendStatus)
     {
