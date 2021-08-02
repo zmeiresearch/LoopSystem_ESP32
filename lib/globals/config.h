@@ -27,7 +27,7 @@
 #define     WIFI_AP_CHANNEL         9
 
 // Name the board will advertise once connected to a network
-#define     WIFI_DEVICE_NAME        "loopsystem-esp32"
+#define     WIFI_DEVICE_NAME        "loopcontrol"
 
 // Time in milliseconds to wait for WiFi to connect in client mode
 #define     WIFI_DEFAULT_CONNECT_TIME   30 * 1000       // on a single try
