@@ -1,32 +1,28 @@
-function updateConfig(data)
+function receiveConfig(data)
 {
     console.log("Updating config values");
     
     $('#wifiSsid').val(data["wifi"]["ssid"]);
     $('#wifiPassword').val(data["wifi"]["password"]);
     $('#buildId').text(data["system"]["buildId"]);
-    $('#buildTime').text(data["system"]["buildTime"]);        
+    $('#buildTime').text(data["system"]["buildTime"]);
+    $('#memory').text(data["system"]["memory"]);
 }
 
-async function set_config()
+async function uploadConfig()
 {
-    wifi = {
-        'ssid' : $('#wifiSsid').val(),
-        'password' : $('#wifiPassword').val(),
-    };
+    data = {
+        "wifi": {
+            'ssid' : $('#wifiSsid').val(),
+            'password' : $('#wifiPassword').val(),
+    }};
 
-    $.ajax("config", {
-        data : JSON.stringify({"wifi" : wifi}),
-        contentType : 'application/json',
-        type : 'POST'
-        }).always(function(done) {
-            setTimeout(get_config, 600);
-        });
+    sendConfig(data)
 }
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log("system.js: Registering status handler");
     if (!window.socketMessageHandlers) window.socketMessageHandlers = {};
-    window.socketMessageHandlers["Config"] = updateConfig;
+    window.socketMessageHandlers["Config"] = receiveConfig;
     requestConfig();
 }, false);

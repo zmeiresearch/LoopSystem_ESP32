@@ -24,6 +24,8 @@
           </div>
           <div>Build Time: <div id="buildTime" style="display: inline;">--</div>
           </div>
+          <div>Memory: <div id="memory" style="display: inline;">--</div>
+          </div>
         </fieldset>
         <fieldset>
           <legend>Wifi Configuration</legend>
@@ -31,7 +33,7 @@
           <input type="text" name="" id="wifiSsid">
           <label for='wifiPassword'>Password</label>
           <input type="password" name="" id="wifiPassword">
-          <input type='submit' onclick="set_config()" value='Set Wifi Configuration'>
+          <input type='submit' onclick="uploadConfig()" value='Set Wifi Configuration'>
         </fieldset>
         <fieldset>
           <legend>Firmware Update</legend>

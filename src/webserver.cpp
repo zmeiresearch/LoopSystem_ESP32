@@ -329,6 +329,7 @@ static eStatus pushConfig()
     json["data"]["wifi"]["password"] = String(ConfigWifiPassword());
     json["data"]["system"]["buildId"] = String(SystemGetBuildId());
     json["data"]["system"]["buildTime"] = String(SystemGetBuildTime());
+    json["data"]["system"]["memory"] = String("Free: ") + String(esp_get_free_heap_size()) + String(", Min Free: ") + String(esp_get_minimum_free_heap_size());
 
     return webscocketSendJsonAll(json);
 }

@@ -93,6 +93,10 @@ async function sendModeValues(data) {
     websocketSend(JSON.stringify({ action: "setModeValues", data}));
 }
 
+async function sendConfig(data) {
+    websocketSend(JSON.stringify({ action: "setConfig", data}));
+}
+
 document.addEventListener('DOMContentLoaded', connectSocket, false);
 
 /*

@@ -63,7 +63,7 @@ static void setupmDNS()
     {
         Log(eLogInfo, CMP_NAME, "SystemManagerTask: mDNS responder started");
         MDNS.addService("http", "tcp", 80);
-		MDNS.addServiceTxt("http", "tcp", "PATH", "/config");
+		//MDNS.addServiceTxt("http", "tcp", "PATH", "/config");
     }
 }
 
