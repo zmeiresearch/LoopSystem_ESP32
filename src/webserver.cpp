@@ -323,13 +323,18 @@ static eStatus receiveGlobalValues(const JsonObject &json)
 //==============================================================================
 static eStatus pushConfig()
 {
-    DynamicJsonDocument json(256);
+    String tmp;
+    DynamicJsonDocument json(512);
     json["type"] = String("Config");
     json["data"]["wifi"]["ssid"] = String(ConfigWifiSSID());
     json["data"]["wifi"]["password"] = String(ConfigWifiPassword());
     json["data"]["system"]["buildId"] = String(SystemGetBuildId());
     json["data"]["system"]["buildTime"] = String(SystemGetBuildTime());
-    json["data"]["system"]["memory"] = String("Free: ") + String(esp_get_free_heap_size()) + String(", Min Free: ") + String(esp_get_minimum_free_heap_size());
+
+    SystemGetMemoryInfo(tmp);
+    json["data"]["system"]["memoryStats"] = tmp;
+    SystemGetCpuUsage(tmp);
+    json["data"]["system"]["cpuStats"] = tmp;
 
     return webscocketSendJsonAll(json);
 }

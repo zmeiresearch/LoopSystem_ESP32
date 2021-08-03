@@ -17,8 +17,10 @@
 //==============================================================================
 //  Defines
 //==============================================================================
+#define SYSTEM_CPU_MONITOR_PERIOD (1000)
+
 #if !defined(BUILD_REV)
-#define BUILD_REV               "Unknown"
+#define BUILD_REV                 "Unknown"
 #endif  // BUILD_REV
 
 //==============================================================================
@@ -28,8 +30,11 @@
 #define SystemGetBuildTime()    (__TIME__ " ; " __DATE__ )
 
 #define SystemGetTimeMs()       (xTaskGetTickCount() * portTICK_PERIOD_MS)
+#define SystemGetTimeuS()       (esp_timer_get_time())
+// No need to round in the most common case of 1 tick/ms
 #define SystemSleepMs(x)        (vTaskDelay((x)/portTICK_PERIOD_MS))
 #define SystemElapsedTimeMs(x)  (SystemGetTimeMs() - (x))
+#define SystemElapsedTimeuS(x)  (SystemGetTimeuS() - (x))
 
 //==============================================================================
 //  Exported types
@@ -42,7 +47,10 @@
 //==============================================================================
 //  Exported functions
 //==============================================================================
+void    SystemStartCpuStats();
 void    SystemRestart();
+void    SystemGetMemoryInfo(String & memInfo);
+void    SystemGetCpuUsage(String & cpuInfo);
 
 #endif // INC_SYSTEM_H
 

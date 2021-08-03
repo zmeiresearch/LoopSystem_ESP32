@@ -19,6 +19,8 @@
 //==============================================================================
 #define ARRAY_SIZE(x)           (sizeof(x)/sizeof(x[0]))
 
+#define DIV_ROUND_CLOSEST(n, d) ((((n) < 0) ^ ((d) < 0)) ? (((n) - (d)/2)/(d)) : (((n) + (d)/2)/(d)))
+
 // GCC-ism below. Make it a proper function if compilation fails 
 #define WAIT_FOR(cond, timeout) ({                                          \
         uint32_t startTime = PortGetTime(); bool condState = (cond);        \

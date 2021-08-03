@@ -16,7 +16,6 @@
 #include "config.h"
 #include "logger.h"
 
-
 #include "webserver.h"
 #include "runtime_config.h"
 #include "system.h"
@@ -131,6 +130,8 @@ static eStatus startAP(const char * const ssid, const char * const password)
 eStatus SystemManagerInit(void * params)
 {
     Log(eLogInfo, CMP_NAME, "SystemManagerInit: Build ID:%s", SystemGetBuildId());
+
+    SystemStartCpuStats();
 
     ConfigInit();
 

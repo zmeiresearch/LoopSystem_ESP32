@@ -6,7 +6,8 @@ function receiveConfig(data)
     $('#wifiPassword').val(data["wifi"]["password"]);
     $('#buildId').text(data["system"]["buildId"]);
     $('#buildTime').text(data["system"]["buildTime"]);
-    $('#memory').text(data["system"]["memory"]);
+    $('#memoryStats').text(data["system"]["memoryStats"]);
+    $('#cpuStats').text(data["system"]["cpuStats"]);
 }
 
 async function uploadConfig()
