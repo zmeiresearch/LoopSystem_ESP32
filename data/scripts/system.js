@@ -7,7 +7,6 @@ function receiveConfig(data)
     $('#buildId').text(data["system"]["buildId"]);
     $('#buildTime').text(data["system"]["buildTime"]);
     $('#memoryStats').text(data["system"]["memoryStats"]);
-    $('#cpuStats').text(data["system"]["cpuStats"]);
 }
 
 async function uploadConfig()

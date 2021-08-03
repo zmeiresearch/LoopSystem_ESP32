@@ -47,10 +47,8 @@
 //==============================================================================
 //  Exported functions
 //==============================================================================
-void    SystemStartCpuStats();
 void    SystemRestart();
 void    SystemGetMemoryInfo(String & memInfo);
-void    SystemGetCpuUsage(String & cpuInfo);
 
 #endif // INC_SYSTEM_H
 

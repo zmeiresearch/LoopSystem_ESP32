@@ -131,8 +131,6 @@ eStatus SystemManagerInit(void * params)
 {
     Log(eLogInfo, CMP_NAME, "SystemManagerInit: Build ID:%s", SystemGetBuildId());
 
-    SystemStartCpuStats();
-
     ConfigInit();
 
     return eOK;

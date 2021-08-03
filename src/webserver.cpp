@@ -333,8 +333,6 @@ static eStatus pushConfig()
 
     SystemGetMemoryInfo(tmp);
     json["data"]["system"]["memoryStats"] = tmp;
-    SystemGetCpuUsage(tmp);
-    json["data"]["system"]["cpuStats"] = tmp;
 
     return webscocketSendJsonAll(json);
 }
