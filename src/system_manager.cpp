@@ -19,6 +19,7 @@
 #include "webserver.h"
 #include "runtime_config.h"
 #include "system.h"
+#include "wireguard_vpn.h"
 
 //==============================================================================
 //  Defines
@@ -66,6 +67,12 @@ static void setupmDNS()
     }
 }
 
+static void wifiDisconnected(WiFiEvent_t event, WiFiEventInfo_t info)
+{
+    Log(eLogWarn, CMP_NAME, "wifiDicsonnected, retrying!");
+    WiFi.begin(ConfigWifiSSID().c_str(), ConfigWifiPassword().c_str());
+}
+
 static eStatus connectWifi(const char * const ssid, const char * const password)
 {
     eStatus retVal = eFAIL;
@@ -73,10 +80,13 @@ static eStatus connectWifi(const char * const ssid, const char * const password)
     Log(eLogInfo, CMP_NAME, "connectWifi: Connecting to %s", ssid);
 
     WiFi.mode(WIFI_STA);
+    WiFi.onEvent(wifiDisconnected, SYSTEM_EVENT_STA_DISCONNECTED);
+
+    // IVA: TODO: handle static IP address!
+    //WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
     WiFi.setHostname(WIFI_DEVICE_NAME);
     WiFi.begin(ssid, password);
 
-    //uint32_t startTime = xTaskGetTickCount() * portTICK_PERIOD_MS;
     uint32_t startTime = xTaskGetTickCount();
     // Wait for connection
     while ( (WiFi.status() != WL_CONNECTED) &&
@@ -166,6 +176,7 @@ eStatus SystemManagerTask()
         {
             wifiConnected = true;
             WebserverInit();
+            wireguard_setup();
             setupmDNS();
         }
         else
