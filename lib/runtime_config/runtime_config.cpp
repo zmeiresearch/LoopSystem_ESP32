@@ -5,7 +5,7 @@
 //==============================================================================
 //  Includes
 //==============================================================================
-#include <Preferences.h>
+
 
 #include "config.h"
 
@@ -29,7 +29,6 @@
 //==============================================================================
 //  Local data
 //==============================================================================
-static Preferences preferences;
 
 //==============================================================================
 //  Local functions
@@ -39,17 +38,25 @@ static Preferences preferences;
 //  Exported functions
 //==============================================================================
 
-void         ConfigInit()
+//==============================================================================
+//  Exported data
+//==============================================================================
+class RuntimeConfig RuntimeConfigInst;
+
+void RuntimeConfig::Init()
 {
-    preferences.begin(CONFIG_NAMESPACE, false); 
+    // IVA: TODO: Handle updates!
+    prefs.begin(CONFIG_NAMESPACE, false); 
 }
 
-void         ConfigFinalize()
+void RuntimeConfig::Finalize()
 {
-    preferences.end();
+    prefs.end();
 }
 
-uint32_t     ConfigVersion()
+
+
+/*uint32_t     ConfigVersion()
 {
     return CONFIG_STRUCT_VERSION;
 }
@@ -70,14 +77,9 @@ String       ConfigWifiPassword()
     return preferences.getString("WifiPassword", WIFI_DEFAULT_PASSWORD);
 }
 
-void incrementUpdateCount()
-{
-    uint32_t updateCount = preferences.getUInt("UpdateCount", 0);
-    updateCount++;
-    preferences.putUInt("UpdateCount", updateCount);
-}
 
-bool        ConfigWriteWifiSSID(const String ssid)
+
+bool  ConfigWriteWifiSSID(const String ssid)
 {
     Log(eLogInfo, CMP_NAME, "ConfigWriteWifiSSID: %s", ssid.c_str());
     if (0 != preferences.putString("WifiSSID", ssid.c_str()))
@@ -99,4 +101,4 @@ bool        ConfigWriteWifiPassword(const String password)
     }
     Log(eLogError, CMP_NAME "ConfigWriteWifiPassword: error setting Password!");
     return false;
-}
+}*/
