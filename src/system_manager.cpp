@@ -70,7 +70,7 @@ static void setupmDNS()
 static void wifiDisconnected(WiFiEvent_t event, WiFiEventInfo_t info)
 {
     Log(eLogWarn, CMP_NAME, "wifiDicsonnected, retrying!");
-    WiFi.begin(ConfigWifiSSID().c_str(), ConfigWifiPassword().c_str());
+    WiFi.begin(Config.WifiSSID.Get().c_str(), Config.WifiPassword.Get().c_str());
 }
 
 static eStatus connectWifi(const char * const ssid, const char * const password)
@@ -141,7 +141,7 @@ eStatus SystemManagerInit(void * params)
 {
     Log(eLogInfo, CMP_NAME, "SystemManagerInit: Build ID:%s", SystemGetBuildId());
 
-    ConfigInit();
+    Config.Init();
 
     return eOK;
 }
@@ -165,18 +165,22 @@ eStatus SystemManagerTask()
 
     if (!wifiConnected && !wifiApStarted)
     {
-        Log(eLogInfo, CMP_NAME, "SystemManagerTask: Connecting to configured Wifi: %s", ConfigWifiSSID().c_str());
+        Log(eLogInfo, CMP_NAME, "SystemManagerTask: Connecting to configured Wifi: %s", Config.WifiSSID.Get().c_str());
 
         if ( 0 == wifiClientConnectStartTime)
         {
             wifiClientConnectStartTime = SystemGetTimeMs();
         }
 
-        if (eOK == connectWifi(ConfigWifiSSID().c_str(), ConfigWifiPassword().c_str()))
+        if (eOK == connectWifi(Config.WifiSSID.Get().c_str(), Config.WifiPassword.Get().c_str()))
         {
             wifiConnected = true;
             WebserverInit();
-            wireguard_setup();
+            if (Config.VpnEnabled.Get())
+            {
+                WireguardSetup();
+            }
+
             setupmDNS();
         }
         else

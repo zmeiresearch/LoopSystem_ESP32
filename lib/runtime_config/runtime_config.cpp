@@ -5,18 +5,20 @@
 //==============================================================================
 //  Includes
 //==============================================================================
-#include <Preferences.h>
+#include "StreamUtils.h"
 
 #include "config.h"
-
 #include "runtime_config.h"
-
 #include "logger.h"
 
 //==============================================================================
 //  Defines
 //==============================================================================
+#define CONFIG_UPDATE_COUNT_KEY "ConfigUpdateCount"
+#define CONFIG_VERSION_KEY      "ConfigStructVersion"
+
 #define CMP_NAME    "RuntimeConfig"
+
 
 //==============================================================================
 //  Local types
@@ -29,74 +31,54 @@
 //==============================================================================
 //  Local data
 //==============================================================================
-static Preferences preferences;
 
 //==============================================================================
 //  Local functions
 //==============================================================================
 
 //==============================================================================
+//  Exported data
+//==============================================================================
+
+class RuntimeConfig Config;
+
+//==============================================================================
 //  Exported functions
 //==============================================================================
 
-void         ConfigInit()
+void RuntimeConfig::Init()
 {
-    preferences.begin(CONFIG_NAMESPACE, false); 
-}
+    Log(eLogInfo, CMP_NAME, "RuntimeConfig::Init");
+    EEPROM.begin(512);
+    EepromStream eepromStream(0, CONFIG_JSON_SIZE);
+    deserializeJson(*_json, eepromStream);
 
-void         ConfigFinalize()
-{
-    preferences.end();
-}
+    uint32_t storedConfigVersion = (*_json)[CONFIG_VERSION_KEY].as<uint32_t>();
 
-uint32_t     ConfigVersion()
-{
-    return CONFIG_STRUCT_VERSION;
-}
-
-uint32_t     ConfigUpdateCount()
-{
-    return preferences.getUInt("UpdateCount", 0);
-}
-
-// Data starts here
-String       ConfigWifiSSID()
-{
-    return preferences.getString("WifiSSID", WIFI_DEFAULT_SSID);
-}
-
-String       ConfigWifiPassword()
-{
-    return preferences.getString("WifiPassword", WIFI_DEFAULT_PASSWORD);
-}
-
-void incrementUpdateCount()
-{
-    uint32_t updateCount = preferences.getUInt("UpdateCount", 0);
-    updateCount++;
-    preferences.putUInt("UpdateCount", updateCount);
-}
-
-bool        ConfigWriteWifiSSID(const String ssid)
-{
-    Log(eLogInfo, CMP_NAME, "ConfigWriteWifiSSID: %s", ssid.c_str());
-    if (0 != preferences.putString("WifiSSID", ssid.c_str()))
+    if ((uint32_t)CONFIG_STRUCT_VERSION != storedConfigVersion)
     {
-        incrementUpdateCount();
-        return true;
+        doUpgrade(storedConfigVersion, (uint32_t)CONFIG_STRUCT_VERSION);
     }
-    Log(eLogError, CMP_NAME "ConfigWriteWifiSSID: error setting SSID!");
-    return false;
 }
 
-bool        ConfigWriteWifiPassword(const String password)
+void RuntimeConfig::Finalize()
 {
-    Log(eLogInfo, CMP_NAME, "ConfigWriteWifiPassword: %s", password.c_str());
-    if (0 != preferences.putString("WifiPassword", password.c_str()))
-    {
-        incrementUpdateCount();
-        return true;
-    }
-    Log(eLogError, CMP_NAME "ConfigWriteWifiPassword: error setting Password!");
-    return false;
+    Log(eLogInfo, CMP_NAME, "RuntimeConfig::Finalize");
+}
+
+void RuntimeConfig::commit()
+{
+    Log(eLogInfo, CMP_NAME, "RuntimeConfig::commit");
+    (*_json)[CONFIG_UPDATE_COUNT_KEY] = (*_json)[CONFIG_UPDATE_COUNT_KEY].as<uint32_t>() + 1;
+    EepromStream eepromStream(0, CONFIG_JSON_SIZE);
+    serializeJson(*_json, eepromStream);
+    eepromStream.flush();
+}
+
+void RuntimeConfig::doUpgrade(uint32_t previousVersion, uint32_t currentVersion)
+{
+    Log(eLogInfo, CMP_NAME, "RuntimeConfig::doUpgrade: from %d to %d", previousVersion, currentVersion);
+
+    (*_json)CONFIG_VERSION_KEY] = currentVersion;
+    commit();
 }

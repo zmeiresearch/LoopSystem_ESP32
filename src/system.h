@@ -49,6 +49,7 @@
 //==============================================================================
 void    SystemRestart();
 void    SystemGetMemoryInfo(String & memInfo);
+void    SystemGetWifiStatus(String & wifiStatus);
 
 #endif // INC_SYSTEM_H
 

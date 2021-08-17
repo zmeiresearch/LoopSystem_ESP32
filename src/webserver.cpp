@@ -319,17 +319,30 @@ static eStatus receiveGlobalValues(const JsonObject &json)
 }
 
 //==============================================================================
-//  Get/Post device configuration
+//  Get system status
+//==============================================================================
+eStatus PushSystemStatus(const CurrentStatus & status)
+{
+    DynamicJsonDocument json(256);
+    json["type"] = String("SystemStatus");
+    json["data"]["wifi"]["ssid"] = Config.WifiSSID.Get();
+    json["data"]["wifi"]["status"] = "";
+    json["data"]["system"]["buildId"] = String(SystemGetBuildId());
+    json["data"]["system"]["buildTime"] = String(SystemGetBuildTime());
+
+    return webscocketSendJsonAll(json);
+}
+
+//==============================================================================
+//  Get/Post system configuration
 //==============================================================================
 static eStatus pushConfig()
 {
     String tmp;
     DynamicJsonDocument json(512);
     json["type"] = String("Config");
-    json["data"]["wifi"]["ssid"] = String(ConfigWifiSSID());
-    json["data"]["wifi"]["password"] = String(ConfigWifiPassword());
-    json["data"]["system"]["buildId"] = String(SystemGetBuildId());
-    json["data"]["system"]["buildTime"] = String(SystemGetBuildTime());
+    json["data"]["wifi"]["ssid"] = Config.WifiSSID.Get();
+    json["data"]["wifi"]["password"] = Config.WifiPassword.Get();
 
     SystemGetMemoryInfo(tmp);
     json["data"]["system"]["memoryStats"] = tmp;
@@ -346,8 +359,8 @@ static eStatus receiveConfig(const JsonObject &json)
     if ((ssid) && (password))
     {
         Log(eLogWarn, CMP_NAME, "postConfig: Setting wifi parameters: %s, %s", ssid, password);
-        ConfigWriteWifiSSID(json["wifi"]["ssid"].as<String>());
-        ConfigWriteWifiPassword(json["wifi"]["password"].as<String>());
+        Config.WifiSSID.Set(json["wifi"]["ssid"].as<String>());
+        Config.WifiPassword.Set(json["wifi"]["password"].as<String>());
 
         SystemRestart();
     }
@@ -510,7 +523,7 @@ eStatus WebserverCloseSockets()
     return eOK;
 }
 
-// Initialize update webserver
+// Initialize webserver
 eStatus WebserverInit()
 {
     Log(eLogInfo, CMP_NAME, "Webserver init called");
