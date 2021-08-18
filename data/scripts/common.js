@@ -77,6 +77,10 @@ async function requestConfig() {
     websocketSend(JSON.stringify({ action: "getConfig"}));
 }
 
+async function requestSystemStatus() {
+    websocketSend(JSON.stringify({ action: "getSystemStatus"}));
+}
+
 async function requestModeValues(mode) {
     websocketSend(JSON.stringify({ action: "getModeValues", data: { mode: mode}}));
 }

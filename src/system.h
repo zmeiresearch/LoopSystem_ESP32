@@ -27,7 +27,7 @@
 //  Function-like macros
 //==============================================================================
 #define SystemGetBuildId()      (BUILD_REV)
-#define SystemGetBuildTime()    (__TIME__ " ; " __DATE__ )
+#define SystemGetBuildTime()    (__TIME__ ", " __DATE__ )
 
 #define SystemGetTimeMs()       (xTaskGetTickCount() * portTICK_PERIOD_MS)
 #define SystemGetTimeuS()       (esp_timer_get_time())

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Loop32 configuration page</title>
+  <script src='scripts/jquery-3.6.0.min.js'></script>
+  <script src='scripts/common.js'></script>
+  <script src='scripts/config.js' defer></script>
+  <link rel="stylesheet" type="text/css" href="css/config.css" />
+</head>
+
+<body>
+  <div class="breakpoint active" id="bp_infinity" data-min-width="961">
+    <div id="page">
+
+    <div style='max-width: 99%'>
+      <div>
+        <fieldset>
+          <legend>Wifi Configuration</legend>
+          <p>
+            <label for='WifiSSID'>SSID</label>
+            <input type="text" name="" id="WifiSSID">
+            <label for='WifiPassword'>Password</label>
+            <input type="password" name="" id="WifiPassword">
+          </p>
+          <input type='submit' onclick="uploadWifiConfig()" value='Set Wifi Configuration'>
+        </fieldset>
+        <fieldset>
+          <legend>VPN Configuration</legend>
+
+          <div class="settings">
+            <label>Enabled</label>
+            <input type="checkbox" name="" id="VpnEnabled">
+
+            <p></p><span></span>
+
+            <label>VPN local address</label>
+            <input type="text" name="" id="VpnLocalAddress">
+            <label>Netmask</label>
+            <input type="text" name="" id="VpnLocalNetmask">
+            <label>Port</label>
+            <input type="number" name="" id="VpnClientPort">
+            <label>Gateway address</label>
+            <input type="text" name="" id="VpnGateway">
+            <label>Local private key</label>
+            <input type="text" name="" id="VpnClientPrivateKey">
+
+            <p></p><span></span>
+            <label>Server address</label>
+            <input type="text" name="" id="VpnPeerAddress">
+            <label>Port</label>
+            <input type="text" name="" id="VpnPeerPort">
+            <label>Server public key</label>
+            <input type="text" name="" id="VpnPeerPublicKey">
+            
+          </div>
+          <p>
+            <input type='submit' onclick="uploadVpnConfig()" value='Set VPN Configuration'>
+          </p>
+        </fieldset>
+      </div>
+    </div>
+    </div>
+    </div>
+
+</body>
+
+</html>

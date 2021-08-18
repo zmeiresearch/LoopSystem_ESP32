@@ -20,9 +20,8 @@
 //==============================================================================
 //  Defines
 //==============================================================================
-#define CONFIG_STRUCT_VERSION   1
 #define CONFIG_JSON_SIZE        2048
-#define CONFIG_UPDATE_COUNT_KEY "ConfigUpdateCount"
+
 
 //==============================================================================
 //  Exported types
@@ -51,11 +50,11 @@ class RuntimeConfigVariable
                 return _config.json()[_key].as<T>();
             }
         };
-        bool Set(T val) {
+        void Set(T val) {
             _config.json()[_key] = val;
             _config.commit();
-            return true;
         };
+        void SetDefault() { _config.json()[_key] = _default;};
 };
 
 #define DECLARE_CONFIG_VARIABLE(type, name)  RuntimeConfigVariable <type> name = RuntimeConfigVariable <type>(#name, CONFIG_DEFAULT_##name, *this)
@@ -63,26 +62,36 @@ class RuntimeConfigVariable
 class RuntimeConfig : RuntimeConfigBase
 {
     private:
-        //Preferences             _prefs;
-        DynamicJsonDocument*    _json;
+        DynamicJsonDocument    _json = DynamicJsonDocument(CONFIG_JSON_SIZE);
 
     private:
         void doUpgrade(uint32_t previousVersion, uint32_t currentVersion);
 
     public: // RuntimeConfigBase interface
-        JsonDocument& json() { return *_json; };
+        JsonDocument& json() { return _json; };
         void commit();
 
     public:
-        RuntimeConfig() {_json = new DynamicJsonDocument(CONFIG_JSON_SIZE); };
-        ~RuntimeConfig() { delete _json; };
+        RuntimeConfig(){};
         void Init();
         void Finalize();
+        void DumpConfig(DynamicJsonDocument const & doc);
+        void DumpConfig() { DumpConfig(_json);};
     
     public: // Configuration variables
-        DECLARE_CONFIG_VARIABLE(String, WifiSSID);
-        DECLARE_CONFIG_VARIABLE(String, WifiPassword);
-        DECLARE_CONFIG_VARIABLE(bool,   VpnEnabled);
+        DECLARE_CONFIG_VARIABLE(String,     WifiSSID);
+        DECLARE_CONFIG_VARIABLE(String,     WifiPassword);
+
+        DECLARE_CONFIG_VARIABLE(bool,       VpnEnabled);
+        DECLARE_CONFIG_VARIABLE(String,     VpnLocalAddress);
+        DECLARE_CONFIG_VARIABLE(String,     VpnLocalNetmask);
+        DECLARE_CONFIG_VARIABLE(String,     VpnGateway);
+        DECLARE_CONFIG_VARIABLE(uint16_t,   VpnClientPort);
+        DECLARE_CONFIG_VARIABLE(String,     VpnClientPrivateKey);
+        DECLARE_CONFIG_VARIABLE(uint16_t,   VpnPeerPort);
+        DECLARE_CONFIG_VARIABLE(String,     VpnPeerAddress);
+        DECLARE_CONFIG_VARIABLE(String,     VpnPeerPublicKey);
+#define CONFIG_STRUCT_VERSION   2   // Here so that it's easier to remember it on every bump!
 };
 
 

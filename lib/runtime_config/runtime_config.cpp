@@ -17,8 +17,7 @@
 #define CONFIG_UPDATE_COUNT_KEY "ConfigUpdateCount"
 #define CONFIG_VERSION_KEY      "ConfigStructVersion"
 
-#define CMP_NAME    "RuntimeConfig"
-
+#define CMP_NAME                "RuntimeConfig"
 
 //==============================================================================
 //  Local types
@@ -51,9 +50,9 @@ void RuntimeConfig::Init()
     Log(eLogInfo, CMP_NAME, "RuntimeConfig::Init");
     EEPROM.begin(512);
     EepromStream eepromStream(0, CONFIG_JSON_SIZE);
-    deserializeJson(*_json, eepromStream);
+    deserializeJson(_json, eepromStream);
 
-    uint32_t storedConfigVersion = (*_json)[CONFIG_VERSION_KEY].as<uint32_t>();
+    uint32_t storedConfigVersion = _json[CONFIG_VERSION_KEY].as<uint32_t>();
 
     if ((uint32_t)CONFIG_STRUCT_VERSION != storedConfigVersion)
     {
@@ -66,12 +65,19 @@ void RuntimeConfig::Finalize()
     Log(eLogInfo, CMP_NAME, "RuntimeConfig::Finalize");
 }
 
+void RuntimeConfig::DumpConfig(DynamicJsonDocument const & doc)
+{
+    String tmp;
+    serializeJson(doc, tmp);
+    Log(eLogInfo, CMP_NAME, "DumpConfig: %s", tmp.c_str());
+}
+
 void RuntimeConfig::commit()
 {
     Log(eLogInfo, CMP_NAME, "RuntimeConfig::commit");
-    (*_json)[CONFIG_UPDATE_COUNT_KEY] = (*_json)[CONFIG_UPDATE_COUNT_KEY].as<uint32_t>() + 1;
+    _json[CONFIG_UPDATE_COUNT_KEY] = _json[CONFIG_UPDATE_COUNT_KEY].as<uint32_t>() + 1;
     EepromStream eepromStream(0, CONFIG_JSON_SIZE);
-    serializeJson(*_json, eepromStream);
+    serializeJson(_json, eepromStream);
     eepromStream.flush();
 }
 
@@ -79,6 +85,32 @@ void RuntimeConfig::doUpgrade(uint32_t previousVersion, uint32_t currentVersion)
 {
     Log(eLogInfo, CMP_NAME, "RuntimeConfig::doUpgrade: from %d to %d", previousVersion, currentVersion);
 
-    (*_json)CONFIG_VERSION_KEY] = currentVersion;
+    for (uint32_t i = previousVersion; i<=currentVersion; i++)
+    {
+        switch (i)
+        {
+            case 1:
+                WifiSSID.SetDefault();
+                WifiPassword.SetDefault();
+                break;
+            case 2:
+                // Added VPN parameters
+                VpnEnabled.SetDefault();
+                VpnLocalAddress.SetDefault();
+                VpnLocalNetmask.SetDefault();
+                VpnGateway.SetDefault();
+                VpnClientPort.SetDefault();
+                VpnClientPrivateKey.SetDefault();
+                VpnPeerPort.SetDefault();
+                VpnPeerAddress.SetDefault();
+                VpnPeerPublicKey.SetDefault();
+                break;
+            default:
+                break;
+        }
+    }
+
+
+    _json[CONFIG_VERSION_KEY] = currentVersion;
     commit();
 }

@@ -163,17 +163,38 @@ static Modes modeFromString(String modeStr)
     return mode;
 }
 
-template<typename T>eStatus setVariableFromJson(const JsonObject &json, T * const variable, const char * const variableName)
+template<typename T>eStatus setVarFromJson(const JsonObject &json, const char * const key, T * const var )
 {
     eStatus retVal = eFAIL;
-     if (json.containsKey(variableName)) {
-        *variable = json[variableName].as<T>();
+     if (json.containsKey(key)) {
+        *var = json[key].as<T>();
         retVal = eOK;
     }
     else
     {
-        Log(eLogWarn, CMP_NAME, "setVariableFromJson: no %s", variableName);
+        Log(eLogWarn, CMP_NAME, "setVariableFromJson: no %s", key);
     }
+    return retVal;
+}
+
+template<typename T>eStatus setConfigVarFromJson(const JsonObject &json, const char * const key, RuntimeConfigVariable<T>& configVar)
+{
+    eStatus retVal = eFAIL;
+
+    if (json.containsKey(key))
+    {
+        if (configVar.Get() != json[key].as<T>())
+        {
+            Log(eLogInfo, CMP_NAME, "setConfigFromJson: setting %s", key);
+            configVar.Set(json[key].as<T>());
+            retVal = eOK;
+        }
+        else
+        {
+            retVal = eNOCHANGE;
+        }
+    }
+
     return retVal;
 }
 
@@ -234,12 +255,12 @@ static eStatus receiveModeValues(const JsonObject &json)
         if (eModeCount != mode)
         {
             values.mode = mode;
-            retVal = (eStatus)(retVal | setVariableFromJson(json, &values.speed, "speed"));
-            retVal = (eStatus)(retVal | setVariableFromJson(json, &values.turn1, "turn1"));
-            retVal = (eStatus)(retVal | setVariableFromJson(json, &values.turn2, "turn2"));
-            retVal = (eStatus)(retVal | setVariableFromJson(json, &values.brakeTime, "brakeTime"));
-            retVal = (eStatus)(retVal | setVariableFromJson(json, &values.acc, "acc"));
-            retVal = (eStatus)(retVal | setVariableFromJson(json, &values.dec, "dec"));
+            retVal = (eStatus)(retVal | setVarFromJson(json, "speed",       &values.speed ));
+            retVal = (eStatus)(retVal | setVarFromJson(json, "turn1",       &values.turn1));
+            retVal = (eStatus)(retVal | setVarFromJson(json, "turn2",       &values.turn2));
+            retVal = (eStatus)(retVal | setVarFromJson(json, "brakeTime",   &values.brakeTime));
+            retVal = (eStatus)(retVal | setVarFromJson(json, "acc",         &values.acc));
+            retVal = (eStatus)(retVal | setVarFromJson(json, "dec",         &values.dec));
 
             if (eOK == retVal) 
             {
@@ -301,17 +322,17 @@ static eStatus receiveGlobalValues(const JsonObject &json)
     eStatus retVal = eOK;
     Log(eLogInfo, CMP_NAME, "receiveGlobalValues");
     GlobalValues values;
-    retVal = (eStatus)(retVal | setVariableFromJson(json, &values.home, "home"));
-    retVal = (eStatus)(retVal | setVariableFromJson(json, &values.maxEnd, "maxEnd"));
-    retVal = (eStatus)(retVal | setVariableFromJson(json, &values.maxTurn1, "maxTurn1"));
-    retVal = (eStatus)(retVal | setVariableFromJson(json, &values.minTurn2, "minTurn2"));
-    retVal = (eStatus)(retVal | setVariableFromJson(json, &values.maxAcc, "maxAcc"));
-    retVal = (eStatus)(retVal | setVariableFromJson(json, &values.maxDec, "maxDec"));
-    retVal = (eStatus)(retVal | setVariableFromJson(json, &values.maxSpeed, "maxSpeed"));
-    retVal = (eStatus)(retVal | setVariableFromJson(json, &values.homingSpeed, "homingSpeed"));
-    retVal = (eStatus)(retVal | setVariableFromJson(json, &values.maxTime, "maxTime"));
-    retVal = (eStatus)(retVal | setVariableFromJson(json, &values.maxLaps, "maxLaps"));
-    retVal = (eStatus)(retVal | setVariableFromJson(json, &values.servSpeed, "servSpeed"));
+    retVal = (eStatus)(retVal | setVarFromJson(json, "home",        &values.home));
+    retVal = (eStatus)(retVal | setVarFromJson(json, "maxEnd",      &values.maxEnd));
+    retVal = (eStatus)(retVal | setVarFromJson(json, "maxTurn1",    &values.maxTurn1));
+    retVal = (eStatus)(retVal | setVarFromJson(json, "minTurn2",    &values.minTurn2 ));
+    retVal = (eStatus)(retVal | setVarFromJson(json, "maxAcc",      &values.maxAcc));
+    retVal = (eStatus)(retVal | setVarFromJson(json, "maxDec",      &values.maxDec));
+    retVal = (eStatus)(retVal | setVarFromJson(json, "maxSpeed",    &values.maxSpeed));
+    retVal = (eStatus)(retVal | setVarFromJson(json, "homingSpeed", &values.homingSpeed));
+    retVal = (eStatus)(retVal | setVarFromJson(json, "maxTime",     &values.maxTime));
+    retVal = (eStatus)(retVal | setVarFromJson(json, "maxLaps",     &values.maxLaps));
+    retVal = (eStatus)(retVal | setVarFromJson(json, "servSpeed",   &values.servSpeed));
 
     SerialSendGlobalValues(&values);
 
@@ -321,14 +342,20 @@ static eStatus receiveGlobalValues(const JsonObject &json)
 //==============================================================================
 //  Get system status
 //==============================================================================
-eStatus PushSystemStatus(const CurrentStatus & status)
+eStatus pushSystemStatus()
 {
-    DynamicJsonDocument json(256);
+    String tmp;
+    DynamicJsonDocument json(512);
+    
     json["type"] = String("SystemStatus");
     json["data"]["wifi"]["ssid"] = Config.WifiSSID.Get();
-    json["data"]["wifi"]["status"] = "";
+    SystemGetWifiStatus(tmp);
+    json["data"]["wifi"]["status"] = tmp;
     json["data"]["system"]["buildId"] = String(SystemGetBuildId());
     json["data"]["system"]["buildTime"] = String(SystemGetBuildTime());
+    
+    SystemGetMemoryInfo(tmp);
+    json["data"]["system"]["memoryStats"] = tmp;
 
     return webscocketSendJsonAll(json);
 }
@@ -338,14 +365,9 @@ eStatus PushSystemStatus(const CurrentStatus & status)
 //==============================================================================
 static eStatus pushConfig()
 {
-    String tmp;
-    DynamicJsonDocument json(512);
+    DynamicJsonDocument json(1024);
     json["type"] = String("Config");
-    json["data"]["wifi"]["ssid"] = Config.WifiSSID.Get();
-    json["data"]["wifi"]["password"] = Config.WifiPassword.Get();
-
-    SystemGetMemoryInfo(tmp);
-    json["data"]["system"]["memoryStats"] = tmp;
+    json["data"] = Config.json().as<JsonObject>();
 
     return webscocketSendJsonAll(json);
 }
@@ -353,20 +375,30 @@ static eStatus pushConfig()
 static eStatus receiveConfig(const JsonObject &json)
 {
     eStatus retVal = eFAIL;
+    bool systemRestart = false;
+    bool vpnRestart = false;
 
-    const char* ssid = json["wifi"]["ssid"];
-    const char* password = json["wifi"]["password"];
-    if ((ssid) && (password))
+    if (eOK == setConfigVarFromJson(json, "WifiSSID",           Config.WifiSSID)) systemRestart = true;
+    if (eOK == setConfigVarFromJson(json, "WifiPassword",       Config.WifiPassword)) systemRestart = true;
+
+    if (eOK == setConfigVarFromJson(json, "VpnEnabled",         Config.VpnEnabled)) vpnRestart = true;
+    if (eOK == setConfigVarFromJson(json, "VpnLocalAddress",    Config.VpnLocalAddress)) vpnRestart = true;
+    if (eOK == setConfigVarFromJson(json, "VpnLocalNetmask",    Config.VpnLocalNetmask)) vpnRestart = true;
+    if (eOK == setConfigVarFromJson(json, "VpnGateway",         Config.VpnGateway)) vpnRestart = true;
+    if (eOK == setConfigVarFromJson(json, "VpnClientPort",      Config.VpnClientPort)) vpnRestart = true;
+    if (eOK == setConfigVarFromJson(json, "VpnClientPrivateKey",Config.VpnClientPrivateKey)) vpnRestart = true;
+    if (eOK == setConfigVarFromJson(json, "VpnPeerPort",        Config.VpnPeerPort)) vpnRestart = true;
+    if (eOK == setConfigVarFromJson(json, "VpnPeerAddress",     Config.VpnPeerAddress)) vpnRestart = true;
+    if (eOK == setConfigVarFromJson(json, "VpnPeerPublicKey",   Config.VpnPeerPublicKey)) vpnRestart = true;
+    
+    if (systemRestart)
     {
-        Log(eLogWarn, CMP_NAME, "postConfig: Setting wifi parameters: %s, %s", ssid, password);
-        Config.WifiSSID.Set(json["wifi"]["ssid"].as<String>());
-        Config.WifiPassword.Set(json["wifi"]["password"].as<String>());
-
         SystemRestart();
     }
-    else
+
+    if (vpnRestart)
     {
-        Log(eLogWarn, CMP_NAME, "postConfig: incomplete wifi configuration!");
+        //VpnRestart();
     }
 
     return retVal;
@@ -404,7 +436,7 @@ static eStatus webscocketSendJsonAll(const JsonDocument & json)
         }
         else
         {
-            Log(eLogWarn, CMP_NAME, "getConfig: Error serializing, ended up with: %s", buffer->get());
+            Log(eLogWarn, CMP_NAME, "webscocketSendJsonAll: Error serializing, ended up with: %s", buffer->get());
         }        
     }
     return retVal;
@@ -441,6 +473,10 @@ static eStatus  websocketHandleMessage(AsyncWebSocketClient * client, void *arg,
                 if (0 == strcmp(action, "getConfig"))
                 {
                     retVal = pushConfig();
+                }
+                else if (0 == strcmp(action, "getSystemStatus"))
+                {
+                    retVal = pushSystemStatus();
                 }
                 else if ( 0 == strcmp(action, "setConfig"))
                 {
