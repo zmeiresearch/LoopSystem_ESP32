@@ -44,6 +44,7 @@ class RuntimeConfigVariable
     public:
         RuntimeConfigVariable(const char * key, T defaultVal, RuntimeConfigBase& config): 
             _default(defaultVal), _config(config), _key(key) {};
+        T operator()() { return Get(); };
         T Get() { 
             if (_config.json()[_key].isNull()) {
                 return _default;
