@@ -20,6 +20,7 @@
 #include "control_serial.h"
 #include "system.h"
 #include "wifi_manager.h"
+#include "vpn_manager.h"
 
 #include "runtime_config.h"
 
@@ -377,10 +378,10 @@ static eStatus pushConfig()
 
 static eStatus receiveConfig(const JsonObject &json)
 {
-    eStatus retVal = eFAIL;
+    eStatus retVal = eOK;
     bool systemRestart = false;
     bool vpnRestart = false;
-
+    
     if (eOK == setConfigVarFromJson(json, "WifiSSID",           Config.WifiSSID)) systemRestart = true;
     if (eOK == setConfigVarFromJson(json, "WifiPassword",       Config.WifiPassword)) systemRestart = true;
 
@@ -401,7 +402,7 @@ static eStatus receiveConfig(const JsonObject &json)
 
     if (vpnRestart)
     {
-        //VpnRestart();
+        VpnRestart();
     }
 
     return retVal;

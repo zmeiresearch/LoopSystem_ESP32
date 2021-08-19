@@ -1,35 +1,23 @@
 //==============================================================================
-// Wireguard VPN Client demo for LwIP/ESP32
+// Wireguard VPN Client for LwIP/ESP32
 //==============================================================================
-#ifdef __cplusplus
-extern "C" {
-#endif // __cplusplus
+
 
 //==============================================================================
 //  Multi-include guard
 //==============================================================================
-#ifndef INC_WIREGUARD_VPN_H
-#define INC_WIREGUARD_VPN_H
+#ifndef INC_VPN_MANAGER_H
+#define INC_VPN_MANAGER_H
 
 //==============================================================================
 //  Includes
 //==============================================================================
+#include "globals.h"
 #include "config_local.h"
 
 //==============================================================================
 //  Defines
 //==============================================================================
-
-//#define WG_LOCAL_ADDRESS        IPADDR4_INIT_BYTES(10, 0, 2, 2)
-//#define WG_LOCAL_NETMASK        IPADDR4_INIT_BYTES(255, 255, 255, 0)
-//#define WG_GATEWAY_ADDRESS      IPADDR4_INIT_BYTES(10, 0, 2, 1)
-
-//#define WG_CLIENT_PRIVATE_KEY   "XXX"
-//#define WG_CLIENT_PORT          51820
-
-//#define WG_PEER_PUBLIC_KEY      "YYY"
-//#define WG_PEER_PORT            55820
-//#define WG_PEER_ADDRESS         IPADDR4_INIT_BYTES(192, 168, 0, 5)
 
 //==============================================================================
 //  Exported types
@@ -43,13 +31,11 @@ extern "C" {
 //  Exported functions
 //==============================================================================
 
-void wireguard_setup();
+eStatus VpnManagerInit(void * params);
+eStatus VpnManagerTask();
+eStatus VpnRestart();
 
-#ifdef __cplusplus
-}
-#endif // __cplusplus
-
-#endif // INC_WIREGUARD_VPN_H
+#endif // INC_VPN_MANAGER_H
 
 
 

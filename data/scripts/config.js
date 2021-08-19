@@ -5,7 +5,7 @@ function receiveConfig(data)
     $('#WifiSSID').val(data["WifiSSID"]);
     $('#WifiPassword').val(data["WifiPassword"]);
     
-    $('#VpnEnabled').val(data["VpnEnabled"]);
+    $('#VpnEnabled').prop('checked', data["VpnEnabled"]);
     $('#VpnLocalAddress').val(data["VpnLocalAddress"]);
     $('#VpnLocalNetmask').val(data["VpnLocalNetmask"]);
     $('#VpnClientPort').val(data["VpnClientPort"]);
@@ -29,7 +29,7 @@ async function uploadWifiConfig()
 async function uploadVpnConfig()
 {
     data = {
-        'VpnEnabled'            : $('#VpnEnabled').val(),
+        'VpnEnabled'            : $('#VpnEnabled').prop('checked'),
         'VpnLocalAddress'       : $('#VpnLocalAddress').val(),
         'VpnLocalNetmask'       : $('#VpnLocalNetmask').val(),
         'VpnClientPort'         : $('#VpnClientPort').val(),

@@ -20,6 +20,7 @@
 #include <control_protocol.h>
 #include <control_serial.h>
 #include "system_manager.h"
+#include "vpn_manager.h"
 
 
 //==============================================================================
@@ -32,10 +33,6 @@
 #else
 #define ARDUINO_RUNNING_CORE    1
 #endif
-
-#define   INIT_DO_HIGH(x)       { pinMode((x), OUTPUT); digitalWrite((x), HIGH); }
-#define   INIT_DO_LOW(x)        { pinMode((x), OUTPUT); digitalWrite((x), LOW); }
-
 
 //==============================================================================
 //  Local types
@@ -51,13 +48,15 @@ static eStatus  keepaliveLoop();
 //  Local data
 //==============================================================================
 const Module modules[] = {
-    { "Logger",         LogInit,            LogLoop,                LOG_TASK_PERIOD,    NULL,   4096,   2 },
-    { "SystemManager",  SystemManagerInit,  SystemManagerTask,      100,                NULL,   8192,   1 },
-    { "Keepalive",      NULL,               keepaliveLoop,          10000,              NULL,   4096,   0 },
-    { "SerialReceive",  ControlSerialInit,  ControlSerialReceive,   5,                  NULL,   4096,   2 },
-    { "SerialTransmit", ControlSerialInit,  ControlSerialTransmit,  5,                  NULL,   4096,   2 },
+    { "Logger",         LogInit,                LogLoop,                LOG_TASK_PERIOD,    NULL,   4096,   2 },
+    { "SystemManager",  SystemManagerInit,      SystemManagerTask,      100,                NULL,   8192,   1 },
+    { "Keepalive",      NULL,                   keepaliveLoop,          10000,              NULL,   4096,   0 },
+    { "SerialReceive",  ControlSerialInit,      ControlSerialReceive,   5,                  NULL,   4096,   2 },
+    { "SerialTransmit", ControlSerialInit,      ControlSerialTransmit,  5,                  NULL,   4096,   2 },
     // WebserverInit is called from system_manager instead
-    { "Webserver",      NULL,               WebserverTask,          1000,               NULL,   4096,   1 }
+    { "Webserver",      NULL,                   WebserverTask,          1000,               NULL,   4096,   1 },
+    // VpnManagerInit called from system_manager instead
+    { "VpnManager",     NULL,                   VpnManagerTask,         5000,               NULL,   4096,   1 }
 };
 
 //==============================================================================

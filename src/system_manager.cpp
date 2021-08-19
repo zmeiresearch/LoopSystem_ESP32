@@ -16,11 +16,10 @@
 #include "config.h"
 #include "logger.h"
 
-#include "webserver.h"
 #include "wifi_manager.h"
 #include "runtime_config.h"
 #include "system.h"
-#include "wireguard_vpn.h"
+#include "vpn_manager.h"
 
 //==============================================================================
 //  Defines
@@ -69,6 +68,7 @@ eStatus SystemManagerInit(void * params)
     Log(eLogInfo, CMP_NAME, "SystemManagerInit: Build ID:%s", SystemGetBuildId());
 
     Config.Init();
+    VpnManagerInit(NULL);
 
     return eOK;
 }
