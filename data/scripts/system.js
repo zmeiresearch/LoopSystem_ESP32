@@ -4,6 +4,9 @@ function receiveSystemStatus(data)
     
     $('#wifiSsid').text(data["wifi"]["ssid"]);
     $('#wifiStatus').text(data["wifi"]["status"]);
+    $('#wifiAddress').text(data["wifi"]["address"]);
+    $('#wifiRssi').text(data["wifi"]["rssi"]);
+
     $('#buildId').text(data["system"]["buildId"]);
     $('#buildTime').text(data["system"]["buildTime"]);
     $('#memoryStats').text(data["system"]["memoryStats"]);

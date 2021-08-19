@@ -21,13 +21,17 @@
         <fieldset>
           <legend>System Status</legend>
           <div>Memory: <div id="memoryStats" style="display: inline;">--</div></div>
-          <div>
-            Wifi SSID: <div id="wifiSsid" style="display: inline;">--</div>;
-            WifiStatus: <div id="wifiStatus" style="display: inline;">--</div>
-          </div>
           <div>Build ID: <div id="buildId" style="display: inline;">--</div></div>
           <div>Build Time: <div id="buildTime" style="display: inline;">--</div></div>
         </fieldset>
+        
+        <fieldset>
+          <legend>Wifi Status</legend>
+          <div>Status: <div id="wifiStatus" style="display: inline;">--</div></div>
+          <div>SSID: <div id="wifiSsid" style="display: inline;">--</div>:<div id="wifiRssi" style="display: inline;">--</div></div>
+          <div>Address: <div id="wifiAddress" style="display: inline;">--</div></div>
+        </fieldset>
+        
         <fieldset>
           <legend>Firmware Update</legend>
           <form method='POST' action='#' enctype='multipart/form-data' id='updateFirmware'>

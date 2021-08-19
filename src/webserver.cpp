@@ -19,6 +19,7 @@
 #include "values.h"
 #include "control_serial.h"
 #include "system.h"
+#include "wifi_manager.h"
 
 #include "runtime_config.h"
 
@@ -348,9 +349,11 @@ eStatus pushSystemStatus()
     DynamicJsonDocument json(512);
     
     json["type"] = String("SystemStatus");
-    json["data"]["wifi"]["ssid"] = Config.WifiSSID.Get();
-    SystemGetWifiStatus(tmp);
-    json["data"]["wifi"]["status"] = tmp;
+    json["data"]["wifi"]["ssid"] = WifiSsid();
+    json["data"]["wifi"]["status"] = WifiConnectionStatus();
+    json["data"]["wifi"]["address"] = WifiAddress();
+    json["data"]["wifi"]["rssi"] = WifiRssi();
+
     json["data"]["system"]["buildId"] = String(SystemGetBuildId());
     json["data"]["system"]["buildTime"] = String(SystemGetBuildTime());
     
